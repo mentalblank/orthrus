@@ -1,10 +1,16 @@
 import { darkenColor } from "@renderer/helpers";
 import {
   useAppSelector,
-  useToast,
   useCollectionSettings,
+  useUserDetails,
 } from "@renderer/hooks";
-import type { Badge, UserProfile, UserStats, UserGame } from "@types";
+import type {
+  Badge,
+  LibraryGame,
+  UserGame,
+  UserProfile,
+  UserStats,
+} from "@types";
 import { average } from "color.js";
 
 import {
@@ -15,7 +21,6 @@ import {
   useMemo,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 
 export interface UserProfileContext {
   userProfile: UserProfile | null;
@@ -36,6 +41,8 @@ export interface UserProfileContext {
 }
 
 export const DEFAULT_USER_PROFILE_BACKGROUND = "#151515B3";
+
+const LIBRARY_PAGE_SIZE = 12;
 
 export const userProfileContext = createContext<UserProfileContext>({
   userProfile: null,
@@ -62,18 +69,47 @@ export interface UserProfileContextProviderProps {
   userId: string;
 }
 
+/* Local-only: maps a locally stored library game into the profile shape. */
+const toUserGame = (game: LibraryGame): UserGame => ({
+  objectId: game.objectId,
+  shop: game.shop,
+  title: game.title,
+  iconUrl: game.iconUrl ?? null,
+  libraryHeroImageUrl: game.libraryHeroImageUrl ?? null,
+  libraryImageUrl: game.libraryImageUrl ?? null,
+  logoImageUrl: game.logoImageUrl ?? null,
+  logoPosition: game.logoPosition ?? null,
+  coverImageUrl: game.coverImageUrl ?? null,
+  downloadSources: game.downloadSources ?? [],
+  playTimeInSeconds: Math.floor((game.playTimeInMilliseconds ?? 0) / 1000),
+  lastTimePlayed: game.lastTimePlayed ?? null,
+  unlockedAchievementCount: game.unlockedAchievementCount ?? 0,
+  achievementCount: game.achievementCount ?? 0,
+  achievementsPointsEarnedSum: 0,
+  hasManuallyUpdatedPlaytime: false,
+  isFavorite: game.favorite ?? false,
+  isPinned: game.isPinned ?? false,
+  pinnedDate: game.pinnedDate ?? null,
+});
+
+const sortByLastPlayed = (games: UserGame[]): UserGame[] =>
+  [...games].sort((a, b) => {
+    const aTime = a.lastTimePlayed ? new Date(a.lastTimePlayed).getTime() : 0;
+    const bTime = b.lastTimePlayed ? new Date(b.lastTimePlayed).getTime() : 0;
+    return bTime - aTime;
+  });
+
 export function UserProfileContextProvider({
   children,
-  userId,
 }: Readonly<UserProfileContextProviderProps>) {
-  const { userDetails } = useAppSelector((state) => state.userDetails);
+  const { userDetails } = useUserDetails();
 
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [userStats] = useState<UserStats | null>(null);
 
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [allGames, setAllGames] = useState<UserGame[]>([]);
   const [libraryGames, setLibraryGames] = useState<UserGame[]>([]);
   const [pinnedGames, setPinnedGames] = useState<UserGame[]>([]);
-  const [badges, setBadges] = useState<Badge[]>([]);
+  const [badges] = useState<Badge[]>([]);
   const [heroBackground, setHeroBackground] = useState(
     DEFAULT_USER_PROFILE_BACKGROUND
   );
@@ -82,7 +118,8 @@ export function UserProfileContextProvider({
   const [hasMoreLibraryGames, setHasMoreLibraryGames] = useState(true);
   const [isLoadingLibraryGames, setIsLoadingLibraryGames] = useState(false);
 
-  const isMe = userDetails?.id === userProfile?.id;
+  /* Local-only: the profile always belongs to the local user. */
+  const isMe = true;
 
   const library = useAppSelector((state) => state.library.value);
   const { isGameHiddenInLibrary } = useCollectionSettings();
@@ -113,15 +150,34 @@ export function UserProfileContextProvider({
     );
   }, [pinnedGames, isGameHidden]);
 
-  const visibleUserProfile = useMemo(() => {
-    if (!userProfile) return null;
+  const userProfile = useMemo<UserProfile | null>(() => {
+    if (!userDetails) return null;
+
+    const recentGames = sortByLastPlayed(
+      allGames.filter((game) => !isGameHidden(game.shop, game.objectId))
+    ).slice(0, 12);
+
     return {
-      ...userProfile,
-      recentGames: userProfile.recentGames.filter(
-        (game) => !isGameHidden(game.shop, game.objectId)
-      ),
+      id: userDetails.id,
+      displayName: userDetails.displayName,
+      profileImageUrl: userDetails.profileImageUrl,
+      email: userDetails.email,
+      backgroundImageUrl: userDetails.backgroundImageUrl,
+      profileVisibility: userDetails.profileVisibility,
+      libraryGames: [],
+      recentGames,
+      friends: [],
+      totalFriends: 0,
+      relation: null,
+      currentGame: null,
+      bio: userDetails.bio,
+      hasActiveSubscription: false,
+      karma: userDetails.karma,
+      quirks: userDetails.quirks ?? { backupsPerGameLimit: 0 },
+      badges: [],
+      hasCompletedWrapped2025: false,
     };
-  }, [userProfile, isGameHidden]);
+  }, [userDetails, allGames, isGameHidden]);
 
   const getHeroBackgroundFromImageUrl = async (imageUrl: string) => {
     const output = await average(imageUrl, { amount: 1, format: "hex" });
@@ -137,55 +193,35 @@ export function UserProfileContextProvider({
     return "";
   };
 
-  const { t, i18n } = useTranslation("user_profile");
+  const { i18n } = useTranslation("user_profile");
 
-  const { showErrorToast } = useToast();
-  const navigate = useNavigate();
-
-  const getUserStats = useCallback(async () => {
-    window.electron.hydraApi
-      .get<UserStats>(`/users/${userId}/stats`)
-      .then((stats) => {
-        setUserStats(stats);
-      });
-  }, [userId]);
+  const loadLocalGames = useCallback(async (): Promise<UserGame[]> => {
+    const games = await window.electron.getLibrary();
+    return games.map(toUserGame);
+  }, []);
 
   const getUserLibraryGames = useCallback(
     async (sortBy?: string, reset = true) => {
       if (reset) {
         setLibraryPage(0);
-        setHasMoreLibraryGames(true);
         setIsLoadingLibraryGames(true);
       }
 
       try {
-        const params = new URLSearchParams();
-        params.append("take", "12");
-        params.append("skip", "0");
-        if (sortBy) {
-          params.append("sortBy", sortBy);
-        }
+        const games = await loadLocalGames();
+        const sorted =
+          sortBy === "playTime"
+            ? [...games].sort(
+                (a, b) => b.playTimeInSeconds - a.playTimeInSeconds
+              )
+            : sortByLastPlayed(games);
 
-        const queryString = params.toString();
-        const url = queryString
-          ? `/users/${userId}/library?${queryString}`
-          : `/users/${userId}/library`;
-
-        const response = await window.electron.hydraApi.get<{
-          library: UserGame[];
-          pinnedGames: UserGame[];
-        }>(url);
-
-        if (response) {
-          setLibraryGames(response.library);
-          setPinnedGames(response.pinnedGames);
-          setHasMoreLibraryGames(response.library.length === 12);
-        } else {
-          setLibraryGames([]);
-          setPinnedGames([]);
-          setHasMoreLibraryGames(false);
-        }
-      } catch (error) {
+        setAllGames(sorted);
+        setLibraryGames(sorted.slice(0, LIBRARY_PAGE_SIZE));
+        setPinnedGames(sorted.filter((game) => game.isPinned));
+        setHasMoreLibraryGames(sorted.length > LIBRARY_PAGE_SIZE);
+      } catch {
+        setAllGames([]);
         setLibraryGames([]);
         setPinnedGames([]);
         setHasMoreLibraryGames(false);
@@ -193,108 +229,57 @@ export function UserProfileContextProvider({
         setIsLoadingLibraryGames(false);
       }
     },
-    [userId]
+    [loadLocalGames]
   );
 
   const loadMoreLibraryGames = useCallback(
-    async (sortBy?: string): Promise<boolean> => {
+    async (_sortBy?: string): Promise<boolean> => {
       if (isLoadingLibraryGames || !hasMoreLibraryGames) {
         return false;
       }
 
-      setIsLoadingLibraryGames(true);
-      try {
-        const nextPage = libraryPage + 1;
-        const params = new URLSearchParams();
-        params.append("take", "12");
-        params.append("skip", String(nextPage * 12));
-        if (sortBy) {
-          params.append("sortBy", sortBy);
-        }
+      const nextPage = libraryPage + 1;
+      const nextGames = allGames.slice(0, (nextPage + 1) * LIBRARY_PAGE_SIZE);
 
-        const queryString = params.toString();
-        const url = queryString
-          ? `/users/${userId}/library?${queryString}`
-          : `/users/${userId}/library`;
-
-        const response = await window.electron.hydraApi.get<{
-          library: UserGame[];
-          pinnedGames: UserGame[];
-        }>(url);
-
-        if (response && response.library.length > 0) {
-          setLibraryGames((prev) => {
-            const existingIds = new Set(prev.map((game) => game.objectId));
-            const newGames = response.library.filter(
-              (game) => !existingIds.has(game.objectId)
-            );
-            return [...prev, ...newGames];
-          });
-          setLibraryPage(nextPage);
-          setHasMoreLibraryGames(response.library.length === 12);
-          return true;
-        } else {
-          setHasMoreLibraryGames(false);
-          return false;
-        }
-      } catch (error) {
-        setHasMoreLibraryGames(false);
-        return false;
-      } finally {
-        setIsLoadingLibraryGames(false);
-      }
+      setLibraryGames(nextGames);
+      setLibraryPage(nextPage);
+      setHasMoreLibraryGames(nextGames.length < allGames.length);
+      return nextGames.length > libraryGames.length;
     },
-    [userId, libraryPage, hasMoreLibraryGames, isLoadingLibraryGames]
+    [
+      allGames,
+      libraryGames,
+      libraryPage,
+      hasMoreLibraryGames,
+      isLoadingLibraryGames,
+    ]
   );
 
   const getUserProfile = useCallback(async () => {
-    getUserStats();
-    getUserLibraryGames();
-
-    return window.electron.hydraApi
-      .get<UserProfile>(`/users/${userId}`)
-      .then((userProfile) => {
-        setUserProfile(userProfile);
-
-        if (userProfile.profileImageUrl) {
-          getHeroBackgroundFromImageUrl(userProfile.profileImageUrl).then(
-            (color) => setHeroBackground(color)
-          );
-        }
-      })
-      .catch(() => {
-        showErrorToast(t("user_not_found"));
-        navigate(-1);
-      });
-  }, [navigate, getUserStats, getUserLibraryGames, showErrorToast, userId, t]);
-
-  const getBadges = useCallback(async () => {
-    const language = i18n.language.split("-")[0];
-    const params = new URLSearchParams({ locale: language });
-
-    const badges = await window.electron.hydraApi.get<Badge[]>(
-      `/badges?${params.toString()}`,
-      { needsAuth: false }
-    );
-    setBadges(badges);
-  }, [i18n]);
+    await getUserLibraryGames();
+  }, [getUserLibraryGames]);
 
   useEffect(() => {
-    setUserProfile(null);
-    setLibraryGames([]);
-    setPinnedGames([]);
-    setHeroBackground(DEFAULT_USER_PROFILE_BACKGROUND);
+    if (userProfile?.profileImageUrl) {
+      getHeroBackgroundFromImageUrl(userProfile.profileImageUrl).then((color) =>
+        setHeroBackground(color)
+      );
+    } else {
+      setHeroBackground(DEFAULT_USER_PROFILE_BACKGROUND);
+    }
+  }, [userProfile?.profileImageUrl]);
+
+  useEffect(() => {
     setLibraryPage(0);
     setHasMoreLibraryGames(true);
-
     getUserProfile();
-    getBadges();
-  }, [getUserProfile, getBadges]);
+    /* i18n dependency kept so localized data refreshes on language change. */
+  }, [getUserProfile, i18n.language]);
 
   return (
     <Provider
       value={{
-        userProfile: visibleUserProfile,
+        userProfile,
         heroBackground,
         isMe,
         getUserProfile,
