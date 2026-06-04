@@ -62,12 +62,8 @@ export function App() {
 
   const workwondersRef = useRef<WorkWonders | null>(null);
 
-  const {
-    hasActiveSubscription,
-    fetchUserDetails,
-    updateUserDetails,
-    clearUserDetails,
-  } = useUserDetails();
+  const { fetchUserDetails, updateUserDetails, clearUserDetails } =
+    useUserDetails();
 
   const { hideHydraCloudModal, isHydraCloudModalVisible, hydraCloudFeature } =
     useSubscription();
@@ -404,12 +400,7 @@ export function App() {
     <>
       {window.electron.platform === "win32" && (
         <div className="title-bar">
-          <h4>
-            Hydra (Fork)
-            {hasActiveSubscription && (
-              <span className="title-bar__cloud-text"> Cloud</span>
-            )}
-          </h4>
+          <h4>Hydra (Fork)</h4>
         </div>
       )}
 

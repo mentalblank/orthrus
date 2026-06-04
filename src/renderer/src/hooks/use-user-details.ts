@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
   setProfileBackground,
@@ -126,10 +126,8 @@ export function useUserDetails() {
   const unblockUser = (userId: string) =>
     globalThis.window.electron.hydraApi.post(`/users/${userId}/unblock`);
 
-  const hasActiveSubscription = useMemo(() => {
-    const expiresAt = new Date(userDetails?.subscription?.expiresAt ?? 0);
-    return expiresAt > new Date();
-  }, [userDetails]);
+  /* Local-only: subscriptions removed, no paywalls. */
+  const hasActiveSubscription = false;
 
   return {
     userDetails,
