@@ -51,7 +51,6 @@ import {
 } from "@primer/octicons-react";
 import deckyIcon from "@renderer/assets/icons/decky.png";
 import { setCollections } from "@renderer/features";
-import { setFriendRequestCount } from "@renderer/features/user-details-slice";
 import cn from "classnames";
 import { sortBy } from "lodash-es";
 import { useDispatch } from "react-redux";
@@ -241,16 +240,6 @@ export function Sidebar() {
     if (!userDetails || hasLoadedCollections) return;
     void loadCollections();
   }, [hasLoadedCollections, loadCollections, userDetails]);
-
-  useEffect(() => {
-    const unsubscribe = window.electron.onSyncFriendRequests((result) => {
-      dispatch(setFriendRequestCount(result.friendRequestCount));
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [dispatch]);
 
   const sidebarRef = useRef<HTMLElement>(null);
 

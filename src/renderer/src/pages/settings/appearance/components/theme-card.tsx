@@ -2,7 +2,6 @@ import { PencilIcon, TrashIcon } from "@primer/octicons-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@renderer/components/button/button";
 import type { Theme } from "@types";
-import { useNavigate } from "react-router-dom";
 import "./theme-card.scss";
 import { useState } from "react";
 import { DeleteThemeModal } from "../modals/delete-theme-modal";
@@ -17,7 +16,6 @@ interface ThemeCardProps {
 
 export const ThemeCard = ({ theme, onListUpdated }: ThemeCardProps) => {
   const { t } = useTranslation("settings");
-  const navigate = useNavigate();
 
   const [deleteThemeModalVisible, setDeleteThemeModalVisible] = useState(false);
 
@@ -87,12 +85,7 @@ export const ThemeCard = ({ theme, onListUpdated }: ThemeCardProps) => {
           <p className="theme-card__author">
             {t("by")}
 
-            <button
-              className="theme-card__author__name"
-              onClick={() => navigate(`/profile/${theme.author}`)}
-            >
-              {theme.authorName}
-            </button>
+            <span className="theme-card__author__name">{theme.authorName}</span>
           </p>
         )}
 
