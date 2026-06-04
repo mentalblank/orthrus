@@ -181,10 +181,6 @@ export function App() {
       const workWondersWithKnowledge =
         workwondersRef.current as WorkWondersWithKnowledge;
       workWondersWithKnowledge.knowledge?.initKnowledgeWidget?.();
-
-      if (token) {
-        workwondersRef.current.feedback.initFeedbackWidget();
-      }
     },
     [workwondersRef]
   );
