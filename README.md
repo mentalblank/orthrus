@@ -53,6 +53,12 @@ After installing dependencies, `postinstall` now builds the Rust native addon au
 
 Packaging scripts (`yarn build:win`, `yarn build:mac`, `yarn build:linux`, `yarn build:unpack`) now run `yarn build:python-rpc` automatically.
 
+## Acknowledgements
+
+This fork only exists because of the excellent work by the [Hydra Launcher team](https://github.com/hydralauncher/hydra). All credit for the original application, its catalogue, and ongoing development goes to them.
+
+If you enjoy this fork, please consider supporting the upstream project — visit [hydralauncher.gg](https://hydralauncher.gg), star the [original repository](https://github.com/hydralauncher/hydra), and contribute back where you can. A healthy upstream benefits everyone, this fork included, since it continues to power the shared game catalogue.
+
 ## License
 
 Hydra is licensed under the [MIT License](LICENSE).
