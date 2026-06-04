@@ -106,6 +106,13 @@ export interface GameCollection {
   gamesCount: number;
 }
 
+/** Client-side per-collection UX flags (not persisted on the backend). */
+export interface CollectionSettings {
+  showInLibrary: boolean;
+  showInSidebar: boolean;
+  locked: boolean;
+}
+
 export interface GameRunning {
   id: string;
   title: string;
