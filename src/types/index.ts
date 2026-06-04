@@ -214,7 +214,6 @@ export interface UserDetails {
   backgroundImageUrl: string | null;
   profileVisibility: ProfileVisibility;
   bio: string;
-  workwondersJwt: string;
   subscription: Subscription | null;
   karma: number;
   quirks?: {

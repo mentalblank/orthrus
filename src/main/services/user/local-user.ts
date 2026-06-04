@@ -61,7 +61,6 @@ export const toUserDetails = (user: User): UserDetails => ({
   backgroundImageUrl: user.backgroundImageUrl,
   profileVisibility: user.profileVisibility ?? "PUBLIC",
   bio: user.bio ?? "",
-  workwondersJwt: "",
   subscription: null,
   karma: 0,
   quirks: { backupsPerGameLimit: 0 },

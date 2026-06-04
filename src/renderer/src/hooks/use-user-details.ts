@@ -63,7 +63,6 @@ export function useUserDetails() {
         ...response,
         username: userDetails?.username || "",
         subscription: userDetails?.subscription || null,
-        workwondersJwt: userDetails?.workwondersJwt || "",
         karma: userDetails?.karma || 0,
       });
     },
@@ -71,7 +70,6 @@ export function useUserDetails() {
       updateUserDetails,
       userDetails?.username,
       userDetails?.subscription,
-      userDetails?.workwondersJwt,
       userDetails?.karma,
     ]
   );

@@ -45,7 +45,6 @@ function mergeUserProfileIntoDetails(
     backgroundImageUrl: updatedProfile.backgroundImageUrl,
     profileVisibility: updatedProfile.profileVisibility,
     bio: updatedProfile.bio,
-    workwondersJwt: currentUserDetails?.workwondersJwt ?? "",
     subscription: currentUserDetails?.subscription ?? null,
     karma: currentUserDetails?.karma ?? 0,
     quirks: updatedProfile.quirks,
