@@ -4,16 +4,10 @@ import type { GameShop, ShopAssets } from "@types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { buildLibraryToastOptions, getItemFocusTarget } from "../../helpers";
-import {
-  Typography,
-  VerticalFocusGroup,
-  Divider,
-  FocusItem,
-} from "../../components";
+import { Typography, VerticalFocusGroup, FocusItem } from "../../components";
 import { DownloadGameModal } from "../../components/modals";
 import {
   AchievementsBox,
-  GameReviews,
   Hero,
   HowLongToBeatBox,
   PlaytimeBar,
@@ -268,7 +262,7 @@ export default function Game() {
   const { shop, objectId } = useParams<{ shop: GameShop; objectId: string }>();
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [isAddingToLibrary, setIsAddingToLibrary] = useState(false);
-  const [hasNavigableComments, setHasNavigableComments] = useState(false);
+  const hasNavigableComments = false;
   const [activeMediaItemId, setActiveMediaItemId] = useState<string | null>(
     null
   );
@@ -384,13 +378,6 @@ export default function Game() {
       hasDescription ? getItemFocusTarget(GAME_DESCRIPTION_BODY_ID) : undefined,
     [hasDescription]
   );
-  const descriptionBottomEntryTarget = useMemo(
-    () =>
-      hasDescription
-        ? getItemFocusTarget(GAME_DESCRIPTION_BOTTOM_ENTRY_ID)
-        : undefined,
-    [hasDescription]
-  );
   const commentsEntryTarget = useMemo(() => {
     if (!hasNavigableComments) {
       return undefined;
@@ -466,22 +453,6 @@ export default function Game() {
     }),
     []
   );
-  const commentsTopNavigationTarget = useMemo(() => {
-    if (descriptionBottomEntryTarget) {
-      return descriptionBottomEntryTarget;
-    }
-
-    if (hasMedia) {
-      return contentBelowHeroTarget ?? heroActionsLeftNavigationTarget;
-    }
-
-    return heroActionsLeftNavigationTarget;
-  }, [
-    contentBelowHeroTarget,
-    descriptionBottomEntryTarget,
-    hasMedia,
-    heroActionsLeftNavigationTarget,
-  ]);
   useHeaderTitle(shopDetails?.assets?.title ?? game?.title);
 
   useHeaderTitle(shopDetails?.assets?.title ?? game?.title);
@@ -1070,15 +1041,6 @@ export default function Game() {
                   </FocusItem>
                 </VerticalFocusGroup>
               )}
-
-              <Divider />
-
-              <GameReviews
-                shop={shop!}
-                objectId={objectId!}
-                topNavigationTarget={commentsTopNavigationTarget}
-                onHasNavigableActionsChange={setHasNavigableComments}
-              />
             </div>
 
             <VerticalFocusGroup regionId={GAME_SIDEBAR_REGION_ID} asChild>
