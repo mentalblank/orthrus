@@ -6,13 +6,11 @@ import {
   useDownload,
   useLibrary,
   useToast,
-  useUserDetails,
 } from "@renderer/hooks";
 
 import "./bottom-panel.scss";
 
 import { useNavigate } from "react-router-dom";
-import { VERSION_CODENAME } from "@renderer/constants";
 
 import { ChangelogModal } from "../changelog-modal/changelog-modal";
 
@@ -20,8 +18,6 @@ export function BottomPanel() {
   const { t } = useTranslation("bottom_panel");
 
   const navigate = useNavigate();
-
-  const { userDetails } = useUserDetails();
 
   const { library } = useLibrary();
 
@@ -32,7 +28,6 @@ export function BottomPanel() {
   const extraction = useAppSelector((state) => state.download.extraction);
 
   const [version, setVersion] = useState("");
-  const [sessionHash, setSessionHash] = useState<null | string>("");
   const [commonRedistStatus, setCommonRedistStatus] = useState<string | null>(
     null
   );
@@ -64,10 +59,6 @@ export function BottomPanel() {
 
     return () => unlisten();
   }, [t, showSuccessToast]);
-
-  useEffect(() => {
-    window.electron.getSessionHash().then((result) => setSessionHash(result));
-  }, [userDetails?.id]);
 
   const status = useMemo(() => {
     if (commonRedistStatus) {
@@ -169,10 +160,7 @@ export function BottomPanel() {
         onClick={() => setIsChangelogModalVisible(true)}
         className="bottom-panel__version-button"
       >
-        <small>
-          {sessionHash ? `${sessionHash} -` : ""} v{version} &quot;
-          {VERSION_CODENAME}&quot;
-        </small>
+        <small>v{version}</small>
       </button>
 
       <ChangelogModal

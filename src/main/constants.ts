@@ -39,7 +39,8 @@ export const achievementSoundPath = app.isPackaged
 
 export const backupsPath = path.join(SystemPath.getPath("userData"), "Backups");
 
-export const appVersion = app.getVersion() + (isStaging ? "-staging" : "");
+/* Packaged builds use the tagged version (set in CI); dev builds are marked -DEV. */
+export const appVersion = `${app.getVersion()}${app.isPackaged ? "" : "-DEV"}`;
 
 export const ASSETS_PATH = path.join(SystemPath.getPath("userData"), "Assets");
 
