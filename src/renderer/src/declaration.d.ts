@@ -362,6 +362,11 @@ declare global {
       writeText: (text: string) => Promise<void>;
     };
 
+    /* Clipboard */
+    clipboard: {
+      writeText: (text: string) => Promise<void>;
+    };
+
     /* Misc */
     openExternal: (src: string) => Promise<void>;
     getVersion: () => Promise<string>;
