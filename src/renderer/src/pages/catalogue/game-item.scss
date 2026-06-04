@@ -10,6 +10,21 @@
   border: 1px solid globals.$border-color;
   min-height: 103px;
 
+  &--selected {
+    border-color: globals.$brand-teal;
+    outline: 1px solid globals.$brand-teal;
+  }
+
+  &__select-indicator {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    color: #fff;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+    pointer-events: none;
+  }
+
   &:hover .game-item__content-link {
     background-color: rgba(255, 255, 255, 0.05);
   }

@@ -4,10 +4,17 @@ import type {
   DownloadSource,
 } from "@types";
 
-import { useAppDispatch, useAppSelector, useFormat } from "@renderer/hooks";
+import {
+  useAppDispatch,
+  useAppSelector,
+  useFormat,
+  useLibrary,
+  useToast,
+} from "@renderer/hooks";
 import {
   lazy,
   Suspense,
+  useCallback,
   useDeferredValue,
   useEffect,
   useMemo,
@@ -17,6 +24,8 @@ import {
 
 import "./catalogue.scss";
 
+import { ChecklistIcon, XIcon } from "@primer/octicons-react";
+import cn from "classnames";
 import { Button } from "@renderer/components/button/button";
 import { SelectField } from "@renderer/components/select-field/select-field";
 import { setFilters, setPage } from "@renderer/features";
@@ -143,6 +152,109 @@ export default function Catalogue() {
 
   const { t, i18n } = useTranslation("catalogue");
   const shouldShowProtonFeatures = window.electron.platform === "linux";
+
+  const { library, updateLibrary } = useLibrary();
+  const { showSuccessToast, showErrorToast } = useToast();
+
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  const resultKey = useCallback(
+    (game: CatalogueSearchResult) => `${game.shop}:${game.objectId}`,
+    []
+  );
+
+  const handleToggleSelectionMode = useCallback(() => {
+    setSelectionMode((prev) => {
+      if (prev) setSelectedKeys(new Set());
+      return !prev;
+    });
+  }, []);
+
+  const handleToggleSelect = useCallback(
+    (game: CatalogueSearchResult) => {
+      setSelectedKeys((prev) => {
+        const next = new Set(prev);
+        const key = resultKey(game);
+        if (next.has(key)) {
+          next.delete(key);
+        } else {
+          next.add(key);
+        }
+        return next;
+      });
+    },
+    [resultKey]
+  );
+
+  const selectedResults = useMemo(
+    () => results.filter((game) => selectedKeys.has(resultKey(game))),
+    [results, selectedKeys, resultKey]
+  );
+
+  const isInLibrary = useCallback(
+    (game: CatalogueSearchResult) =>
+      library.some(
+        (libItem) =>
+          libItem.shop === game.shop && libItem.objectId === game.objectId
+      ),
+    [library]
+  );
+
+  const handleBulkAddToLibrary = useCallback(async () => {
+    setIsBulkProcessing(true);
+    try {
+      for (const game of selectedResults) {
+        if (isInLibrary(game)) continue;
+        await window.electron.addGameToLibrary(
+          game.shop,
+          game.objectId,
+          game.title
+        );
+      }
+      await updateLibrary();
+      showSuccessToast(t("games_added_to_library"));
+      setSelectedKeys(new Set());
+    } catch (error) {
+      void error;
+      showErrorToast(t("failed_bulk_library"));
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  }, [
+    selectedResults,
+    isInLibrary,
+    updateLibrary,
+    showSuccessToast,
+    showErrorToast,
+    t,
+  ]);
+
+  const handleBulkRemoveFromLibrary = useCallback(async () => {
+    setIsBulkProcessing(true);
+    try {
+      for (const game of selectedResults) {
+        if (!isInLibrary(game)) continue;
+        await window.electron.removeGameFromLibrary(game.shop, game.objectId);
+      }
+      await updateLibrary();
+      showSuccessToast(t("games_removed_from_library"));
+      setSelectedKeys(new Set());
+    } catch (error) {
+      void error;
+      showErrorToast(t("failed_bulk_library"));
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  }, [
+    selectedResults,
+    isInLibrary,
+    updateLibrary,
+    showSuccessToast,
+    showErrorToast,
+    t,
+  ]);
 
   const debouncedSearch = useRef(
     debounce(
@@ -479,6 +591,21 @@ export default function Catalogue() {
           </div>
 
           <div className="catalogue__sort-inline">
+            <button
+              type="button"
+              className={cn("catalogue__select-button", {
+                "catalogue__select-button--active": selectionMode,
+              })}
+              onClick={handleToggleSelectionMode}
+            >
+              {selectionMode ? (
+                <XIcon size={16} />
+              ) : (
+                <ChecklistIcon size={16} />
+              )}
+              <span>{selectionMode ? t("exit_selection") : t("select")}</span>
+            </button>
+
             <span className="catalogue__sort-label">{t("sort_by")}</span>
             <SelectField
               theme="dark"
@@ -500,6 +627,47 @@ export default function Catalogue() {
             />
           </div>
         </div>
+
+        {selectionMode && selectedResults.length > 0 && (
+          <div className="catalogue__bulk-bar">
+            <span className="catalogue__bulk-count">
+              {t("games_selected", { count: selectedResults.length })}
+            </span>
+
+            <div className="catalogue__bulk-actions">
+              <Button
+                type="button"
+                theme="outline"
+                onClick={() => {
+                  void handleBulkAddToLibrary();
+                }}
+                disabled={isBulkProcessing}
+              >
+                {t("add_to_library")}
+              </Button>
+
+              <Button
+                type="button"
+                theme="outline"
+                onClick={() => {
+                  void handleBulkRemoveFromLibrary();
+                }}
+                disabled={isBulkProcessing}
+              >
+                {t("remove_from_library")}
+              </Button>
+
+              <Button
+                type="button"
+                theme="outline"
+                onClick={() => setSelectedKeys(new Set())}
+                disabled={isBulkProcessing}
+              >
+                {t("clear_selection")}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {selectedFiltersCount > 0 && (
           <div className="catalogue__header-row catalogue__header-row--filters">
@@ -563,7 +731,15 @@ export default function Catalogue() {
               ))}
             </SkeletonTheme>
           ) : (
-            results.map((game) => <GameItem key={game.id} game={game} />)
+            results.map((game) => (
+              <GameItem
+                key={game.id}
+                game={game}
+                selectable={selectionMode}
+                selected={selectedKeys.has(resultKey(game))}
+                onToggleSelect={handleToggleSelect}
+              />
+            ))
           )}
 
           {isFetching && !isLoading && (

@@ -2,12 +2,19 @@ import { Badge } from "@renderer/components/badge/badge";
 import { buildGameDetailsPath } from "@renderer/helpers";
 import { useAppSelector, useLibrary } from "@renderer/hooks";
 import { lazy, Suspense, useMemo, useState, useEffect } from "react";
+import type { MouseEvent } from "react";
 import { Link } from "@renderer/components/link/link";
 
 import "./game-item.scss";
 import { useTranslation } from "react-i18next";
 import { CatalogueSearchResult } from "@types";
-import { QuestionIcon, PlusIcon, CheckIcon } from "@primer/octicons-react";
+import {
+  QuestionIcon,
+  PlusIcon,
+  CheckIcon,
+  CheckCircleFillIcon,
+  CircleIcon,
+} from "@primer/octicons-react";
 import cn from "classnames";
 
 const ProtonDBBadge = lazy(async () => {
@@ -17,9 +24,17 @@ const ProtonDBBadge = lazy(async () => {
 
 export interface GameItemProps {
   game: CatalogueSearchResult;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (game: CatalogueSearchResult) => void;
 }
 
-export function GameItem({ game }: GameItemProps) {
+export function GameItem({
+  game,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
+}: GameItemProps) {
   const { i18n, t } = useTranslation("game_details");
 
   const language = i18n.language.split("-")[0];
@@ -114,9 +129,30 @@ export function GameItem({ game }: GameItemProps) {
       ? protonBadgeValue
       : null;
 
+  const handleContentClick = (event: MouseEvent) => {
+    if (!selectable) return;
+    event.preventDefault();
+    onToggleSelect?.(game);
+  };
+
   return (
-    <article className="game-item">
-      <Link to={buildGameDetailsPath(game)} className="game-item__content-link">
+    <article
+      className={cn("game-item", { "game-item--selected": selected })}
+    >
+      <Link
+        to={buildGameDetailsPath(game)}
+        className="game-item__content-link"
+        onClick={handleContentClick}
+      >
+        {selectable && (
+          <div className="game-item__select-indicator">
+            {selected ? (
+              <CheckCircleFillIcon size={20} />
+            ) : (
+              <CircleIcon size={20} />
+            )}
+          </div>
+        )}
         <div className="game-item__cover-wrapper">
           {libraryImage}
 
@@ -144,18 +180,20 @@ export function GameItem({ game }: GameItemProps) {
           </div>
         </div>
       </Link>
-      <button
-        type="button"
-        className={cn("game-item__plus-wrapper", {
-          "game-item__plus-wrapper--added": added,
-        })}
-        onClick={addGameToLibrary}
-        title={added ? t("already_in_library") : t("add_to_library")}
-        aria-label={added ? t("already_in_library") : t("add_to_library")}
-        disabled={added || isAddingToLibrary}
-      >
-        {added ? <CheckIcon size={16} /> : <PlusIcon size={16} />}
-      </button>
+      {!selectable && (
+        <button
+          type="button"
+          className={cn("game-item__plus-wrapper", {
+            "game-item__plus-wrapper--added": added,
+          })}
+          onClick={addGameToLibrary}
+          title={added ? t("already_in_library") : t("add_to_library")}
+          aria-label={added ? t("already_in_library") : t("add_to_library")}
+          disabled={added || isAddingToLibrary}
+        >
+          {added ? <CheckIcon size={16} /> : <PlusIcon size={16} />}
+        </button>
+      )}
     </article>
   );
 }
