@@ -507,6 +507,8 @@ contextBridge.exposeInMainWorld("electron", {
   openCheckout: () => ipcRenderer.invoke("openCheckout"),
   showOpenDialog: (options: Electron.OpenDialogOptions) =>
     ipcRenderer.invoke("showOpenDialog", options),
+  exportBackup: (scope: "all" | "saves") =>
+    ipcRenderer.invoke("exportBackup", scope),
   showItemInFolder: (path: string) =>
     ipcRenderer.invoke("showItemInFolder", path),
   getImageDataUrl: (imageUrl: string) =>

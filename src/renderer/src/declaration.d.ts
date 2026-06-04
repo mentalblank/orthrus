@@ -394,6 +394,9 @@ declare global {
     showOpenDialog: (
       options: Electron.OpenDialogOptions
     ) => Promise<Electron.OpenDialogReturnValue>;
+    exportBackup: (
+      scope: "all" | "saves"
+    ) => Promise<{ canceled: boolean; path?: string }>;
     showItemInFolder: (path: string) => Promise<void>;
     getImageDataUrl: (imageUrl: string) => Promise<string | null>;
     hydraApi: {

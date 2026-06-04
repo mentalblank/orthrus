@@ -11,7 +11,7 @@ import {
 } from "@renderer/components";
 import type { DownloadDirectoryPreference } from "@types";
 import { settingsContext } from "@renderer/context";
-import { useAppSelector } from "@renderer/hooks";
+import { useAppSelector, useToast } from "@renderer/hooks";
 import languageResources from "@locales";
 import {
   prepareDefaultDownloadPathSync,
@@ -44,6 +44,9 @@ export function SettingsContextGeneral({
 }: Readonly<SettingsContextGeneralProps>) {
   const { t } = useTranslation("settings");
   const { updateUserPreferences } = useContext(settingsContext);
+  const { showSuccessToast, showErrorToast } = useToast();
+
+  const [isExporting, setIsExporting] = useState<"all" | "saves" | null>(null);
 
   const userPreferences = useAppSelector(
     (state) => state.userPreferences.value
@@ -125,6 +128,21 @@ export function SettingsContextGeneral({
     const value = event.target.value;
     handleChange({ language: value });
     changeLanguage(value);
+  };
+
+  const handleExportBackup = async (scope: "all" | "saves") => {
+    setIsExporting(scope);
+    try {
+      const result = await window.electron.exportBackup(scope);
+      if (!result.canceled && result.path) {
+        showSuccessToast(t("backup_exported"));
+        window.electron.showItemInFolder(result.path);
+      }
+    } catch {
+      showErrorToast(t("backup_export_failed"));
+    } finally {
+      setIsExporting(null);
+    }
   };
 
   const handleChooseDownloadsPath = async () => {
@@ -304,6 +322,31 @@ export function SettingsContextGeneral({
           />
         </div>
       )}
+
+      <div className="settings-context-panel__group">
+        <h3>{t("data_backup")}</h3>
+        <p>{t("export_backup_description")}</p>
+
+        <div className="settings-context-panel__buttons">
+          <Button
+            theme="outline"
+            onClick={() => handleExportBackup("all")}
+            disabled={isExporting !== null}
+          >
+            {isExporting === "all" ? t("exporting") : t("export_all_data")}
+          </Button>
+
+          <Button
+            theme="outline"
+            onClick={() => handleExportBackup("saves")}
+            disabled={isExporting !== null}
+          >
+            {isExporting === "saves"
+              ? t("exporting")
+              : t("export_save_backups")}
+          </Button>
+        </div>
+      </div>
 
       <div className="settings-context-panel__group">
         <h3>{t("appearance")}</h3>
