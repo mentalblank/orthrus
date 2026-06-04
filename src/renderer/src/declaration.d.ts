@@ -16,7 +16,6 @@ import type {
   UserDetails,
   LudusaviBackup,
   UserAchievement,
-  ComparedAchievements,
   LibraryGame,
   GameRunning,
   TorBoxUser,
@@ -455,11 +454,6 @@ declare global {
     onSignOut: (cb: () => void) => () => Electron.IpcRenderer;
 
     /* User */
-    getComparedUnlockedAchievements: (
-      objectId: string,
-      shop: GameShop,
-      userId: string
-    ) => Promise<ComparedAchievements>;
     getUnlockedAchievements: (
       objectId: string,
       shop: GameShop

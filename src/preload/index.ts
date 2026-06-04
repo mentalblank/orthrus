@@ -626,17 +626,6 @@ contextBridge.exposeInMainWorld("electron", {
   ) => ipcRenderer.invoke("cropProfileImage", imagePath, params),
 
   /* User */
-  getComparedUnlockedAchievements: (
-    objectId: string,
-    shop: GameShop,
-    userId: string
-  ) =>
-    ipcRenderer.invoke(
-      "getComparedUnlockedAchievements",
-      objectId,
-      shop,
-      userId
-    ),
   getUnlockedAchievements: (objectId: string, shop: GameShop) =>
     ipcRenderer.invoke("getUnlockedAchievements", objectId, shop),
 

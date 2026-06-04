@@ -3,7 +3,6 @@ import type { SteamAppDetails } from "./steam.types";
 import type { Download, Game, Subscription } from "./level.types";
 import type { GameShop, UnlockedAchievement } from "./game.types";
 
-export type FriendRequestAction = "ACCEPTED" | "REFUSED" | "CANCEL";
 export * from "./download-contract";
 
 export interface DiskUsage {
@@ -156,31 +155,6 @@ export interface UserFriend {
         sessionDurationInSeconds: number;
       })
     | null;
-}
-
-export interface UserFriends {
-  totalFriends: number;
-  friends: UserFriend[];
-}
-
-export interface UserBlocks {
-  totalBlocks: number;
-  blocks: UserFriend[];
-}
-
-export interface FriendRequestSync {
-  friendRequestCount: number;
-}
-
-export interface NotificationSync {
-  notificationCount: number;
-}
-
-export interface FriendRequest {
-  id: string;
-  displayName: string;
-  profileImageUrl: string | null;
-  type: "SENT" | "RECEIVED";
 }
 
 export interface UserRelation {
@@ -386,36 +360,6 @@ export interface NotificationCountResponse {
   count: number;
 }
 
-export interface ComparedAchievements {
-  achievementsPointsTotal: number;
-  owner: {
-    totalAchievementCount: number;
-    unlockedAchievementCount: number;
-    achievementsPointsEarnedSum?: number;
-  };
-  target: {
-    displayName: string;
-    profileImageUrl: string;
-    totalAchievementCount: number;
-    unlockedAchievementCount: number;
-    achievementsPointsEarnedSum: number;
-  };
-  achievements: {
-    hidden: boolean;
-    icon: string;
-    displayName: string;
-    description: string;
-    ownerStat?: {
-      unlocked: boolean;
-      unlockTime: number;
-    };
-    targetStat: {
-      unlocked: boolean;
-      unlockTime: number;
-    };
-  }[];
-}
-
 export interface CatalogueSearchPayload {
   title: string;
   sortBy:
@@ -473,23 +417,6 @@ export type LibraryGame = Game &
     unlockedAchievementCount?: number;
     achievementCount?: number;
   };
-
-export type UserGameDetails = ShopAssets & {
-  id: string;
-  playTimeInSeconds: number;
-  unlockedAchievementCount: number;
-  achievementsPointsEarnedSum: number;
-  lastTimePlayed: Date | null;
-  isDeleted: boolean;
-  isFavorite: boolean;
-  friendsWhoPlayed: {
-    id: string;
-    displayName: string;
-    profileImageUrl: string | null;
-    lastTimePlayed: Date | null;
-    playTimeInSeconds: number;
-  }[];
-};
 
 export * from "./game.types";
 export * from "./steam.types";
