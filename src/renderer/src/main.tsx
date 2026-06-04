@@ -21,7 +21,6 @@ import resources from "@locales";
 
 import { logger } from "./logger";
 import { addCookieInterceptor } from "./cookies";
-import * as Sentry from "@sentry/react";
 import { levelDBService } from "./services/leveldb.service";
 import Catalogue from "./pages/catalogue/catalogue";
 import Home from "./pages/home/home";
@@ -47,18 +46,6 @@ import BigPictureGame from "../../big-picture/src/pages/game/game";
 import BigPictureGameAchievements from "../../big-picture/src/pages/game-achievements/game-achievements";
 
 console.log = logger.log;
-
-Sentry.init({
-  dsn: import.meta.env.RENDERER_VITE_SENTRY_DSN,
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
-  ],
-  tracesSampleRate: 0.5,
-  replaysSessionSampleRate: 0,
-  replaysOnErrorSampleRate: 0,
-  release: "hydra-launcher@" + (await globalThis.electron.getVersion()),
-});
 
 const isStaging = await globalThis.electron.isStaging();
 addCookieInterceptor(isStaging);
