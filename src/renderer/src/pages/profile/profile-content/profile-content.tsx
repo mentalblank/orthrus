@@ -8,7 +8,6 @@ import type { GameShop } from "@types";
 import { LockedProfile } from "./locked-profile";
 import { ReportProfile } from "../report-profile/report-profile";
 import { BadgesBox } from "./badges-box";
-import { FriendsBox, FriendsBoxAddButton } from "./friends-box";
 import { RecentGamesBox } from "./recent-games-box";
 import { UserStatsBox } from "./user-stats-box";
 import { ProfileSection } from "../profile-section/profile-section";
@@ -403,16 +402,6 @@ export function ProfileContent() {
             {userProfile?.recentGames.length > 0 && (
               <ProfileSection title={t("activity")} defaultOpen={true}>
                 <RecentGamesBox />
-              </ProfileSection>
-            )}
-            {(userProfile?.friends.length > 0 || isMe) && (
-              <ProfileSection
-                title={t("friends")}
-                count={userStats?.friendsCount || userProfile.friends.length}
-                action={<FriendsBoxAddButton />}
-                defaultOpen={true}
-              >
-                <FriendsBox />
               </ProfileSection>
             )}
             <ReportProfile />
