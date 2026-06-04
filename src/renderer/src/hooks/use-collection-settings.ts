@@ -71,11 +71,11 @@ export function useCollectionSettings() {
     dispatch(setUnlocked(false));
   }, [dispatch]);
 
+  /* Session unlock only bypasses the `locked` gate — not show-in-library/sidebar. */
   const isChipVisibleInLibrary = useCallback(
     (collectionId: string): boolean => {
       const { showInLibrary, locked } = getSettings(collectionId);
-      if (unlocked) return true;
-      return showInLibrary && !(locked && !unlocked);
+      return showInLibrary && (!locked || unlocked);
     },
     [getSettings, unlocked]
   );
@@ -83,8 +83,7 @@ export function useCollectionSettings() {
   const isChipVisibleInSidebar = useCallback(
     (collectionId: string): boolean => {
       const { locked } = getSettings(collectionId);
-      if (unlocked) return true;
-      return !(locked && !unlocked);
+      return !locked || unlocked;
     },
     [getSettings, unlocked]
   );
@@ -93,7 +92,6 @@ export function useCollectionSettings() {
     (collectionIds: string[]): boolean =>
       collectionIds.some((id) => {
         const { showInLibrary, locked } = getSettings(id);
-        if (unlocked) return false;
         return !showInLibrary || (locked && !unlocked);
       }),
     [getSettings, unlocked]
@@ -103,7 +101,6 @@ export function useCollectionSettings() {
     (collectionIds: string[]): boolean =>
       collectionIds.some((id) => {
         const { showInSidebar, locked } = getSettings(id);
-        if (unlocked) return false;
         return !showInSidebar || (locked && !unlocked);
       }),
     [getSettings, unlocked]
