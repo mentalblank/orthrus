@@ -6,8 +6,8 @@ concurrency:
 
 on:
   push:
-    branches:
-      - release/**
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -34,6 +34,11 @@ jobs:
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
+
+      - name: Get version
+        id: get_version
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - name: Install Python
         uses: actions/setup-python@v5
@@ -114,6 +119,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           draft: true
+          generate_release_notes: true
+          name: ${{ steps.get_version.outputs.version }}
           files: |
             dist/*.exe
             dist/*.zip
