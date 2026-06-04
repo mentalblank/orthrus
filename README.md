@@ -1,6 +1,6 @@
 <div align="center">
 
-[<img src="https://raw.githubusercontent.com/mentalblank/hydra/refs/heads/main/resources/icon.png" width="144"/>](https://help.hydralauncher.gg)
+[<img src="https://raw.githubusercontent.com/mentalblank/hydra/refs/heads/main/resources/icon.png" width="144"/>](https://github.com/mentalblank/hydra)
 
   <h1 align="center">Hydra Launcher</h1>
   <p align="center">
@@ -28,19 +28,20 @@
 - Navigate through a rich catalogue with a powerful suggestion algorithm
 - Discover new games that you haven't played before
 
-## Fork differences
+## Why this fork?
 
-This fork runs fully **local-only** — no account, login, or remote profile is required:
+This fork runs fully **local-only**. It keeps everything that makes Hydra useful for managing your library while removing the parts that phone home, so your data stays yours:
 
-- **No accounts/login** — a local profile is created automatically and stored on your machine.
-- **No cloud sync** — save backups stay on disk (Ludusavi); no S3 uploads or subscriptions.
-- **No social** — friends, presence, chat, reviews, and user comments are removed.
-- **No telemetry** — Sentry crash reporting and third-party SDKs are stripped.
-- **Catalogue retained** — game search, suggestions, and repacks still use the central Hydra API.
+- **Privacy first** — no telemetry. Sentry crash reporting and third-party SDKs are stripped, so nothing about how you use the app is sent anywhere.
+- **No account required** — a local profile is created automatically and stored on your machine. No login, no JWT, no remote sync.
+- **Offline-friendly** — your library, achievements, and play stats live on disk and work without an account.
+- **You own your saves** — game save backups are created locally with Ludusavi (and can be exported); no cloud uploads and no subscription paywall.
+- **Lighter** — friends, presence, chat, reviews, comments, and cloud features are removed, leaving a leaner app.
+- **Catalogue retained** — game search, suggestions, and repacks still use the central Hydra API, so discovery keeps working.
 
 ## Build from source and contributing
 
-Please, refer to our Documentation pages: [docs.hydralauncher.gg](https://docs.hydralauncher.gg/getting-started)
+For environment setup and build steps, the upstream getting-started guide still applies: [docs.hydralauncher.gg](https://docs.hydralauncher.gg/getting-started).
 
 ### Local development requirements
 
