@@ -6,6 +6,7 @@ import {
 import { useMemo } from "react";
 import "./settings.scss";
 import {
+  ArchiveIcon,
   BellIcon,
   CloudIcon,
   DownloadIcon,
@@ -20,6 +21,7 @@ import { SettingsContextNotifications } from "./settings-context-notifications";
 import { SettingsContextContentGameplay } from "./settings-context-content-gameplay";
 import { SettingsContextIntegrations } from "./settings-context-integrations";
 import { SettingsContextCompatibility } from "./settings-context-compatibility";
+import { SettingsBackup } from "./settings-backup";
 import { SettingsAbout } from "./settings-about";
 
 export default function Settings() {
@@ -56,6 +58,11 @@ export default function Settings() {
         id: "compatibility" as const,
         label: t("compatibility"),
         icon: <Wrench size={16} />,
+      },
+      {
+        id: "backup" as const,
+        label: t("backup"),
+        icon: <ArchiveIcon size={16} />,
       },
       {
         id: "about" as const,
@@ -98,6 +105,10 @@ export default function Settings() {
 
             if (selectedCategoryId === "compatibility") {
               return <SettingsContextCompatibility />;
+            }
+
+            if (selectedCategoryId === "backup") {
+              return <SettingsBackup />;
             }
 
             if (selectedCategoryId === "about") {

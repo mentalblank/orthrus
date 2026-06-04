@@ -1,0 +1,28 @@
+@use "../../scss/globals.scss";
+
+.settings-backup {
+  display: flex;
+  flex-direction: column;
+  gap: calc(globals.$spacing-unit * 3);
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: calc(globals.$spacing-unit * 1.5);
+
+    h3 {
+      margin: 0;
+    }
+
+    p {
+      color: globals.$muted-color;
+      margin: 0;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: globals.$spacing-unit;
+  }
+}

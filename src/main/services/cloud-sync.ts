@@ -1,12 +1,9 @@
-import { levelKeys, gamesSublevel } from "@main/level";
+import { levelKeys, gamesSublevel, db } from "@main/level";
 import path from "node:path";
-import * as tar from "tar";
-import crypto from "node:crypto";
 import fs from "node:fs";
-import type { GameShop } from "@types";
+import type { GameShop, UserPreferences } from "@types";
 import { backupsPath } from "@main/constants";
 import { normalizePath, parseRegFile } from "@main/helpers";
-import { logger } from "./logger";
 import { WindowManager } from "./window-manager";
 import { Ludusavi } from "./ludusavi";
 import { formatDate } from "@shared";
@@ -66,62 +63,35 @@ export class CloudSync {
     });
   }
 
-  private static async bundleBackup(
-    shop: GameShop,
-    objectId: string,
-    winePrefix: string | null
-  ) {
-    const backupPath = path.join(backupsPath, `${shop}-${objectId}`);
-
-    // Remove existing backup
-    if (fs.existsSync(backupPath)) {
-      try {
-        await fs.promises.rm(backupPath, { recursive: true });
-      } catch (error) {
-        logger.error("Failed to remove backup path", { backupPath, error });
-      }
-    }
-
-    await Ludusavi.backupGame(shop, objectId, backupPath, winePrefix);
-
-    const tarLocation = path.join(backupsPath, `${crypto.randomUUID()}.tar`);
-
-    await tar.create(
-      {
-        gzip: false,
-        file: tarLocation,
-        cwd: backupPath,
-      },
-      ["."]
-    );
-
-    return tarLocation;
-  }
-
   public static async uploadSaveGame(
     objectId: string,
     shop: GameShop,
     _downloadOptionTitle: string | null,
     _label?: string
   ) {
-    /* Local-only: keep a local Ludusavi backup, no subscription or cloud upload. */
+    /* Local-only incremental backup: keep the last N versions, never wipe history. */
     const game = await gamesSublevel.get(levelKeys.game(shop, objectId));
     const effectiveWinePrefixPath = Wine.getEffectivePrefixPath(
       game?.winePrefixPath,
       objectId
     );
 
-    const bundleLocation = await this.bundleBackup(
+    const backupPath = path.join(backupsPath, `${shop}-${objectId}`);
+
+    const userPreferences = await db
+      .get<string, UserPreferences>(levelKeys.userPreferences, {
+        valueEncoding: "json",
+      })
+      .catch(() => null);
+
+    await Ludusavi.setBackupRetention(userPreferences?.backupsToKeep ?? 5);
+
+    await Ludusavi.backupGame(
       shop,
       objectId,
+      backupPath,
       effectiveWinePrefixPath
     );
-
-    try {
-      await fs.promises.unlink(bundleLocation);
-    } catch (error) {
-      logger.error("Failed to remove tar file", { bundleLocation, error });
-    }
 
     WindowManager.mainWindow?.webContents.send(
       `on-upload-complete-${objectId}-${shop}`,
