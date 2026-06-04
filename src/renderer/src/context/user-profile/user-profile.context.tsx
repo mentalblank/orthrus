@@ -1,9 +1,9 @@
 import { darkenColor } from "@renderer/helpers";
-import { useAppSelector, useToast } from "@renderer/hooks";
+import { useAppSelector, useToast, useCollectionSettings } from "@renderer/hooks";
 import type { Badge, UserProfile, UserStats, UserGame } from "@types";
 import { average } from "color.js";
 
-import { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -73,6 +73,40 @@ export function UserProfileContextProvider({
   const [isLoadingLibraryGames, setIsLoadingLibraryGames] = useState(false);
 
   const isMe = userDetails?.id === userProfile?.id;
+
+  const library = useAppSelector((state) => state.library.value);
+  const { isGameHiddenInLibrary } = useCollectionSettings();
+
+  const isGameHidden = useCallback(
+    (shop: string, objectId: string) => {
+      const localGame = library.find(
+        (g) => g.shop === shop && g.objectId === objectId
+      );
+      const collectionIds = localGame && Array.isArray(localGame.collectionIds)
+        ? localGame.collectionIds
+        : [];
+      return isGameHiddenInLibrary(collectionIds);
+    },
+    [library, isGameHiddenInLibrary]
+  );
+
+  const visibleLibraryGames = useMemo(() => {
+    return libraryGames.filter((game) => !isGameHidden(game.shop, game.objectId));
+  }, [libraryGames, isGameHidden]);
+
+  const visiblePinnedGames = useMemo(() => {
+    return pinnedGames.filter((game) => !isGameHidden(game.shop, game.objectId));
+  }, [pinnedGames, isGameHidden]);
+
+  const visibleUserProfile = useMemo(() => {
+    if (!userProfile) return null;
+    return {
+      ...userProfile,
+      recentGames: userProfile.recentGames.filter(
+        (game) => !isGameHidden(game.shop, game.objectId)
+      ),
+    };
+  }, [userProfile, isGameHidden]);
 
   const getHeroBackgroundFromImageUrl = async (imageUrl: string) => {
     const output = await average(imageUrl, { amount: 1, format: "hex" });
@@ -245,7 +279,7 @@ export function UserProfileContextProvider({
   return (
     <Provider
       value={{
-        userProfile,
+        userProfile: visibleUserProfile,
         heroBackground,
         isMe,
         getUserProfile,
@@ -255,8 +289,8 @@ export function UserProfileContextProvider({
         backgroundImage: getBackgroundImageUrl(),
         userStats,
         badges,
-        libraryGames,
-        pinnedGames,
+        libraryGames: visibleLibraryGames,
+        pinnedGames: visiblePinnedGames,
         hasMoreLibraryGames,
         isLoadingLibraryGames,
       }}
