@@ -36,6 +36,7 @@ import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { FilterItem } from "./filter-item";
 import { FilterSection } from "./filter-section";
 import { GameItem } from "./game-item";
+import { ViewOptions, ViewMode } from "../library/view-options";
 import { Pagination } from "./pagination";
 
 const ProtonCompatibilitySection = lazy(async () => {
@@ -143,6 +144,16 @@ export default function Catalogue() {
   const [isFetching, setIsFetching] = useState(false);
 
   const [results, setResults] = useState<CatalogueSearchResult[]>([]);
+
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem("catalogue-view-mode");
+    return (saved as ViewMode) || "grid";
+  });
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem("catalogue-view-mode", mode);
+  };
 
   const [itemsCount, setItemsCount] = useState(0);
 
@@ -625,6 +636,11 @@ export default function Catalogue() {
                 dispatch(setFilters({ sortBy, sortOrder }));
               }}
             />
+
+            <ViewOptions
+              viewMode={viewMode}
+              onViewModeChange={handleViewModeChange}
+            />
           </div>
         </div>
 
@@ -723,7 +739,9 @@ export default function Catalogue() {
       </div>
 
       <div className="catalogue__content">
-        <div className="catalogue__games-container">
+        <div
+          className={`catalogue__games-container catalogue__games-container--${viewMode}`}
+        >
           {isLoading ? (
             <SkeletonTheme baseColor="#1c1c1c" highlightColor="#444">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => (

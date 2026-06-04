@@ -162,6 +162,29 @@
     width: 100%;
     min-width: 0;
     gap: 8px;
+
+    &--list {
+      gap: 4px;
+    }
+
+    &--grid,
+    &--compact {
+      display: grid;
+      gap: 12px;
+    }
+
+    &--grid {
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    }
+
+    &--compact {
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    &--grid .catalogue__pagination-container,
+    &--compact .catalogue__pagination-container {
+      grid-column: 1 / -1;
+    }
   }
 
   &__pagination-container {
