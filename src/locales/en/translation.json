@@ -392,6 +392,7 @@
     "install_backup": "Install",
     "delete_backup": "Delete",
     "create_backup": "New backup",
+    "achievement_points_earned": "{{earned}} / {{total}} points",
     "backup": "Save backup",
     "backup_description": "Create and manage local backups of your game saves.",
     "enable_automatic_backup": "Automatically back up saves after playing",

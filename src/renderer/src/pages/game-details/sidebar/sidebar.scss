@@ -8,6 +8,20 @@
   flex-direction: column;
   gap: calc(globals.$spacing-unit * 1.5);
 
+  &__achievement-points {
+    display: flex;
+    align-items: center;
+    gap: globals.$spacing-unit;
+    margin-bottom: globals.$spacing-unit;
+    font-size: globals.$small-font-size;
+    color: globals.$muted-color;
+  }
+
+  &__achievement-points-icon {
+    width: 16px;
+    height: 16px;
+  }
+
   @media (min-width: 1024px) {
     width: 320px;
   }
