@@ -39,6 +39,9 @@ import {
   UnlinkIcon,
   XCircleIcon,
   GraphIcon,
+  CheckCircleFillIcon,
+  CircleIcon,
+  ChecklistIcon,
 } from "@primer/octicons-react";
 import { MoreVertical, Folder } from "lucide-react";
 import { average } from "color.js";
@@ -546,6 +549,7 @@ export function DownloadGroup({
     isGameDeleting,
     pauseSeeding,
     resumeSeeding,
+    removeGameInstaller,
   } = useDownload();
 
   // Wrap resumeDownload with optimistic update
@@ -609,6 +613,62 @@ export function DownloadGroup({
   const [gameActionTypes, setGameActionTypes] = useState<
     Record<string, "install" | "open-folder">
   >({});
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkRemoveModalVisible, setBulkRemoveModalVisible] = useState(false);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  const toggleSelect = useCallback((gameId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(gameId)) {
+        next.delete(gameId);
+      } else {
+        next.add(gameId);
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleSelectionMode = useCallback(() => {
+    setSelectionMode((prev) => {
+      if (prev) setSelectedIds(new Set());
+      return !prev;
+    });
+  }, []);
+
+  const selectedGames = useMemo(
+    () => library.filter((game) => selectedIds.has(game.id)),
+    [library, selectedIds]
+  );
+
+  const handleBulkExtract = useCallback(async () => {
+    setIsBulkProcessing(true);
+    try {
+      for (const game of selectedGames) {
+        if (game.download?.progress !== 1 || game.download.extracting) continue;
+        await window.electron.extractGameDownload(game.shop, game.objectId);
+      }
+      updateLibrary();
+      setSelectedIds(new Set());
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  }, [selectedGames, updateLibrary]);
+
+  const handleConfirmBulkRemoveInstaller = useCallback(async () => {
+    setIsBulkProcessing(true);
+    try {
+      for (const game of selectedGames) {
+        await pauseSeeding(game.shop, game.objectId);
+        await removeGameInstaller(game.shop, game.objectId);
+      }
+      setSelectedIds(new Set());
+    } finally {
+      setIsBulkProcessing(false);
+      setBulkRemoveModalVisible(false);
+    }
+  }, [selectedGames, pauseSeeding, removeGameInstaller]);
 
   const extractDominantColor = useCallback(
     async (imageUrl: string, gameId: string) => {
@@ -1026,6 +1086,19 @@ export function DownloadGroup({
         onConfirm={handleConfirmCancel}
         onClose={handleCancelModalClose}
       />
+      <ConfirmationModal
+        visible={bulkRemoveModalVisible}
+        title={t("remove_installer")}
+        descriptionText={t("bulk_remove_installer_description", {
+          count: selectedGames.length,
+        })}
+        confirmButtonLabel={t("remove_installer")}
+        cancelButtonLabel={t("cancel")}
+        onConfirm={() => {
+          void handleConfirmBulkRemoveInstaller();
+        }}
+        onClose={() => setBulkRemoveModalVisible(false)}
+      />
       <div
         className={`download-group ${isQueuedGroup ? "download-group--queued" : ""} ${isCompletedGroup ? "download-group--completed" : ""}`}
       >
@@ -1034,12 +1107,79 @@ export function DownloadGroup({
             <h2>{title}</h2>
             <h3 className="download-group__header-count">{library.length}</h3>
           </div>
+
+          {isCompletedGroup && (
+            <button
+              type="button"
+              className={`download-group__select-toggle ${selectionMode ? "download-group__select-toggle--active" : ""}`}
+              onClick={toggleSelectionMode}
+            >
+              {selectionMode ? (
+                <XCircleIcon size={14} />
+              ) : (
+                <ChecklistIcon size={14} />
+              )}
+              {selectionMode ? t("exit_selection") : t("select")}
+            </button>
+          )}
         </div>
+
+        {isCompletedGroup && selectionMode && selectedGames.length > 0 && (
+          <div className="download-group__bulk-bar">
+            <span className="download-group__bulk-count">
+              {t("games_selected", { count: selectedGames.length })}
+            </span>
+
+            <div className="download-group__bulk-actions">
+              <Button
+                theme="outline"
+                onClick={() => {
+                  void handleBulkExtract();
+                }}
+                disabled={isBulkProcessing}
+              >
+                <FileDirectoryIcon size={16} />
+                {t("extract")}
+              </Button>
+
+              <Button
+                theme="outline"
+                onClick={() => setBulkRemoveModalVisible(true)}
+                disabled={isBulkProcessing}
+              >
+                <TrashIcon size={16} />
+                {t("remove_installer")}
+              </Button>
+
+              <Button
+                theme="outline"
+                onClick={() => setSelectedIds(new Set())}
+                disabled={isBulkProcessing}
+              >
+                {t("clear_selection")}
+              </Button>
+            </div>
+          </div>
+        )}
 
         <ul className="download-group__simple-list">
           {downloadInfo.map(({ game, size, progress, isSeeding: seeding }) => {
             return (
               <li key={game.id} className="download-group__simple-card">
+                {isCompletedGroup && selectionMode && (
+                  <button
+                    type="button"
+                    onClick={() => toggleSelect(game.id)}
+                    className="download-group__simple-select"
+                    aria-label={t("select")}
+                  >
+                    {selectedIds.has(game.id) ? (
+                      <CheckCircleFillIcon size={20} />
+                    ) : (
+                      <CircleIcon size={20} />
+                    )}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => navigate(buildGameDetailsPath(game))}
