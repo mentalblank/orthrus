@@ -7,6 +7,7 @@ import {
   PuzzlePieceIcon,
   SignOutIcon,
   SquaresFourIcon,
+  TrophyIcon,
 } from "@phosphor-icons/react";
 import { forwardRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -75,6 +76,12 @@ function SidebarRouter() {
         label: "Library",
         path: `${basePath}/library`,
         icon: BookOpenIcon,
+      },
+      {
+        key: "achievementsStats",
+        label: "Achievements",
+        path: `${basePath}/achievements-stats`,
+        icon: TrophyIcon,
       },
       {
         key: "downloads",

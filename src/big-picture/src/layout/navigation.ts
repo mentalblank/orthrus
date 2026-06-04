@@ -5,6 +5,7 @@ import { CATALOGUE_GRID_REGION_ID } from "../pages/catalogue/navigation";
 import { HOME_PAGE_REGION_ID } from "../pages/home/navigation";
 import { SETTINGS_PAGE_REGION_ID } from "../pages/settings/navigation";
 import { LIBRARY_PAGE_REGION_ID } from "../components/pages/library/navigation";
+import { ACHIEVEMENTS_STATS_PAGE_REGION_ID } from "../pages/achievements-stats/navigation";
 
 export const BIG_PICTURE_APP_LAYER_ID = "big-picture-app-layer";
 export const BIG_PICTURE_SHELL_REGION_ID = "big-picture-shell";
@@ -16,6 +17,7 @@ export const BIG_PICTURE_SIDEBAR_ITEM_IDS = {
   home: "big-picture-sidebar-home",
   catalogue: "big-picture-sidebar-catalogue",
   library: "big-picture-sidebar-library",
+  achievementsStats: "big-picture-sidebar-achievements-stats",
   downloads: "big-picture-sidebar-downloads",
   settings: "big-picture-sidebar-settings",
   componentLab: "big-picture-sidebar-component-lab",
@@ -91,6 +93,10 @@ export function getBigPictureSidebarItemIdFromPathname(pathname: string) {
     return BIG_PICTURE_SIDEBAR_ITEM_IDS.settings;
   }
 
+  if (normalizedPathname.startsWith("/achievements-stats")) {
+    return BIG_PICTURE_SIDEBAR_ITEM_IDS.achievementsStats;
+  }
+
   if (normalizedPathname.startsWith("/library")) {
     return BIG_PICTURE_SIDEBAR_ITEM_IDS.library;
   }
@@ -109,6 +115,10 @@ export function getBigPictureContentEntryRegionIdFromPathname(
 
   if (normalizedPathname.startsWith("/catalogue")) {
     return CATALOGUE_GRID_REGION_ID;
+  }
+
+  if (normalizedPathname.startsWith("/achievements-stats")) {
+    return ACHIEVEMENTS_STATS_PAGE_REGION_ID;
   }
 
   if (normalizedPathname.startsWith("/library")) {
