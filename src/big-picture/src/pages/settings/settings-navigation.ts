@@ -31,18 +31,10 @@ export const NOTIFICATIONS_ACHIEVEMENTS_TEST_BUTTON_ID =
 export const CONTENT_SECTION_REGION_ID = "content-section-region";
 export const COMPATIBILITY_SECTION_REGION_ID = "compatibility-section-region";
 export const INTEGRATIONS_SECTION_REGION_ID = "integrations-section-region";
-export const ACCOUNT_PRIVACY_PRIVACY_SELECT_ID =
-  "account-privacy-profile-visibility";
 export const COMPATIBILITY_GAMEMODE_FOCUS_ID = "compatibility-gamemode";
 export const COMPATIBILITY_MANGOHUD_FOCUS_ID = "compatibility-mangohud";
 export const COMPATIBILITY_COMMON_REDIST_BUTTON_ID =
   "compatibility-common-redist";
-export const ACCOUNT_PRIVACY_UPDATE_EMAIL_BUTTON_ID =
-  "account-privacy-update-email";
-export const ACCOUNT_PRIVACY_UPDATE_PASSWORD_BUTTON_ID =
-  "account-privacy-update-password";
-export const ACCOUNT_PRIVACY_HYDRA_CLOUD_BUTTON_ID =
-  "account-privacy-hydra-cloud";
 
 export const BEHAVIOR_ITEM_FOCUS_IDS = {
   preferQuitInsteadOfHiding: "behavior-prefer-quit-instead-of-hiding",

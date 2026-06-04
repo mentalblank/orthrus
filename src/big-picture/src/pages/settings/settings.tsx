@@ -5,7 +5,6 @@ import { Tabs, type TabsItem, VerticalFocusGroup } from "../../components";
 import { useGamepad, useNavigation } from "../../hooks";
 import { GamepadButtonType } from "../../types";
 import { useVirtualKeyboardStore } from "../../stores";
-import { AccountPrivacySettingsSection } from "./account-privacy";
 import { CompatibilitySettingsSection } from "./compatibility";
 import { ContentSettingsSection } from "./content";
 import { DownloadsSettingsSection } from "./downloads";
@@ -13,9 +12,7 @@ import { GeneralSettingsSection } from "./general";
 import { IntegrationsSettingsSection } from "./integrations";
 import { SETTINGS_PAGE_REGION_ID } from "./navigation";
 import { NotificationsSettingsSection } from "./notifications";
-import { useUserDetails } from "../../hooks";
 import {
-  ACCOUNT_PRIVACY_PRIVACY_SELECT_ID,
   COMPATIBILITY_COMMON_REDIST_BUTTON_ID,
   COMPATIBILITY_PROTON_OPTION_AUTO_FOCUS_ID,
   CONTENT_ITEM_FOCUS_IDS,
@@ -34,7 +31,6 @@ const ALL_SETTINGS_TABS = [
   { id: "content", label: "Content" },
   { id: "integrations", label: "Integrations" },
   { id: "compatibility", label: "Compatibility" },
-  { id: "account-privacy", label: "Account and Privacy" },
 ] as const;
 
 const SETTINGS_PAGE_FADE_TRANSITION = {
@@ -66,7 +62,6 @@ const SETTINGS_TAB_CONTENT: Record<
   content: ContentSettingsSection,
   integrations: IntegrationsSettingsSection,
   compatibility: CompatibilitySettingsSection,
-  "account-privacy": AccountPrivacySettingsSection,
 };
 
 function SettingsTabPanel({
@@ -106,7 +101,6 @@ function SettingsTabPanel({
 }
 
 export default function Settings() {
-  const { userDetails } = useUserDetails();
   const [selectedTab, setSelectedTab] = useState<SettingsTabId>(
     ALL_SETTINGS_TABS[0].id
   );
@@ -115,13 +109,7 @@ export default function Settings() {
     (state) => state.target
   );
 
-  const visibleTabs = useMemo(() => {
-    return ALL_SETTINGS_TABS.filter((tab) => {
-      if (tab.id !== "account-privacy") return true;
-
-      return Boolean(userDetails);
-    });
-  }, [userDetails]);
+  const visibleTabs = useMemo(() => ALL_SETTINGS_TABS, []);
 
   const selectedTabIndex = visibleTabs.findIndex(
     (tab) => tab.id === selectedTab
@@ -222,12 +210,10 @@ export default function Settings() {
         return platform === "win32"
           ? COMPATIBILITY_COMMON_REDIST_BUTTON_ID
           : COMPATIBILITY_PROTON_OPTION_AUTO_FOCUS_ID;
-      case "account-privacy":
-        return userDetails ? ACCOUNT_PRIVACY_PRIVACY_SELECT_ID : null;
       default:
         return null;
     }
-  }, [selectedTab, userDetails]);
+  }, [selectedTab]);
 
   return (
     <VerticalFocusGroup regionId={SETTINGS_PAGE_REGION_ID} asChild>

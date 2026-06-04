@@ -334,18 +334,6 @@ export interface AchievementNotificationInfo {
   points?: number;
 }
 
-export interface GameArtifact {
-  id: string;
-  artifactLengthInBytes: number;
-  downloadOptionTitle: string | null;
-  createdAt: string;
-  updatedAt: string;
-  hostname: string;
-  downloadCount: number;
-  label?: string;
-  isFrozen: boolean;
-}
-
 export type NotificationType =
   | "FRIEND_REQUEST_RECEIVED"
   | "FRIEND_REQUEST_ACCEPTED"

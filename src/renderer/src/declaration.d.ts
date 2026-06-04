@@ -17,7 +17,6 @@ import type {
   UserDetails,
   FriendRequestSync,
   NotificationSync,
-  GameArtifact,
   LudusaviBackup,
   UserAchievement,
   ComparedAchievements,
@@ -40,7 +39,6 @@ import type {
   TorrentFilesResponse,
   DownloadLayoutState,
 } from "@types";
-import type { AxiosProgressEvent } from "axios";
 
 export interface DriveInfo {
   root: string;
@@ -349,15 +347,6 @@ declare global {
       shop: GameShop,
       downloadOptionTitle: string | null
     ) => Promise<void>;
-    downloadGameArtifact: (
-      objectId: string,
-      shop: GameShop,
-      gameArtifactId: string
-    ) => Promise<void>;
-    getGameArtifacts: (
-      objectId: string,
-      shop: GameShop
-    ) => Promise<GameArtifact[]>;
     getGameBackupPreview: (
       objectId: string,
       shop: GameShop
@@ -367,25 +356,14 @@ declare global {
       objectId: string,
       backupPath: string | null
     ) => Promise<void>;
-    onBackupDownloadComplete: (
-      objectId: string,
-      shop: GameShop,
-      cb: () => void
-    ) => () => Electron.IpcRenderer;
     onUploadComplete: (
       objectId: string,
       shop: GameShop,
       cb: () => void
     ) => () => Electron.IpcRenderer;
-    onBackupDownloadProgress: (
-      objectId: string,
-      shop: GameShop,
-      cb: (progress: AxiosProgressEvent) => void
-    ) => () => Electron.IpcRenderer;
 
     /* Misc */
     openExternal: (src: string) => Promise<void>;
-    openCheckout: () => Promise<void>;
     getVersion: () => Promise<string>;
     isStaging: () => Promise<boolean>;
     ping: () => string;
