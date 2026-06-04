@@ -7,8 +7,11 @@ import {
   TrophyIcon,
   DatabaseIcon,
   FileZipIcon,
+  CheckCircleFillIcon,
+  CircleIcon,
 } from "@primer/octicons-react";
 import { memo, useEffect, useMemo, useState } from "react";
+import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import "./library-game-card-large.scss";
 
@@ -18,6 +21,9 @@ interface LibraryGameCardLargeProps {
     game: LibraryGame,
     position: { x: number; y: number }
   ) => void;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (game: LibraryGame) => void;
 }
 
 const normalizePathForCss = (url: string | null | undefined): string => {
@@ -28,10 +34,23 @@ const normalizePathForCss = (url: string | null | undefined): string => {
 export const LibraryGameCardLarge = memo(function LibraryGameCardLarge({
   game,
   onContextMenu,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
 }: Readonly<LibraryGameCardLargeProps>) {
   const { t } = useTranslation("library");
   const { formatPlayTime, handleCardClick, handleContextMenuClick } =
     useGameCard(game, onContextMenu);
+
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (selectable) {
+      event.preventDefault();
+      onToggleSelect?.(game);
+      return;
+    }
+
+    handleCardClick();
+  };
 
   const sizeBars = useMemo(() => {
     const items: {
@@ -138,10 +157,22 @@ export const LibraryGameCardLarge = memo(function LibraryGameCardLarge({
   return (
     <button
       type="button"
-      className="library-game-card-large"
-      onClick={handleCardClick}
+      className={`library-game-card-large${
+        selected ? " library-game-card-large--selected" : ""
+      }`}
+      onClick={handleClick}
       onContextMenu={handleContextMenuClick}
     >
+      {selectable && (
+        <div className="library-game-card-large__select-indicator">
+          {selected ? (
+            <CheckCircleFillIcon size={22} />
+          ) : (
+            <CircleIcon size={22} />
+          )}
+        </div>
+      )}
+
       <div
         className="library-game-card-large__background"
         style={backgroundStyle}

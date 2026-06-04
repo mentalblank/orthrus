@@ -1,11 +1,14 @@
 import { LibraryGame } from "@types";
 import { useGameCard } from "@renderer/hooks";
 import { memo, useEffect, useState } from "react";
+import type { MouseEvent } from "react";
 import {
   ClockIcon,
   AlertFillIcon,
   TrophyIcon,
   ImageIcon,
+  CheckCircleFillIcon,
+  CircleIcon,
 } from "@primer/octicons-react";
 import "./library-game-card.scss";
 import { logger } from "@renderer/logger";
@@ -20,6 +23,9 @@ interface LibraryGameCardProps {
   ) => void;
   onShowTooltip?: (gameId: string) => void;
   onHideTooltip?: () => void;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (game: LibraryGame) => void;
 }
 
 export const LibraryGameCard = memo(function LibraryGameCard({
@@ -27,9 +33,22 @@ export const LibraryGameCard = memo(function LibraryGameCard({
   onMouseEnter,
   onMouseLeave,
   onContextMenu,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
 }: Readonly<LibraryGameCardProps>) {
   const { formatPlayTime, handleCardClick, handleContextMenuClick } =
     useGameCard(game, onContextMenu);
+
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (selectable) {
+      event.preventDefault();
+      onToggleSelect?.(game);
+      return;
+    }
+
+    handleCardClick();
+  };
 
   const sources = [
     game.customIconUrl, // Level 0
@@ -96,11 +115,23 @@ export const LibraryGameCard = memo(function LibraryGameCard({
       type="button"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="library-game-card__wrapper"
+      className={`library-game-card__wrapper${
+        selectable ? " library-game-card__wrapper--selectable" : ""
+      }${selected ? " library-game-card__wrapper--selected" : ""}`}
       title={game.title}
-      onClick={handleCardClick}
+      onClick={handleClick}
       onContextMenu={handleContextMenuClick}
     >
+      {selectable && (
+        <div className="library-game-card__select-indicator">
+          {selected ? (
+            <CheckCircleFillIcon size={20} />
+          ) : (
+            <CircleIcon size={20} />
+          )}
+        </div>
+      )}
+
       <div className="library-game-card__overlay">
         <div className="library-game-card__top-section">
           <div className="library-game-card__playtime">
