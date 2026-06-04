@@ -946,6 +946,7 @@
     "grid_view": "Grid view",
     "compact_view": "Compact view",
     "large_view": "Large view",
+    "list_view": "List view",
     "no_games_title": "Your library is empty",
     "no_games_description": "Add games from the catalogue or download them to get started",
     "amount_hours": "{{amount}} hours",

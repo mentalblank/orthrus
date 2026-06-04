@@ -1,8 +1,13 @@
-import { AppsIcon, RowsIcon, SquareIcon } from "@primer/octicons-react";
+import {
+  AppsIcon,
+  ListUnorderedIcon,
+  RowsIcon,
+  SquareIcon,
+} from "@primer/octicons-react";
 import { useTranslation } from "react-i18next";
 import "./view-options.scss";
 
-export type ViewMode = "grid" | "compact" | "large";
+export type ViewMode = "grid" | "compact" | "large" | "list";
 
 interface ViewOptionsProps {
   viewMode: ViewMode;
@@ -38,6 +43,13 @@ export function ViewOptions({
           title={t("large_view")}
         >
           <RowsIcon size={16} />
+        </button>
+        <button
+          className={`library-view-options__option ${viewMode === "list" ? "active" : ""}`}
+          onClick={() => onViewModeChange("list")}
+          title={t("list_view")}
+        >
+          <ListUnorderedIcon size={16} />
         </button>
       </div>
     </div>

@@ -768,8 +768,8 @@ export default function Library() {
             </div>
 
             <div className="library__controls-right">
-              {hasLockedCollections && (
-                unlocked ? (
+              {hasLockedCollections &&
+                (unlocked ? (
                   <button
                     type="button"
                     className="library__control-button"
@@ -783,14 +783,15 @@ export default function Library() {
                   <button
                     type="button"
                     className="library__control-button"
-                    onClick={() => setPinModal({ visible: true, mode: "enter" })}
+                    onClick={() =>
+                      setPinModal({ visible: true, mode: "enter" })
+                    }
                     title={t("reveal_locked")}
                   >
                     <LockIcon size={16} />
                     <span>{t("reveal_locked")}</span>
                   </button>
-                )
-              )}
+                ))}
 
               <button
                 type="button"
@@ -947,10 +948,10 @@ export default function Library() {
         !shouldShowFavoritesEmptyState &&
         !shouldShowCollectionEmptyState && (
           <AnimatePresence mode="wait">
-            {viewMode === "large" && (
+            {(viewMode === "large" || viewMode === "list") && (
               <motion.div
-                key={`${sortBy}-large`}
-                className="library__games-list library__games-list--large"
+                key={`${sortBy}-${viewMode}`}
+                className={`library__games-list library__games-list--${viewMode}`}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
@@ -969,7 +970,7 @@ export default function Library() {
               </motion.div>
             )}
 
-            {viewMode !== "large" && (
+            {(viewMode === "grid" || viewMode === "compact") && (
               <motion.ul
                 key={`${sortBy}-${viewMode}`}
                 className={`library__games-grid library__games-grid--${viewMode}`}
