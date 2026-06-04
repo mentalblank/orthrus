@@ -1,6 +1,6 @@
 <div align="center">
 
-[<img src="https://raw.githubusercontent.com/hydralauncher/hydra/refs/heads/main/resources/icon.png" width="144"/>](https://help.hydralauncher.gg)
+[<img src="https://raw.githubusercontent.com/mentalblank/hydra/refs/heads/main/resources/icon.png" width="144"/>](https://help.hydralauncher.gg)
 
   <h1 align="center">Hydra Launcher</h1>
 
@@ -8,8 +8,8 @@
     <strong>Hydra Launcher is an open-source gaming platform created to be the single tool that you need in order to manage your gaming library. Hydra is written in Node.js (Electron, React, Typescript), Python, and Rust.</strong>
   </p>
 
-[![build](https://img.shields.io/github/actions/workflow/status/hydralauncher/hydra/build.yml)](https://github.com/hydralauncher/hydra/actions)
-[![release](https://img.shields.io/github/package-json/v/hydralauncher/hydra)](https://github.com/hydralauncher/hydra/releases)
+[![build](https://img.shields.io/github/actions/workflow/status/mentalblank/hydra/build.yml)](https://github.com/mentalblank/hydra/actions)
+[![release](https://img.shields.io/github/package-json/v/mentalblank/hydra)](https://github.com/mentalblank/hydra/releases)
 [![chocolatey](https://img.shields.io/chocolatey/v/hydralauncher.svg)](https://community.chocolatey.org/packages/hydralauncher)
 
 ![Hydra Launcher Home Page](./docs/screenshot.png)
@@ -41,8 +41,8 @@ Packaging scripts (`yarn build:win`, `yarn build:mac`, `yarn build:linux`, `yarn
 
 ## Contributors
 
-<a href="https://github.com/hydralauncher/hydra/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=hydralauncher/hydra" />
+<a href="https://github.com/mentalblank/hydra/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=mentalblank/hydra" />
 </a>
 
 ## License
