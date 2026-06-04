@@ -3,6 +3,9 @@
 [<img src="https://raw.githubusercontent.com/mentalblank/hydra/refs/heads/main/resources/icon.png" width="144"/>](https://help.hydralauncher.gg)
 
   <h1 align="center">Hydra Launcher</h1>
+  <p align="center">
+    <strong>This project is a fork of the original <a href="https://github.com/hydralauncher/hydra">hydralauncher</a>.</strong>
+  </p>
 
   <p align="center">
     <strong>Hydra Launcher is an open-source gaming platform created to be the single tool that you need in order to manage your gaming library. Hydra is written in Node.js (Electron, React, Typescript), Python, and Rust.</strong>
