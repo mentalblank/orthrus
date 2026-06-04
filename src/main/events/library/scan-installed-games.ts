@@ -1,14 +1,8 @@
 import path from "node:path";
 import fs from "node:fs";
-import { t } from "i18next";
 import { registerEvent } from "../register-event";
 import { gamesSublevel } from "@main/level";
-import {
-  GameExecutables,
-  LocalNotificationManager,
-  logger,
-  WindowManager,
-} from "@main/services";
+import { GameExecutables, logger, WindowManager } from "@main/services";
 
 const SCAN_DIRECTORIES = [
   String.raw`C:\Games`,
@@ -38,27 +32,6 @@ async function searchInDirectories(
     if (foundPath) return foundPath;
   }
   return null;
-}
-
-async function publishScanNotification(foundCount: number): Promise<void> {
-  const hasFoundGames = foundCount > 0;
-
-  await LocalNotificationManager.createNotification(
-    "SCAN_GAMES_COMPLETE",
-    t(
-      hasFoundGames
-        ? "scan_games_complete_title"
-        : "scan_games_no_results_title",
-      { ns: "notifications" }
-    ),
-    t(
-      hasFoundGames
-        ? "scan_games_complete_description"
-        : "scan_games_no_results_description",
-      { ns: "notifications", count: foundCount }
-    ),
-    { url: "/library?openScanModal=true" }
-  );
 }
 
 const scanInstalledGames = async (
@@ -103,7 +76,6 @@ const scanInstalledGames = async (
   }
 
   WindowManager.sendToAppWindows("on-library-batch-complete");
-  await publishScanNotification(foundGames.length);
 
   return { foundGames, total: gamesToScan.length };
 };

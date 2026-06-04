@@ -16,7 +16,6 @@ import { restartAndInstallUpdate } from "@main/events/autoupdater/restart-and-in
 import { SystemPath } from "../system-path";
 import { getThemeSoundPath } from "@main/helpers";
 import { processProfileImage } from "@main/events/profile/process-profile-image";
-import { LocalNotificationManager } from "./local-notifications";
 
 const getStaticImage = async (path: string) => {
   return processProfileImage(path, "jpg")
@@ -92,17 +91,6 @@ export const publishDownloadCompleteNotification = async (game: Game) => {
       icon: await downloadImage(game.iconUrl),
     }).show();
   }
-
-  // Create local notification
-  await LocalNotificationManager.createNotification(
-    "DOWNLOAD_COMPLETE",
-    title,
-    body,
-    {
-      pictureUrl: game.iconUrl,
-      url: `/game/${game.shop}/${game.objectId}`,
-    }
-  );
 };
 
 export const publishNotificationUpdateReadyToInstall = async (
@@ -125,13 +113,6 @@ export const publishNotificationUpdateReadyToInstall = async (
       restartAndInstallUpdate();
     })
     .show();
-
-  // Create local notification
-  await LocalNotificationManager.createNotification(
-    "UPDATE_AVAILABLE",
-    title,
-    body
-  );
 };
 
 export const publishCombinedNewAchievementNotification = async (
@@ -174,16 +155,6 @@ export const publishExtractionCompleteNotification = async (game: Game) => {
     body,
     icon: trayIcon,
   }).show();
-
-  // Create local notification
-  await LocalNotificationManager.createNotification(
-    "EXTRACTION_COMPLETE",
-    title,
-    body,
-    {
-      url: `/game/${game.shop}/${game.objectId}`,
-    }
-  );
 };
 
 export const publishNewAchievementNotification = async (info: {
