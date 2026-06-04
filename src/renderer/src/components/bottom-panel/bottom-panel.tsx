@@ -14,6 +14,8 @@ import "./bottom-panel.scss";
 import { useNavigate } from "react-router-dom";
 import { VERSION_CODENAME } from "@renderer/constants";
 
+import { ChangelogModal } from "../changelog-modal/changelog-modal";
+
 export function BottomPanel() {
   const { t } = useTranslation("bottom_panel");
 
@@ -34,6 +36,7 @@ export function BottomPanel() {
   const [commonRedistStatus, setCommonRedistStatus] = useState<string | null>(
     null
   );
+  const [isChangelogModalVisible, setIsChangelogModalVisible] = useState(false);
 
   useEffect(() => {
     window.electron.getVersion().then((result) => setVersion(result));
@@ -162,7 +165,8 @@ export function BottomPanel() {
       </button>
 
       <button
-        data-open-workwonders-changelog-mini
+        type="button"
+        onClick={() => setIsChangelogModalVisible(true)}
         className="bottom-panel__version-button"
       >
         <small>
@@ -170,6 +174,11 @@ export function BottomPanel() {
           {VERSION_CODENAME}&quot;
         </small>
       </button>
+
+      <ChangelogModal
+        visible={isChangelogModalVisible}
+        onClose={() => setIsChangelogModalVisible(false)}
+      />
     </footer>
   );
 }

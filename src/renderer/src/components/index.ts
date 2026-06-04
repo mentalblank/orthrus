@@ -26,3 +26,4 @@ export * from "./proton-path-picker/proton-path-picker";
 export * from "./create-collection-modal/create-collection-modal";
 export * from "./collection-pin-modal/collection-pin-modal";
 export * from "./manage-collection-games-modal/manage-collection-games-modal";
+export * from "./changelog-modal/changelog-modal";
