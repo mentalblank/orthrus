@@ -1,24 +1,13 @@
-import i18next from "i18next";
 import { registerEvent } from "../register-event";
-import { HydraApi, WindowManager } from "@main/services";
-import { AuthPage } from "@shared";
+import type { AuthPage } from "@shared";
+import { logger } from "@main/services";
 
+/* Local-only: remote login/auth window disabled. */
 const openAuthWindow = async (
   _event: Electron.IpcMainInvokeEvent,
-  page: AuthPage
+  _page: AuthPage
 ) => {
-  const searchParams = new URLSearchParams({
-    lng: i18next.language,
-  });
-
-  if ([AuthPage.UpdateEmail, AuthPage.UpdatePassword].includes(page)) {
-    const { accessToken } = await HydraApi.refreshToken().catch(() => {
-      return { accessToken: "" };
-    });
-    searchParams.set("token", accessToken);
-  }
-
-  WindowManager.openAuthWindow(page, searchParams);
+  logger.info("openAuthWindow ignored: running in local-only mode");
 };
 
 registerEvent("openAuthWindow", openAuthWindow);

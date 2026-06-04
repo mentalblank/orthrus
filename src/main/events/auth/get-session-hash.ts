@@ -1,20 +1,10 @@
-import jwt from "jsonwebtoken";
-
 import { registerEvent } from "../register-event";
-import { db, levelKeys } from "@main/level";
-import type { Auth } from "@types";
+import { getLocalUser } from "@main/services/user/local-user";
 
+/* Local-only: session identity is the local user id, no JWT. */
 const getSessionHash = async (_event: Electron.IpcMainInvokeEvent) => {
-  const auth = await db.get<string, Auth>(levelKeys.auth, {
-    valueEncoding: "json",
-  });
-
-  if (!auth) return null;
-  const payload = jwt.decode(auth.accessToken) as jwt.JwtPayload;
-
-  if (!payload) return null;
-
-  return payload.sessionId;
+  const user = await getLocalUser();
+  return user.id;
 };
 
 registerEvent("getSessionHash", getSessionHash);

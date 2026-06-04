@@ -1,83 +1,64 @@
 import { registerEvent } from "../register-event";
-import { HydraApi } from "@main/services";
 import fs from "node:fs";
 import path from "node:path";
-import type { UpdateProfileRequest, UserProfile } from "@types";
-import { omit } from "lodash-es";
-import axios from "axios";
-import { fileTypeFromFile } from "file-type";
+import { randomUUID } from "node:crypto";
+import type { UpdateProfileRequest, User, UserProfile } from "@types";
+import { ASSETS_PATH } from "@main/constants";
+import {
+  toUserProfile,
+  updateLocalUser,
+} from "@main/services/user/local-user";
 
-export const patchUserProfile = async (updateProfile: UpdateProfileRequest) => {
-  return HydraApi.patch<UserProfile>("/profile", updateProfile);
-};
-
-const uploadImage = async (
-  type: "profile-image" | "background-image",
-  imagePath: string
-) => {
-  const stat = fs.statSync(imagePath);
-  const fileBuffer = fs.readFileSync(imagePath);
-  const fileSizeInBytes = stat.size;
-
-  const response = await HydraApi.post<{ presignedUrl: string }>(
-    `/presigned-urls/${type}`,
-    {
-      imageExt: path.extname(imagePath).slice(1),
-      imageLength: fileSizeInBytes,
-    }
-  );
-
-  const mimeType = await fileTypeFromFile(imagePath);
-
-  await axios.put(response.presignedUrl, fileBuffer, {
-    headers: {
-      "Content-Type": mimeType?.mime,
-    },
-  });
-
-  if (type === "background-image") {
-    return response["backgroundImageUrl"];
+/* Copies a picked image into the local assets dir and returns a local: url. */
+const persistImage = (imagePath: string): string => {
+  if (!fs.existsSync(ASSETS_PATH)) {
+    fs.mkdirSync(ASSETS_PATH, { recursive: true });
   }
 
-  return response["profileImageUrl"];
+  const dest = path.join(
+    ASSETS_PATH,
+    `${randomUUID()}${path.extname(imagePath)}`
+  );
+  fs.copyFileSync(imagePath, dest);
+  return `local:${dest}`;
+};
+
+/* Local-only no-op kept for callers that synced language to the cloud. */
+export const patchUserProfile = async (_updateProfile: UpdateProfileRequest) => {
+  return undefined;
 };
 
 const updateProfile = async (
   _event: Electron.IpcMainInvokeEvent,
   updateProfile: UpdateProfileRequest
-) => {
-  const payload = omit(updateProfile, [
-    "profileImageUrl",
-    "backgroundImageUrl",
-  ]);
+): Promise<UserProfile> => {
+  const patch: Partial<User> = {};
+
+  if (updateProfile.displayName !== undefined) {
+    patch.displayName = updateProfile.displayName;
+  }
+  if (updateProfile.bio !== undefined) {
+    patch.bio = updateProfile.bio;
+  }
+  if (updateProfile.profileVisibility !== undefined) {
+    patch.profileVisibility = updateProfile.profileVisibility;
+  }
 
   if (updateProfile.profileImageUrl !== undefined) {
-    if (updateProfile.profileImageUrl === null) {
-      payload["profileImageUrl"] = null;
-    } else {
-      const profileImageUrl = await uploadImage(
-        "profile-image",
-        updateProfile.profileImageUrl
-      ).catch(() => undefined);
-
-      payload["profileImageUrl"] = profileImageUrl;
-    }
+    patch.profileImageUrl =
+      updateProfile.profileImageUrl === null
+        ? null
+        : persistImage(updateProfile.profileImageUrl);
   }
-
   if (updateProfile.backgroundImageUrl !== undefined) {
-    if (updateProfile.backgroundImageUrl === null) {
-      payload["backgroundImageUrl"] = null;
-    } else {
-      const backgroundImageUrl = await uploadImage(
-        "background-image",
-        updateProfile.backgroundImageUrl
-      ).catch(() => undefined);
-
-      payload["backgroundImageUrl"] = backgroundImageUrl;
-    }
+    patch.backgroundImageUrl =
+      updateProfile.backgroundImageUrl === null
+        ? null
+        : persistImage(updateProfile.backgroundImageUrl);
   }
 
-  return patchUserProfile(payload);
+  const user = await updateLocalUser(patch);
+  return toUserProfile(user);
 };
 
 registerEvent("updateProfile", updateProfile);

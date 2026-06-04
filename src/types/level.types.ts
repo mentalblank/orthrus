@@ -29,6 +29,10 @@ export interface User {
   profileImageUrl: string | null;
   backgroundImageUrl: string | null;
   subscription: Subscription | null;
+  /* Local-only profile fields (no remote account) */
+  username?: string;
+  bio?: string;
+  profileVisibility?: "PUBLIC" | "PRIVATE" | "FRIENDS";
 }
 
 export interface Game {
