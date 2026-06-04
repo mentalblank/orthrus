@@ -98,6 +98,64 @@ export function useGameCollections() {
     [dispatch, library]
   );
 
+  const bulkAssignGamesToCollection = useCallback(
+    async (
+      collectionId: string,
+      games: { add: LibraryGame[]; remove: LibraryGame[] }
+    ) => {
+      const apply = async (game: LibraryGame, shouldBeMember: boolean) => {
+        if (game.shop === "custom") return;
+
+        const currentGame = library.find(
+          (libraryGame) =>
+            libraryGame.shop === game.shop &&
+            libraryGame.objectId === game.objectId
+        );
+
+        const previousCollectionIds = getNormalizedCollectionIds(
+          currentGame ?? game
+        );
+        const isMember = previousCollectionIds.includes(collectionId);
+
+        if (shouldBeMember === isMember) return;
+
+        const nextCollectionIds = shouldBeMember
+          ? [...previousCollectionIds, collectionId]
+          : previousCollectionIds.filter((id) => id !== collectionId);
+
+        await window.electron.assignGameToCollection(
+          game.shop,
+          game.objectId,
+          nextCollectionIds
+        );
+
+        dispatch(
+          setGameCollectionIds({
+            shop: game.shop,
+            objectId: game.objectId,
+            collectionIds: nextCollectionIds,
+          })
+        );
+
+        dispatch(
+          applyCollectionAssignment({
+            previousCollectionIds,
+            nextCollectionIds,
+          })
+        );
+      };
+
+      for (const game of games.add) {
+        await apply(game, true);
+      }
+
+      for (const game of games.remove) {
+        await apply(game, false);
+      }
+    },
+    [dispatch, library]
+  );
+
   const createCollection = useCallback(
     async (name: string) => {
       const normalizedName = name.trim().toLocaleLowerCase();
@@ -131,6 +189,7 @@ export function useGameCollections() {
     hasLoaded,
     loadCollections,
     assignGameToCollection,
+    bulkAssignGamesToCollection,
     createCollection,
   };
 }
