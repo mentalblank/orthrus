@@ -363,6 +363,8 @@ export type LibraryGame = Game &
     download: Download | null;
     unlockedAchievementCount?: number;
     achievementCount?: number;
+    achievementsPointsEarnedSum?: number;
+    achievementsPointsTotal?: number;
   };
 
 export * from "./game.types";

@@ -31,15 +31,37 @@ const getLibrary = async (): Promise<LibraryGame[]> => {
               ) || []
             );
 
+            const unlockedAchievementNames = new Set(
+              achievements?.unlockedAchievements
+                ?.filter(
+                  (unlocked) =>
+                    validAchievementNames.has(
+                      (unlocked.name ?? "").toUpperCase()
+                    ) && unlocked.unlockTime > 0
+                )
+                .map((unlocked) => (unlocked.name ?? "").toUpperCase()) ?? []
+            );
+
             const unlockedAchievementCount =
-              achievements?.unlockedAchievements?.filter(
-                (unlocked) =>
-                  validAchievementNames.has(
-                    (unlocked.name ?? "").toUpperCase()
-                  ) && unlocked.unlockTime > 0
-              ).length ??
-              game.unlockedAchievementCount ??
+              unlockedAchievementNames.size ||
+              game.unlockedAchievementCount ||
               0;
+
+            const achievementsPointsTotal =
+              achievements?.achievements?.reduce(
+                (sum, a) => sum + (a.points ?? 0),
+                0
+              ) ?? 0;
+
+            const achievementsPointsEarnedSum =
+              achievements?.achievements?.reduce(
+                (sum, a) =>
+                  sum +
+                  (unlockedAchievementNames.has((a.name ?? "").toUpperCase())
+                    ? (a.points ?? 0)
+                    : 0),
+                0
+              ) ?? 0;
 
             // Verify installer still exists, clear if deleted externally
             let installerSizeInBytes = game.installerSizeInBytes;
@@ -78,6 +100,8 @@ const getLibrary = async (): Promise<LibraryGame[]> => {
               download: download ?? null,
               unlockedAchievementCount,
               achievementCount: game.achievementCount ?? 0,
+              achievementsPointsEarnedSum,
+              achievementsPointsTotal,
               // Spread gameAssets last to ensure all image URLs are properly set
               ...gameAssets,
               // Preserve custom image URLs from game if they exist
