@@ -23,3 +23,9 @@ Future-updates.md
 TO-DO.md
 .planning/
 .claude/
+backend/data/avatars/
+GEMINI*.md
+CLAUDE*.md
+AGENTS*.md
+copilot-instructions*.md
+.claude*/
