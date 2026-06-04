@@ -74,6 +74,7 @@ export function useCollectionSettings() {
   const isChipVisibleInLibrary = useCallback(
     (collectionId: string): boolean => {
       const { showInLibrary, locked } = getSettings(collectionId);
+      if (unlocked) return true;
       return showInLibrary && !(locked && !unlocked);
     },
     [getSettings, unlocked]
@@ -82,6 +83,7 @@ export function useCollectionSettings() {
   const isChipVisibleInSidebar = useCallback(
     (collectionId: string): boolean => {
       const { showInSidebar, locked } = getSettings(collectionId);
+      if (unlocked) return true;
       return showInSidebar && !(locked && !unlocked);
     },
     [getSettings, unlocked]
@@ -91,6 +93,7 @@ export function useCollectionSettings() {
     (collectionIds: string[]): boolean =>
       collectionIds.some((id) => {
         const { showInLibrary, locked } = getSettings(id);
+        if (unlocked) return false;
         return !showInLibrary || (locked && !unlocked);
       }),
     [getSettings, unlocked]
@@ -100,6 +103,7 @@ export function useCollectionSettings() {
     (collectionIds: string[]): boolean =>
       collectionIds.some((id) => {
         const { showInSidebar, locked } = getSettings(id);
+        if (unlocked) return false;
         return !showInSidebar || (locked && !unlocked);
       }),
     [getSettings, unlocked]
