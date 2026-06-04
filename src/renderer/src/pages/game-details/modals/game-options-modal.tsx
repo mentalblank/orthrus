@@ -25,7 +25,7 @@ import { ResetAchievementsModal } from "./reset-achievements-modal";
 import { ChangeGamePlaytimeModal } from "./change-game-playtime-modal";
 import {
   AlertIcon,
-  CloudIcon,
+  ArchiveIcon,
   DownloadIcon,
   FileDirectoryIcon,
   GearIcon,
@@ -639,7 +639,7 @@ export function GameOptionsModal({
       {
         id: "save_backups" as const,
         label: t("settings_category_backups"),
-        icon: <CloudIcon size={16} />,
+        icon: <ArchiveIcon size={16} />,
       },
       ...(shouldShowWinePrefixConfiguration
         ? [

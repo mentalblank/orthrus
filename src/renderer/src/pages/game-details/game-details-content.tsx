@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { PencilIcon } from "@primer/octicons-react";
+import { ArchiveIcon, PencilIcon } from "@primer/octicons-react";
 import { useTranslation } from "react-i18next";
 
 import { HeroPanel } from "./hero";
@@ -10,7 +10,6 @@ import { GameLogo } from "./game-logo";
 
 import { gameDetailsContext } from "@renderer/context";
 
-import cloudIconAnimated from "@renderer/assets/icons/cloud-animated.gif";
 import "./game-details.scss";
 import "./hero.scss";
 
@@ -143,13 +142,7 @@ export function GameDetailsContent() {
                     className="game-details__cloud-sync-button"
                     onClick={handleCloudSaveButtonClick}
                   >
-                    <div className="game-details__cloud-icon-container">
-                      <img
-                        src={cloudIconAnimated}
-                        alt=""
-                        className="game-details__cloud-icon"
-                      />
-                    </div>
+                    <ArchiveIcon size={16} />
                     {t("cloud_save")}
                   </button>
                 )}
