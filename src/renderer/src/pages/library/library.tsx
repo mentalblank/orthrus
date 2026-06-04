@@ -86,6 +86,7 @@ export default function Library() {
     unlocked,
     setPin,
     unlock,
+    lockSession,
     isChipVisibleInLibrary,
     isGameHiddenInLibrary,
   } = useCollectionSettings();
@@ -767,16 +768,28 @@ export default function Library() {
             </div>
 
             <div className="library__controls-right">
-              {hasLockedCollections && !unlocked && (
-                <button
-                  type="button"
-                  className="library__control-button"
-                  onClick={() => setPinModal({ visible: true, mode: "enter" })}
-                  title={t("reveal_locked")}
-                >
-                  <LockIcon size={16} />
-                  <span>{t("reveal_locked")}</span>
-                </button>
+              {hasLockedCollections && (
+                unlocked ? (
+                  <button
+                    type="button"
+                    className="library__control-button"
+                    onClick={lockSession}
+                    title={t("lock_session")}
+                  >
+                    <UnlockIcon size={16} />
+                    <span>{t("lock_session")}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="library__control-button"
+                    onClick={() => setPinModal({ visible: true, mode: "enter" })}
+                    title={t("reveal_locked")}
+                  >
+                    <LockIcon size={16} />
+                    <span>{t("reveal_locked")}</span>
+                  </button>
+                )
               )}
 
               <button

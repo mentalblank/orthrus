@@ -1109,6 +1109,7 @@
     "incorrect_pin": "Incorrect PIN",
     "collection_locked": "Locked",
     "reveal_locked": "Reveal locked collections",
+    "lock_session": "Lock revealed collections",
     "select": "Select",
     "exit_selection": "Exit selection",
     "add_to_collection": "Add to collection",

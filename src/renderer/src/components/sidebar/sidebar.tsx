@@ -136,6 +136,7 @@ export function Sidebar() {
     unlocked,
     setPin,
     unlock,
+    lockSession,
     isChipVisibleInSidebar,
     isGameHiddenInSidebar,
   } = useCollectionSettings();
@@ -801,21 +802,37 @@ export function Sidebar() {
                   {t("collections")}
                 </small>
               </button>
-              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                {hasLockedCollections && !unlocked && (
-                  <button
-                    type="button"
-                    className="sidebar__add-button"
-                    onClick={() =>
-                      setPinModal({ visible: true, mode: "enter" })
-                    }
-                    aria-label={t("reveal_locked", { ns: "library" })}
-                    data-tooltip-id="reveal-locked-tooltip"
-                    data-tooltip-content={t("reveal_locked", { ns: "library" })}
-                    data-tooltip-place="top"
-                  >
-                    <LockIcon size={16} />
-                  </button>
+              <div
+                style={{ display: "flex", gap: "8px", alignItems: "center" }}
+              >
+                {hasLockedCollections && (
+                  unlocked ? (
+                    <button
+                      type="button"
+                      className="sidebar__add-button"
+                      onClick={lockSession}
+                      aria-label={t("lock_session", { ns: "library" })}
+                      data-tooltip-id="lock-session-tooltip"
+                      data-tooltip-content={t("lock_session", { ns: "library" })}
+                      data-tooltip-place="top"
+                    >
+                      <UnlockIcon size={16} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="sidebar__add-button"
+                      onClick={() =>
+                        setPinModal({ visible: true, mode: "enter" })
+                      }
+                      aria-label={t("reveal_locked", { ns: "library" })}
+                      data-tooltip-id="reveal-locked-tooltip"
+                      data-tooltip-content={t("reveal_locked", { ns: "library" })}
+                      data-tooltip-place="top"
+                    >
+                      <LockIcon size={16} />
+                    </button>
+                  )
                 )}
                 <button
                   type="button"
@@ -946,7 +963,8 @@ export function Sidebar() {
                   {filteredLibrary
                     .filter((game) => !showPlayableOnly || isGamePlayable(game))
                     .filter(
-                      (game) => !isGameHiddenInSidebar(getGameCollectionIds(game))
+                      (game) =>
+                        !isGameHiddenInSidebar(getGameCollectionIds(game))
                     )
                     .map((game) => (
                       <SidebarGameItem
@@ -1101,6 +1119,7 @@ export function Sidebar() {
       <Tooltip id="add-custom-game-tooltip" />
       <Tooltip id="create-collection-tooltip" />
       <Tooltip id="reveal-locked-tooltip" />
+      <Tooltip id="lock-session-tooltip" />
       <Tooltip id="show-playable-only-tooltip" />
     </aside>
   );
