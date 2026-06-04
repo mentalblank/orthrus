@@ -9,12 +9,18 @@ export const getDefaultCollectionSettings = (): CollectionSettings => ({
   locked: false,
 });
 
-export const loadCollectionSettings = (): Record<string, CollectionSettings> => {
+export const loadCollectionSettings = (): Record<
+  string,
+  CollectionSettings
+> => {
   try {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (!raw) return {};
 
-    const parsed = JSON.parse(raw) as Record<string, Partial<CollectionSettings>>;
+    const parsed = JSON.parse(raw) as Record<
+      string,
+      Partial<CollectionSettings>
+    >;
     const result: Record<string, CollectionSettings> = {};
 
     for (const [id, value] of Object.entries(parsed)) {

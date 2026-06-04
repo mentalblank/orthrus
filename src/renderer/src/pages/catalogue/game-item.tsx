@@ -136,9 +136,7 @@ export function GameItem({
   };
 
   return (
-    <article
-      className={cn("game-item", { "game-item--selected": selected })}
-    >
+    <article className={cn("game-item", { "game-item--selected": selected })}>
       <Link
         to={buildGameDetailsPath(game)}
         className="game-item__content-link"

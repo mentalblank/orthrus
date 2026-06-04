@@ -2,12 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { GameCollection, LibraryGame } from "@types";
 
-import {
-  Button,
-  CheckboxField,
-  Modal,
-  TextField,
-} from "@renderer/components";
+import { Button, CheckboxField, Modal, TextField } from "@renderer/components";
 import { useGameCollections, useLibrary, useToast } from "@renderer/hooks";
 
 import "./manage-collection-games-modal.scss";

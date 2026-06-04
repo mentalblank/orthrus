@@ -24,7 +24,10 @@ export const collectionSettingsSlice = createSlice({
   reducers: {
     setCollectionSettings: (
       state,
-      action: PayloadAction<{ id: string; partial: Partial<CollectionSettings> }>
+      action: PayloadAction<{
+        id: string;
+        partial: Partial<CollectionSettings>;
+      }>
     ) => {
       const { id, partial } = action.payload;
       const current = state.settings[id] ?? {

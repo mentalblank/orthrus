@@ -1,9 +1,19 @@
 import { darkenColor } from "@renderer/helpers";
-import { useAppSelector, useToast, useCollectionSettings } from "@renderer/hooks";
+import {
+  useAppSelector,
+  useToast,
+  useCollectionSettings,
+} from "@renderer/hooks";
 import type { Badge, UserProfile, UserStats, UserGame } from "@types";
 import { average } from "color.js";
 
-import { createContext, useCallback, useEffect, useState, useMemo } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -82,20 +92,25 @@ export function UserProfileContextProvider({
       const localGame = library.find(
         (g) => g.shop === shop && g.objectId === objectId
       );
-      const collectionIds = localGame && Array.isArray(localGame.collectionIds)
-        ? localGame.collectionIds
-        : [];
+      const collectionIds =
+        localGame && Array.isArray(localGame.collectionIds)
+          ? localGame.collectionIds
+          : [];
       return isGameHiddenInLibrary(collectionIds);
     },
     [library, isGameHiddenInLibrary]
   );
 
   const visibleLibraryGames = useMemo(() => {
-    return libraryGames.filter((game) => !isGameHidden(game.shop, game.objectId));
+    return libraryGames.filter(
+      (game) => !isGameHidden(game.shop, game.objectId)
+    );
   }, [libraryGames, isGameHidden]);
 
   const visiblePinnedGames = useMemo(() => {
-    return pinnedGames.filter((game) => !isGameHidden(game.shop, game.objectId));
+    return pinnedGames.filter(
+      (game) => !isGameHidden(game.shop, game.objectId)
+    );
   }, [pinnedGames, isGameHidden]);
 
   const visibleUserProfile = useMemo(() => {
