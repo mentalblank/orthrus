@@ -12,6 +12,12 @@
   position: relative;
   z-index: globals.$bottom-panel-z-index;
 
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: calc(globals.$spacing-unit * 2);
+  }
+
   &__downloads-button {
     color: globals.$body-color;
     border-bottom: solid 1px transparent;

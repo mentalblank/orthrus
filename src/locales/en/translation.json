@@ -142,6 +142,7 @@
     "scan_games_scan_again": "Scan Again"
   },
   "bottom_panel": {
+    "about": "About",
     "no_downloads_in_progress": "No downloads in progress",
     "downloading_metadata": "Downloading {{title}} metadata…",
     "downloading": "Downloading {{title}}… ({{percentage}} complete) - Completion {{eta}} - {{speed}}",
@@ -702,6 +703,12 @@
     "debrid_services": "Debrid services",
     "download_sources": "Download sources",
     "compatibility": "Compatibility",
+    "about": "About",
+    "about_description": "Orthrus Launcher is a privacy-focused, local-only fork of Hydra Launcher. It manages your game library, achievements, and save backups entirely on your machine — no account, cloud sync, or telemetry.",
+    "about_repository": "Orthrus on GitHub",
+    "about_upstream_repository": "Hydra (upstream) on GitHub",
+    "about_upstream_site": "hydralauncher.gg",
+    "about_credit": "All credit for the original application goes to the Hydra Launcher team. Please consider supporting the upstream project.",
     "language": "Language",
     "api_token": "API Token",
     "enable_real_debrid": "Enable Real-Debrid",

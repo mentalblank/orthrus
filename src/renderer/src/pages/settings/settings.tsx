@@ -10,6 +10,7 @@ import {
   CloudIcon,
   DownloadIcon,
   GearIcon,
+  InfoIcon,
   PlayIcon,
 } from "@primer/octicons-react";
 import { Wrench } from "lucide-react";
@@ -19,6 +20,7 @@ import { SettingsContextNotifications } from "./settings-context-notifications";
 import { SettingsContextContentGameplay } from "./settings-context-content-gameplay";
 import { SettingsContextIntegrations } from "./settings-context-integrations";
 import { SettingsContextCompatibility } from "./settings-context-compatibility";
+import { SettingsAbout } from "./settings-about";
 
 export default function Settings() {
   const { t } = useTranslation("settings");
@@ -54,6 +56,11 @@ export default function Settings() {
         id: "compatibility" as const,
         label: t("compatibility"),
         icon: <Wrench size={16} />,
+      },
+      {
+        id: "about" as const,
+        label: t("about"),
+        icon: <InfoIcon size={16} />,
       },
     ],
     [t]
@@ -91,6 +98,10 @@ export default function Settings() {
 
             if (selectedCategoryId === "compatibility") {
               return <SettingsContextCompatibility />;
+            }
+
+            if (selectedCategoryId === "about") {
+              return <SettingsAbout />;
             }
 
             return <SettingsContextGeneral appearance={appearance} />;

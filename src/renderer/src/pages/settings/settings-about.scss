@@ -1,0 +1,66 @@
+@use "../../scss/globals.scss";
+
+.settings-about {
+  display: flex;
+  flex-direction: column;
+  gap: calc(globals.$spacing-unit * 2);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: calc(globals.$spacing-unit * 2);
+  }
+
+  &__logo {
+    width: 56px;
+    height: 56px;
+  }
+
+  &__heading {
+    display: flex;
+    flex-direction: column;
+    gap: calc(globals.$spacing-unit * 0.5);
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  &__version {
+    color: globals.$muted-color;
+    font-size: globals.$small-font-size;
+  }
+
+  &__description {
+    color: globals.$body-color;
+    line-height: 22px;
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: globals.$spacing-unit;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: globals.$spacing-unit;
+    padding: globals.$spacing-unit calc(globals.$spacing-unit * 1.5);
+    background-color: globals.$dark-background-color;
+    border: 1px solid globals.$border-color;
+    border-radius: 6px;
+    color: globals.$body-color;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: globals.$brand-teal;
+    }
+  }
+
+  &__credit {
+    color: globals.$muted-color;
+    font-size: globals.$small-font-size;
+  }
+}

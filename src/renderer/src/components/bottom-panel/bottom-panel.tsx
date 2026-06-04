@@ -155,13 +155,23 @@ export function BottomPanel() {
         <small>{status}</small>
       </button>
 
-      <button
-        type="button"
-        onClick={() => setIsChangelogModalVisible(true)}
-        className="bottom-panel__version-button"
-      >
-        <small>v{version}</small>
-      </button>
+      <div className="bottom-panel__right">
+        <button
+          type="button"
+          onClick={() => navigate("/settings?tab=about")}
+          className="bottom-panel__version-button"
+        >
+          <small>{t("about")}</small>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setIsChangelogModalVisible(true)}
+          className="bottom-panel__version-button"
+        >
+          <small>v{version}</small>
+        </button>
+      </div>
 
       <ChangelogModal
         visible={isChangelogModalVisible}
