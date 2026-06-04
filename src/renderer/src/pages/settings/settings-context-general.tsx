@@ -145,6 +145,14 @@ export function SettingsContextGeneral({
     }
   };
 
+  const handleRestoreBackup = async () => {
+    try {
+      await window.electron.restoreBackup();
+    } catch {
+      showErrorToast(t("backup_restore_failed"));
+    }
+  };
+
   const handleChooseDownloadsPath = async () => {
     const { filePaths } = await window.electron.showOpenDialog({
       defaultPath: form.downloadsPath,
@@ -344,6 +352,14 @@ export function SettingsContextGeneral({
             {isExporting === "saves"
               ? t("exporting")
               : t("export_save_backups")}
+          </Button>
+
+          <Button
+            theme="outline"
+            onClick={handleRestoreBackup}
+            disabled={isExporting !== null}
+          >
+            {t("restore_backup")}
           </Button>
         </div>
       </div>

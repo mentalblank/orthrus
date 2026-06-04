@@ -467,6 +467,7 @@ contextBridge.exposeInMainWorld("electron", {
     ipcRenderer.invoke("showOpenDialog", options),
   exportBackup: (scope: "all" | "saves") =>
     ipcRenderer.invoke("exportBackup", scope),
+  restoreBackup: () => ipcRenderer.invoke("restoreBackup"),
   showItemInFolder: (path: string) =>
     ipcRenderer.invoke("showItemInFolder", path),
   getImageDataUrl: (imageUrl: string) =>

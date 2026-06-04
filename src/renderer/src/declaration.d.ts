@@ -370,6 +370,7 @@ declare global {
     exportBackup: (
       scope: "all" | "saves"
     ) => Promise<{ canceled: boolean; path?: string }>;
+    restoreBackup: () => Promise<{ canceled: boolean; restored?: boolean }>;
     showItemInFolder: (path: string) => Promise<void>;
     getImageDataUrl: (imageUrl: string) => Promise<string | null>;
     hydraApi: {
