@@ -27,7 +27,6 @@ import Home from "./pages/home/home";
 import Downloads from "./pages/downloads/downloads";
 import GameDetails from "./pages/game-details/game-details";
 import Settings from "./pages/settings/settings";
-import Profile from "./pages/profile/profile";
 import Achievements from "./pages/achievements/achievements";
 import AchievementsStats from "./pages/achievements-stats/achievements-stats";
 import ThemeEditor from "./pages/theme-editor/theme-editor";
@@ -95,7 +94,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/downloads" element={<Downloads />} />
             <Route path="/game/:shop/:objectId" element={<GameDetails />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/achievements-stats" element={<AchievementsStats />} />
             <Route path="/notifications" element={<Notifications />} />

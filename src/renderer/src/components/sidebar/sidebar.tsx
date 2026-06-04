@@ -57,7 +57,6 @@ import { sortBy } from "lodash-es";
 import { useDispatch } from "react-redux";
 import { SidebarAddingCustomGameModal } from "./sidebar-adding-custom-game-modal";
 import { SidebarGameItem } from "./sidebar-game-item";
-import { SidebarProfile } from "./sidebar-profile";
 
 const SIDEBAR_MIN_WIDTH = 200;
 const SIDEBAR_INITIAL_WIDTH = 250;
@@ -716,8 +715,6 @@ export function Sidebar() {
       }}
     >
       <div className="sidebar__container">
-        <SidebarProfile />
-
         <div className="sidebar__content">
           <section className="sidebar__section">
             <ul className="sidebar__menu">
@@ -805,15 +802,17 @@ export function Sidebar() {
               <div
                 style={{ display: "flex", gap: "8px", alignItems: "center" }}
               >
-                {hasLockedCollections && (
-                  unlocked ? (
+                {hasLockedCollections &&
+                  (unlocked ? (
                     <button
                       type="button"
                       className="sidebar__add-button"
                       onClick={lockSession}
                       aria-label={t("lock_session", { ns: "library" })}
                       data-tooltip-id="lock-session-tooltip"
-                      data-tooltip-content={t("lock_session", { ns: "library" })}
+                      data-tooltip-content={t("lock_session", {
+                        ns: "library",
+                      })}
                       data-tooltip-place="top"
                     >
                       <UnlockIcon size={16} />
@@ -827,13 +826,14 @@ export function Sidebar() {
                       }
                       aria-label={t("reveal_locked", { ns: "library" })}
                       data-tooltip-id="reveal-locked-tooltip"
-                      data-tooltip-content={t("reveal_locked", { ns: "library" })}
+                      data-tooltip-content={t("reveal_locked", {
+                        ns: "library",
+                      })}
                       data-tooltip-place="top"
                     >
                       <LockIcon size={16} />
                     </button>
-                  )
-                )}
+                  ))}
                 <button
                   type="button"
                   className="sidebar__add-button"
