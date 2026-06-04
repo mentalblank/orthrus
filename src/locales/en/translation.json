@@ -14,6 +14,7 @@
   "sidebar": {
     "catalogue": "Catalogue",
     "library": "Library",
+    "achievements_stats": "Achievements & Stats",
     "downloads": "Downloads",
     "settings": "Settings",
     "my_library": "My library",
@@ -1134,6 +1135,18 @@
     "earned_points": "Earned points:",
     "available_points": "Available points:",
     "how_to_earn_achievements_points": "How to earn achievement points?"
+  },
+  "achievements_stats": {
+    "title": "Achievements & Stats",
+    "games_in_library": "Games in library",
+    "total_playtime": "Total playtime",
+    "achievements_unlocked": "Achievements unlocked",
+    "completion": "Completion",
+    "games_with_achievements": "Games with achievements",
+    "no_games": "No games with achievements yet",
+    "progress": "{{unlocked}}/{{total}}",
+    "amount_hours": "{{amount}}h",
+    "amount_minutes": "{{amount}}m"
   },
   "hydra_cloud": {
     "subscription_tour_title": "Hydra Cloud Subscription",

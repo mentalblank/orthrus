@@ -4,6 +4,7 @@ import {
   GearIcon,
   HomeIcon,
   BookIcon,
+  TrophyIcon,
 } from "@primer/octicons-react";
 
 export const routes = [
@@ -21,6 +22,11 @@ export const routes = [
     path: "/library",
     nameKey: "library",
     render: () => <BookIcon />,
+  },
+  {
+    path: "/achievements-stats",
+    nameKey: "achievements_stats",
+    render: () => <TrophyIcon />,
   },
   {
     path: "/downloads",
