@@ -11,6 +11,7 @@ import {
   useAppDispatch,
   useAppSelector,
   useGameCollections,
+  useCollectionSettings,
   useToast,
 } from "@renderer/hooks";
 import { setHeaderTitle } from "@renderer/features";
@@ -20,6 +21,14 @@ import {
   FileDirectoryIcon,
   PencilIcon,
   TrashIcon,
+  EyeIcon,
+  EyeClosedIcon,
+  LockIcon,
+  UnlockIcon,
+  ListUnorderedIcon,
+  CheckIcon,
+  ChecklistIcon,
+  XIcon,
 } from "@primer/octicons-react";
 import { useTranslation } from "react-i18next";
 import { GameCollection, LibraryGame } from "@types";
@@ -27,7 +36,10 @@ import {
   Button,
   ConfirmationModal,
   ContextMenu,
+  ContextMenuItemData,
   GameContextMenu,
+  CollectionPinModal,
+  ManageCollectionGamesModal,
   Modal,
   TextField,
 } from "@renderer/components";
@@ -64,8 +76,19 @@ export default function Library() {
   const {
     collections,
     loadCollections,
+    bulkAssignGamesToCollection,
     hasLoaded: hasLoadedCollections,
   } = useGameCollections();
+  const {
+    getSettings,
+    updateSettings,
+    hasPin,
+    unlocked,
+    setPin,
+    unlock,
+    isChipVisibleInLibrary,
+    isGameHiddenInLibrary,
+  } = useCollectionSettings();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -99,6 +122,24 @@ export default function Library() {
   const [showDeleteCollectionModal, setShowDeleteCollectionModal] =
     useState(false);
   const [isDeletingCollection, setIsDeletingCollection] = useState(false);
+  const [pinModal, setPinModal] = useState<{
+    visible: boolean;
+    mode: "create" | "enter";
+  }>({ visible: false, mode: "enter" });
+  const [pendingLockCollectionId, setPendingLockCollectionId] = useState<
+    string | null
+  >(null);
+  const [manageGamesCollection, setManageGamesCollection] =
+    useState<GameCollection | null>(null);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedGameKeys, setSelectedGameKeys] = useState<Set<string>>(
+    new Set()
+  );
+  const [bulkPicker, setBulkPicker] = useState<{
+    visible: boolean;
+    mode: "add" | "remove";
+    position: { x: number; y: number };
+  }>({ visible: false, mode: "add", position: { x: 0, y: 0 } });
 
   const searchQuery = useAppSelector((state) => state.library.searchQuery);
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -330,10 +371,126 @@ export default function Library() {
     resolveCollectionErrorMessage,
   ]);
 
-  const collectionContextMenuItems = useMemo(() => {
+  const handleToggleShowInLibrary = useCallback(() => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    const current = getSettings(collection.id);
+    updateSettings(collection.id, { showInLibrary: !current.showInLibrary });
+    handleCloseCollectionContextMenu();
+  }, [
+    collectionContextMenu.collection,
+    getSettings,
+    updateSettings,
+    handleCloseCollectionContextMenu,
+  ]);
+
+  const handleToggleShowInSidebar = useCallback(() => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    const current = getSettings(collection.id);
+    updateSettings(collection.id, { showInSidebar: !current.showInSidebar });
+    handleCloseCollectionContextMenu();
+  }, [
+    collectionContextMenu.collection,
+    getSettings,
+    updateSettings,
+    handleCloseCollectionContextMenu,
+  ]);
+
+  const handleToggleLock = useCallback(() => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    const current = getSettings(collection.id);
+    handleCloseCollectionContextMenu();
+
+    if (current.locked) {
+      updateSettings(collection.id, { locked: false });
+      return;
+    }
+
+    if (!hasPin) {
+      setPendingLockCollectionId(collection.id);
+      setPinModal({ visible: true, mode: "create" });
+      return;
+    }
+
+    updateSettings(collection.id, { locked: true });
+  }, [
+    collectionContextMenu.collection,
+    getSettings,
+    hasPin,
+    updateSettings,
+    handleCloseCollectionContextMenu,
+  ]);
+
+  const handleOpenManageGames = useCallback(() => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    setManageGamesCollection(collection);
+    handleCloseCollectionContextMenu();
+  }, [collectionContextMenu.collection, handleCloseCollectionContextMenu]);
+
+  const collectionContextMenuItems = useMemo<ContextMenuItemData[]>(() => {
     const isCollectionActionBusy = isRenamingCollection || isDeletingCollection;
+    const collection = collectionContextMenu.collection;
+    const settings = collection
+      ? getSettings(collection.id)
+      : { showInLibrary: true, showInSidebar: true, locked: false };
 
     return [
+      {
+        id: "toggle-show-in-library",
+        label: t("show_in_library"),
+        icon: settings.showInLibrary ? (
+          <EyeIcon size={16} />
+        ) : (
+          <EyeClosedIcon size={16} />
+        ),
+        trailingIcon: settings.showInLibrary ? (
+          <CheckIcon size={16} />
+        ) : undefined,
+        onClick: handleToggleShowInLibrary,
+        closeOnClick: false,
+        disabled: isCollectionActionBusy,
+      },
+      {
+        id: "toggle-show-in-sidebar",
+        label: t("show_in_sidebar"),
+        icon: settings.showInSidebar ? (
+          <EyeIcon size={16} />
+        ) : (
+          <EyeClosedIcon size={16} />
+        ),
+        trailingIcon: settings.showInSidebar ? (
+          <CheckIcon size={16} />
+        ) : undefined,
+        onClick: handleToggleShowInSidebar,
+        closeOnClick: false,
+        disabled: isCollectionActionBusy,
+      },
+      {
+        id: "toggle-lock",
+        label: settings.locked ? t("unlock_collection") : t("lock_collection"),
+        icon: settings.locked ? (
+          <UnlockIcon size={16} />
+        ) : (
+          <LockIcon size={16} />
+        ),
+        onClick: handleToggleLock,
+        disabled: isCollectionActionBusy,
+      },
+      {
+        id: "manage-games",
+        label: t("manage_games"),
+        icon: <ListUnorderedIcon size={16} />,
+        onClick: handleOpenManageGames,
+        separator: true,
+        disabled: isCollectionActionBusy,
+      },
       {
         id: "rename-collection",
         label: t("rename_collection"),
@@ -351,6 +508,12 @@ export default function Library() {
       },
     ];
   }, [
+    collectionContextMenu.collection,
+    getSettings,
+    handleToggleShowInLibrary,
+    handleToggleShowInSidebar,
+    handleToggleLock,
+    handleOpenManageGames,
     handleOpenDeleteCollectionModal,
     handleOpenRenameCollectionModal,
     isDeletingCollection,
@@ -445,6 +608,10 @@ export default function Library() {
           getGameCollectionIds(game).includes(selectedCollectionId)
         );
       }
+    } else {
+      filtered = filtered.filter(
+        (game) => !isGameHiddenInLibrary(getGameCollectionIds(game))
+      );
     }
 
     if (!deferredSearchQuery.trim()) return filtered;
@@ -466,7 +633,12 @@ export default function Library() {
 
       return queryIndex === queryLower.length;
     });
-  }, [sortedLibrary, deferredSearchQuery, selectedCollectionId]);
+  }, [
+    sortedLibrary,
+    deferredSearchQuery,
+    selectedCollectionId,
+    isGameHiddenInLibrary,
+  ]);
 
   const favoritesCount = useMemo(() => {
     return library.filter((game) => game.favorite).length;
@@ -479,9 +651,98 @@ export default function Library() {
         name: t("favorites"),
         gamesCount: favoritesCount,
       },
-      ...collections,
+      ...collections.filter((collection) =>
+        isChipVisibleInLibrary(collection.id)
+      ),
     ];
-  }, [collections, favoritesCount, t]);
+  }, [collections, favoritesCount, t, isChipVisibleInLibrary]);
+
+  const hasLockedCollections = useMemo(
+    () => collections.some((collection) => getSettings(collection.id).locked),
+    [collections, getSettings]
+  );
+
+  const gameKey = useCallback(
+    (game: LibraryGame) => `${game.shop}:${game.objectId}`,
+    []
+  );
+
+  const handleToggleSelectionMode = useCallback(() => {
+    setSelectionMode((prev) => {
+      if (prev) setSelectedGameKeys(new Set());
+      return !prev;
+    });
+  }, []);
+
+  const handleToggleSelect = useCallback(
+    (game: LibraryGame) => {
+      setSelectedGameKeys((prev) => {
+        const next = new Set(prev);
+        const key = gameKey(game);
+        if (next.has(key)) {
+          next.delete(key);
+        } else {
+          next.add(key);
+        }
+        return next;
+      });
+    },
+    [gameKey]
+  );
+
+  const selectedGames = useMemo(
+    () => library.filter((game) => selectedGameKeys.has(gameKey(game))),
+    [library, selectedGameKeys, gameKey]
+  );
+
+  const handleBulkApply = useCallback(
+    async (collectionId: string, mode: "add" | "remove") => {
+      const games =
+        mode === "add"
+          ? { add: selectedGames, remove: [] }
+          : { add: [], remove: selectedGames };
+
+      try {
+        await bulkAssignGamesToCollection(collectionId, games);
+        showSuccessToast(t("collection_games_updated"));
+        setSelectedGameKeys(new Set());
+      } catch (error) {
+        void error;
+        showErrorToast(t("failed_update_collection_games"));
+      }
+    },
+    [
+      selectedGames,
+      bulkAssignGamesToCollection,
+      showSuccessToast,
+      showErrorToast,
+      t,
+    ]
+  );
+
+  const bulkPickerItems = useMemo<ContextMenuItemData[]>(
+    () =>
+      collections.map((collection) => ({
+        id: `bulk-${collection.id}`,
+        label: collection.name,
+        icon: <FileDirectoryIcon size={16} />,
+        onClick: () => {
+          void handleBulkApply(collection.id, bulkPicker.mode);
+        },
+      })),
+    [collections, handleBulkApply, bulkPicker.mode]
+  );
+
+  const handleCreatePin = useCallback(
+    async (pin: string) => {
+      await setPin(pin);
+      if (pendingLockCollectionId) {
+        updateSettings(pendingLockCollectionId, { locked: true });
+        setPendingLockCollectionId(null);
+      }
+    },
+    [setPin, pendingLockCollectionId, updateSettings]
+  );
 
   const hasGames = library.length > 0;
   const hasNoFilteredGames = filteredLibrary.length === 0;
@@ -506,12 +767,94 @@ export default function Library() {
             </div>
 
             <div className="library__controls-right">
+              {hasLockedCollections && !unlocked && (
+                <button
+                  type="button"
+                  className="library__control-button"
+                  onClick={() => setPinModal({ visible: true, mode: "enter" })}
+                  title={t("reveal_locked")}
+                >
+                  <LockIcon size={16} />
+                  <span>{t("reveal_locked")}</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                className={`library__control-button ${
+                  selectionMode ? "library__control-button--active" : ""
+                }`}
+                onClick={handleToggleSelectionMode}
+                title={selectionMode ? t("exit_selection") : t("select")}
+              >
+                {selectionMode ? (
+                  <XIcon size={16} />
+                ) : (
+                  <ChecklistIcon size={16} />
+                )}
+                <span>{selectionMode ? t("exit_selection") : t("select")}</span>
+              </button>
+
               <ViewOptions
                 viewMode={viewMode}
                 onViewModeChange={handleViewModeChange}
               />
             </div>
           </div>
+
+          {selectionMode && selectedGames.length > 0 && (
+            <div className="library__bulk-bar">
+              <span className="library__bulk-count">
+                {t("games_selected", { count: selectedGames.length })}
+              </span>
+
+              <div className="library__bulk-actions">
+                <Button
+                  type="button"
+                  theme="outline"
+                  onClick={(event) =>
+                    setBulkPicker({
+                      visible: true,
+                      mode: "add",
+                      position: {
+                        x: event.clientX,
+                        y: event.clientY,
+                      },
+                    })
+                  }
+                  disabled={collections.length === 0}
+                >
+                  {t("add_to_collection")}
+                </Button>
+
+                <Button
+                  type="button"
+                  theme="outline"
+                  onClick={(event) =>
+                    setBulkPicker({
+                      visible: true,
+                      mode: "remove",
+                      position: {
+                        x: event.clientX,
+                        y: event.clientY,
+                      },
+                    })
+                  }
+                  disabled={collections.length === 0}
+                >
+                  {t("remove_from_collection")}
+                </Button>
+
+                <Button
+                  type="button"
+                  theme="outline"
+                  onClick={() => setSelectedGameKeys(new Set())}
+                >
+                  {t("clear_selection")}
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div
             className="library__collections"
@@ -605,6 +948,9 @@ export default function Library() {
                     key={`${game.shop}-${game.objectId}`}
                     game={game}
                     onContextMenu={handleOpenContextMenu}
+                    selectable={selectionMode}
+                    selected={selectedGameKeys.has(gameKey(game))}
+                    onToggleSelect={handleToggleSelect}
                   />
                 ))}
               </motion.div>
@@ -629,6 +975,9 @@ export default function Library() {
                       onMouseEnter={handleOnMouseEnterGameCard}
                       onMouseLeave={handleOnMouseLeaveGameCard}
                       onContextMenu={handleOpenContextMenu}
+                      selectable={selectionMode}
+                      selected={selectedGameKeys.has(gameKey(game))}
+                      onToggleSelect={handleToggleSelect}
                     />
                   </li>
                 ))}
@@ -651,6 +1000,33 @@ export default function Library() {
         visible={collectionContextMenu.visible}
         position={collectionContextMenu.position}
         onClose={handleCloseCollectionContextMenu}
+      />
+
+      <ContextMenu
+        items={bulkPickerItems}
+        visible={bulkPicker.visible}
+        position={bulkPicker.position}
+        onClose={() => setBulkPicker((prev) => ({ ...prev, visible: false }))}
+      />
+
+      <CollectionPinModal
+        visible={pinModal.visible}
+        mode={pinModal.mode}
+        onClose={() => {
+          setPinModal((prev) => ({ ...prev, visible: false }));
+          setPendingLockCollectionId(null);
+        }}
+        onCreate={handleCreatePin}
+        onUnlock={unlock}
+      />
+
+      <ManageCollectionGamesModal
+        visible={manageGamesCollection !== null}
+        collection={manageGamesCollection}
+        onClose={() => setManageGamesCollection(null)}
+        onApplied={() => {
+          void loadCollections();
+        }}
       />
 
       <Modal
