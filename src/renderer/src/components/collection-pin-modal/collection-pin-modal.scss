@@ -1,0 +1,12 @@
+.collection-pin-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 320px;
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

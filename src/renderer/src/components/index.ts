@@ -24,3 +24,5 @@ export * from "./search-dropdown/search-dropdown";
 export * from "./fullscreen-media-modal/fullscreen-media-modal";
 export * from "./proton-path-picker/proton-path-picker";
 export * from "./create-collection-modal/create-collection-modal";
+export * from "./collection-pin-modal/collection-pin-modal";
+export * from "./manage-collection-games-modal/manage-collection-games-modal";
