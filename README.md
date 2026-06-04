@@ -11,7 +11,7 @@
     <strong>Hydra Launcher is an open-source gaming platform created to be the single tool that you need in order to manage your gaming library. Hydra is written in Node.js (Electron, React, Typescript), Python, and Rust.</strong>
   </p>
 
-[![build](https://img.shields.io/github/actions/workflow/status/mentalblank/hydra/build.yml)](https://github.com/mentalblank/hydra/actions)
+[![release](https://img.shields.io/github/actions/workflow/status/mentalblank/hydra/release.yml)](https://github.com/mentalblank/hydra/actions)
 [![release](https://img.shields.io/github/package-json/v/mentalblank/hydra)](https://github.com/mentalblank/hydra/releases)
 [![chocolatey](https://img.shields.io/chocolatey/v/hydralauncher.svg)](https://community.chocolatey.org/packages/hydralauncher)
 
@@ -22,11 +22,21 @@
 ## Features
 
 - Add games that you own to your library
-- Have a nice profile that shows what you are playing to your friends
-- Save your game progress in the cloud with Hydra Cloud
+- Track your achievements and play stats locally on a dedicated Achievements & Stats page
+- Back up your save games locally
 - Unlock achievements
 - Navigate through a rich catalogue with a powerful suggestion algorithm
 - Discover new games that you haven't played before
+
+## Fork differences
+
+This fork runs fully **local-only** — no account, login, or remote profile is required:
+
+- **No accounts/login** — a local profile is created automatically and stored on your machine.
+- **No cloud sync** — save backups stay on disk (Ludusavi); no S3 uploads or subscriptions.
+- **No social** — friends, presence, chat, reviews, and user comments are removed.
+- **No telemetry** — Sentry crash reporting and third-party SDKs are stripped.
+- **Catalogue retained** — game search, suggestions, and repacks still use the central Hydra API.
 
 ## Build from source and contributing
 
@@ -41,12 +51,6 @@ Please, refer to our Documentation pages: [docs.hydralauncher.gg](https://docs.h
 After installing dependencies, `postinstall` now builds the Rust native addon automatically (`hydra-native/hydra-native.node`).
 
 Packaging scripts (`yarn build:win`, `yarn build:mac`, `yarn build:linux`, `yarn build:unpack`) now run `yarn build:python-rpc` automatically.
-
-## Contributors
-
-<a href="https://github.com/mentalblank/hydra/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=mentalblank/hydra" />
-</a>
 
 ## License
 
