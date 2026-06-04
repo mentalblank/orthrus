@@ -23,9 +23,7 @@ import {
 } from "@renderer/features";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useSubscription } from "./hooks/use-subscription";
 import { ArchiveDeletionModal } from "./pages/downloads/archive-deletion-error-modal";
-import { HydraCloudModal } from "./pages/shared-modals/hydra-cloud/hydra-cloud-modal";
 
 import type { UserPreferences } from "@types";
 import "./app.scss";
@@ -54,9 +52,6 @@ export function App() {
 
   const { fetchUserDetails, updateUserDetails, clearUserDetails } =
     useUserDetails();
-
-  const { hideHydraCloudModal, isHydraCloudModalVisible, hydraCloudFeature } =
-    useSubscription();
 
   const dispatch = useAppDispatch();
 
@@ -322,12 +317,6 @@ export function App() {
         type={toast.type}
         onClose={handleToastClose}
         duration={toast.duration}
-      />
-
-      <HydraCloudModal
-        visible={isHydraCloudModalVisible}
-        onClose={hideHydraCloudModal}
-        feature={hydraCloudFeature}
       />
 
       <ArchiveDeletionModal

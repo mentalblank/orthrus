@@ -1,20 +1,15 @@
 import { setHeaderTitle } from "@renderer/features";
 import { useAppDispatch, useUserDetails } from "@renderer/hooks";
 import { useContext, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   buildGameDetailsPath,
   formatDownloadProgress,
 } from "@renderer/helpers";
-import { LockIcon, PersonIcon, TrophyIcon } from "@primer/octicons-react";
+import { PersonIcon, TrophyIcon } from "@primer/octicons-react";
 import { gameDetailsContext } from "@renderer/context";
-import type { ComparedAchievements } from "@types";
 import { Link } from "@renderer/components";
-import { ComparedAchievementList } from "./compared-achievement-list";
 import { AchievementList } from "./achievement-list";
 import { AchievementPanel } from "./achievement-panel";
-import { ComparedAchievementPanel } from "./compared-achievement-panel";
-import { useSubscription } from "@renderer/hooks/use-subscription";
 import "./achievements-content.scss";
 
 interface UserInfo {
@@ -25,21 +20,11 @@ interface UserInfo {
   unlockedAchievementCount: number;
 }
 
-interface AchievementsContentProps {
-  otherUser: UserInfo | null;
-  comparedAchievements: ComparedAchievements | null;
-}
-
 interface AchievementSummaryProps {
   user: UserInfo;
-  isComparison?: boolean;
 }
 
-function AchievementSummary({ user, isComparison }: AchievementSummaryProps) {
-  const { t } = useTranslation("achievement");
-  const { userDetails, hasActiveSubscription } = useUserDetails();
-  const { showHydraCloudModal } = useSubscription();
-
+function AchievementSummary({ user }: AchievementSummaryProps) {
   const getProfileImage = (
     user: Pick<UserInfo, "profileImageUrl" | "displayName">
   ) => {
@@ -57,28 +42,6 @@ function AchievementSummary({ user, isComparison }: AchievementSummaryProps) {
       </div>
     );
   };
-
-  if (isComparison && userDetails?.id == user.id && !hasActiveSubscription) {
-    return (
-      <div className="achievements-content__comparison">
-        <div className="achievements-content__comparison__container">
-          <LockIcon size={24} />
-          <h3>
-            <button
-              className="achievements-content__comparison__container__subscription-required-button"
-              onClick={() => showHydraCloudModal("achievements")}
-            >
-              {t("subscription_needed")}
-            </button>
-          </h3>
-        </div>
-        <div className="achievements-content__comparison__blured-avatar">
-          {getProfileImage(user)}
-          <h1>{user.displayName}</h1>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="achievements-content__user-summary">
@@ -109,10 +72,7 @@ function AchievementSummary({ user, isComparison }: AchievementSummaryProps) {
   );
 }
 
-export function AchievementsContent({
-  otherUser,
-  comparedAchievements,
-}: AchievementsContentProps) {
+export function AchievementsContent() {
   const heroRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isHeaderStuck, setIsHeaderStuck] = useState(false);
@@ -122,7 +82,7 @@ export function AchievementsContent({
 
   const dispatch = useAppDispatch();
 
-  const { userDetails, hasActiveSubscription } = useUserDetails();
+  const { userDetails } = useUserDetails();
   useEffect(() => {
     dispatch(setHeaderTitle(gameTitle));
   }, [dispatch, gameTitle]);
@@ -138,24 +98,6 @@ export function AchievementsContent({
     if (scrollY <= heroHeight && isHeaderStuck) {
       setIsHeaderStuck(false);
     }
-  };
-
-  const getProfileImage = (
-    user: Pick<UserInfo, "profileImageUrl" | "displayName">
-  ) => {
-    return (
-      <div className="achievements-content__comparison__small-avatar">
-        {user.profileImageUrl ? (
-          <img
-            className="achievements-content__comparison__small-avatar"
-            src={user.profileImageUrl}
-            alt={user.displayName}
-          />
-        ) : (
-          <PersonIcon size={24} />
-        )}
-      </div>
-    );
   };
 
   if (!objectId || !shop || !gameTitle || !userDetails) return null;
@@ -195,52 +137,17 @@ export function AchievementsContent({
             <AchievementSummary
               user={{
                 ...userDetails,
-                totalAchievementCount: comparedAchievements
-                  ? comparedAchievements.owner.totalAchievementCount
-                  : achievements!.length,
-                unlockedAchievementCount: comparedAchievements
-                  ? comparedAchievements.owner.unlockedAchievementCount
-                  : achievements!.filter((achievement) => achievement.unlocked)
-                      .length,
+                totalAchievementCount: achievements!.length,
+                unlockedAchievementCount: achievements!.filter(
+                  (achievement) => achievement.unlocked
+                ).length,
               }}
-              isComparison={otherUser !== null}
             />
-
-            {otherUser && <AchievementSummary user={otherUser} />}
           </div>
         </div>
 
-        {otherUser && (
-          <div
-            className={`achievements-content__achievements-list__section__table-header ${isHeaderStuck ? "achievements-content__achievements-list__section__table-header--stuck" : ""}`}
-          >
-            <div
-              className={`achievements-content__achievements-list__section__table-header__container ${hasActiveSubscription ? "achievements-content__achievements-list__section__table-header__container--has-active-subscription" : "achievements-content__achievements-list__section__table-header__container--has-no-active-subscription"}`}
-            >
-              <div></div>
-              {hasActiveSubscription && (
-                <div className="achievements-content__achievements-list__section__table-header__container__user-avatar">
-                  {getProfileImage({ ...userDetails })}
-                </div>
-              )}
-              <div className="achievements-content__achievements-list__section__table-header__container__other-user-avatar">
-                {getProfileImage(otherUser)}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {otherUser ? (
-          <>
-            <ComparedAchievementPanel achievements={comparedAchievements!} />
-            <ComparedAchievementList achievements={comparedAchievements!} />
-          </>
-        ) : (
-          <>
-            <AchievementPanel achievements={achievements!} />
-            <AchievementList achievements={achievements!} />
-          </>
-        )}
+        <AchievementPanel achievements={achievements!} />
+        <AchievementList achievements={achievements!} />
       </section>
     </div>
   );
