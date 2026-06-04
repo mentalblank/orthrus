@@ -1,18 +1,15 @@
-import { levelKeys, gamesSublevel, db } from "@main/level";
+import { levelKeys, gamesSublevel } from "@main/level";
 import path from "node:path";
 import * as tar from "tar";
 import crypto from "node:crypto";
 import fs from "node:fs";
-import os from "node:os";
-import type { GameShop, User } from "@types";
+import type { GameShop } from "@types";
 import { backupsPath } from "@main/constants";
-import { HydraApi } from "./hydra-api";
 import { normalizePath, parseRegFile } from "@main/helpers";
 import { logger } from "./logger";
 import { WindowManager } from "./window-manager";
-import axios from "axios";
 import { Ludusavi } from "./ludusavi";
-import { formatDate, SubscriptionRequiredError } from "@shared";
+import { formatDate } from "@shared";
 import i18next, { t } from "i18next";
 import { SystemPath } from "./system-path";
 import { Wine } from "./wine";
@@ -104,20 +101,10 @@ export class CloudSync {
   public static async uploadSaveGame(
     objectId: string,
     shop: GameShop,
-    downloadOptionTitle: string | null,
-    label?: string
+    _downloadOptionTitle: string | null,
+    _label?: string
   ) {
-    const hasActiveSubscription = await db
-      .get<string, User>(levelKeys.user, { valueEncoding: "json" })
-      .then((user) => {
-        const expiresAt = new Date(user?.subscription?.expiresAt ?? 0);
-        return expiresAt > new Date();
-      });
-
-    if (!hasActiveSubscription) {
-      throw new SubscriptionRequiredError();
-    }
-
+    /* Local-only: keep a local Ludusavi backup, no subscription or cloud upload. */
     const game = await gamesSublevel.get(levelKeys.game(shop, objectId));
     const effectiveWinePrefixPath = Wine.getEffectivePrefixPath(
       game?.winePrefixPath,
@@ -130,47 +117,15 @@ export class CloudSync {
       effectiveWinePrefixPath
     );
 
-    const stat = await fs.promises.stat(bundleLocation);
-
-    const { uploadUrl } = await HydraApi.post<{
-      id: string;
-      uploadUrl: string;
-    }>("/profile/games/artifacts", {
-      artifactLengthInBytes: stat.size,
-      shop,
-      objectId,
-      hostname: os.hostname(),
-      winePrefixPath: effectiveWinePrefixPath
-        ? fs.existsSync(effectiveWinePrefixPath)
-          ? fs.realpathSync(effectiveWinePrefixPath)
-          : effectiveWinePrefixPath
-        : null,
-      homeDir: this.getWindowsLikeUserProfilePath(effectiveWinePrefixPath),
-      downloadOptionTitle,
-      platform: process.platform,
-      label,
-    });
-
-    const fileBuffer = await fs.promises.readFile(bundleLocation);
-
-    await axios.put(uploadUrl, fileBuffer, {
-      headers: {
-        "Content-Type": "application/tar",
-      },
-      onUploadProgress: (progressEvent) => {
-        logger.log(progressEvent);
-      },
-    });
-
-    WindowManager.mainWindow?.webContents.send(
-      `on-upload-complete-${objectId}-${shop}`,
-      true
-    );
-
     try {
       await fs.promises.unlink(bundleLocation);
     } catch (error) {
       logger.error("Failed to remove tar file", { bundleLocation, error });
     }
+
+    WindowManager.mainWindow?.webContents.send(
+      `on-upload-complete-${objectId}-${shop}`,
+      true
+    );
   }
 }
