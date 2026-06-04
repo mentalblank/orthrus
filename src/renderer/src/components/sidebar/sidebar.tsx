@@ -7,13 +7,17 @@ import type { GameCollection, LibraryGame } from "@types";
 
 import {
   Button,
+  CollectionPinModal,
   ConfirmationModal,
   ContextMenu,
+  ContextMenuItemData,
   CreateCollectionModal,
+  ManageCollectionGamesModal,
   Modal,
   TextField,
 } from "@renderer/components";
 import {
+  useCollectionSettings,
   useDownload,
   useGameCollections,
   useLibrary,
@@ -38,6 +42,12 @@ import {
   PlusIcon,
   TrashIcon,
   VideoIcon,
+  EyeIcon,
+  EyeClosedIcon,
+  LockIcon,
+  UnlockIcon,
+  ListUnorderedIcon,
+  CheckIcon,
 } from "@primer/octicons-react";
 import deckyIcon from "@renderer/assets/icons/decky.png";
 import { setCollections } from "@renderer/features";
@@ -119,6 +129,25 @@ export function Sidebar() {
     hasLoaded: hasLoadedCollections,
     loadCollections,
   } = useGameCollections();
+  const {
+    getSettings,
+    updateSettings,
+    hasPin,
+    unlocked,
+    setPin,
+    unlock,
+    isChipVisibleInSidebar,
+    isGameHiddenInSidebar,
+  } = useCollectionSettings();
+  const [pinModal, setPinModal] = useState<{
+    visible: boolean;
+    mode: "create" | "enter";
+  }>({ visible: false, mode: "enter" });
+  const [pendingLockCollectionId, setPendingLockCollectionId] = useState<
+    string | null
+  >(null);
+  const [manageGamesCollection, setManageGamesCollection] =
+    useState<GameCollection | null>(null);
 
   const selectedCollectionId = useMemo(() => {
     if (!location.pathname.startsWith("/library")) return null;
@@ -493,10 +522,120 @@ export function Sidebar() {
     }
   };
 
-  const collectionContextMenuItems = useMemo(() => {
+  const handleToggleShowInLibrary = () => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    const current = getSettings(collection.id);
+    updateSettings(collection.id, { showInLibrary: !current.showInLibrary });
+    handleCloseCollectionContextMenu();
+  };
+
+  const handleToggleShowInSidebar = () => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    const current = getSettings(collection.id);
+    updateSettings(collection.id, { showInSidebar: !current.showInSidebar });
+    handleCloseCollectionContextMenu();
+  };
+
+  const handleToggleLock = () => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    const current = getSettings(collection.id);
+    handleCloseCollectionContextMenu();
+
+    if (current.locked) {
+      updateSettings(collection.id, { locked: false });
+      return;
+    }
+
+    if (!hasPin) {
+      setPendingLockCollectionId(collection.id);
+      setPinModal({ visible: true, mode: "create" });
+      return;
+    }
+
+    updateSettings(collection.id, { locked: true });
+  };
+
+  const handleOpenManageGames = () => {
+    const collection = collectionContextMenu.collection;
+    if (!collection) return;
+
+    setManageGamesCollection(collection);
+    handleCloseCollectionContextMenu();
+  };
+
+  const handleCreatePin = async (pin: string) => {
+    await setPin(pin);
+    if (pendingLockCollectionId) {
+      updateSettings(pendingLockCollectionId, { locked: true });
+      setPendingLockCollectionId(null);
+    }
+  };
+
+  const collectionContextMenuItems = useMemo<ContextMenuItemData[]>(() => {
     const isCollectionActionBusy = isRenamingCollection || isDeletingCollection;
+    const collection = collectionContextMenu.collection;
+    const settings = collection
+      ? getSettings(collection.id)
+      : { showInLibrary: true, showInSidebar: true, locked: false };
 
     return [
+      {
+        id: "toggle-show-in-library",
+        label: t("show_in_library", { ns: "library" }),
+        icon: settings.showInLibrary ? (
+          <EyeIcon size={16} />
+        ) : (
+          <EyeClosedIcon size={16} />
+        ),
+        trailingIcon: settings.showInLibrary ? (
+          <CheckIcon size={16} />
+        ) : undefined,
+        onClick: handleToggleShowInLibrary,
+        closeOnClick: false,
+        disabled: isCollectionActionBusy,
+      },
+      {
+        id: "toggle-show-in-sidebar",
+        label: t("show_in_sidebar", { ns: "library" }),
+        icon: settings.showInSidebar ? (
+          <EyeIcon size={16} />
+        ) : (
+          <EyeClosedIcon size={16} />
+        ),
+        trailingIcon: settings.showInSidebar ? (
+          <CheckIcon size={16} />
+        ) : undefined,
+        onClick: handleToggleShowInSidebar,
+        closeOnClick: false,
+        disabled: isCollectionActionBusy,
+      },
+      {
+        id: "toggle-lock",
+        label: settings.locked
+          ? t("unlock_collection", { ns: "library" })
+          : t("lock_collection", { ns: "library" }),
+        icon: settings.locked ? (
+          <UnlockIcon size={16} />
+        ) : (
+          <LockIcon size={16} />
+        ),
+        onClick: handleToggleLock,
+        disabled: isCollectionActionBusy,
+      },
+      {
+        id: "manage-games",
+        label: t("manage_games", { ns: "library" }),
+        icon: <ListUnorderedIcon size={16} />,
+        onClick: handleOpenManageGames,
+        separator: true,
+        disabled: isCollectionActionBusy,
+      },
       {
         id: "rename-collection",
         label: t("rename_collection", { ns: "library" }),
@@ -514,6 +653,12 @@ export function Sidebar() {
       },
     ];
   }, [
+    collectionContextMenu.collection,
+    getSettings,
+    handleToggleShowInLibrary,
+    handleToggleShowInSidebar,
+    handleToggleLock,
+    handleOpenManageGames,
     handleOpenDeleteCollectionModal,
     handleOpenRenameCollectionModal,
     isDeletingCollection,
@@ -532,9 +677,25 @@ export function Sidebar() {
         name: t("favorites"),
         gamesCount: favoritesCount,
       },
-      ...collections,
+      ...collections.filter((collection) =>
+        isChipVisibleInSidebar(collection.id)
+      ),
     ];
-  }, [collections, favoritesCount, t]);
+  }, [collections, favoritesCount, t, isChipVisibleInSidebar]);
+
+  const hasLockedCollections = useMemo(
+    () => collections.some((collection) => getSettings(collection.id).locked),
+    [collections, getSettings]
+  );
+
+  const getGameCollectionIds = (game: LibraryGame): string[] => {
+    if (Array.isArray(game.collectionIds)) return game.collectionIds;
+
+    const legacyCollectionId = (game as { collectionId?: string | null })
+      .collectionId;
+
+    return legacyCollectionId ? [legacyCollectionId] : [];
+  };
 
   const handleOpenBigPictureWindow = () => {
     globalThis.window.electron.openBigPictureWindow();
@@ -640,17 +801,34 @@ export function Sidebar() {
                   {t("collections")}
                 </small>
               </button>
-              <button
-                type="button"
-                className="sidebar__add-button"
-                onClick={handleCreateCollectionButtonClick}
-                aria-label={t("create_collection")}
-                data-tooltip-id="create-collection-tooltip"
-                data-tooltip-content={t("create_collection_tooltip")}
-                data-tooltip-place="top"
-              >
-                <PlusIcon size={16} />
-              </button>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                {hasLockedCollections && !unlocked && (
+                  <button
+                    type="button"
+                    className="sidebar__add-button"
+                    onClick={() =>
+                      setPinModal({ visible: true, mode: "enter" })
+                    }
+                    aria-label={t("reveal_locked", { ns: "library" })}
+                    data-tooltip-id="reveal-locked-tooltip"
+                    data-tooltip-content={t("reveal_locked", { ns: "library" })}
+                    data-tooltip-place="top"
+                  >
+                    <LockIcon size={16} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="sidebar__add-button"
+                  onClick={handleCreateCollectionButtonClick}
+                  aria-label={t("create_collection")}
+                  data-tooltip-id="create-collection-tooltip"
+                  data-tooltip-content={t("create_collection_tooltip")}
+                  data-tooltip-place="top"
+                >
+                  <PlusIcon size={16} />
+                </button>
+              </div>
             </div>
 
             {!isCollectionsCollapsed && (
@@ -767,6 +945,9 @@ export function Sidebar() {
                 <ul className="sidebar__menu">
                   {filteredLibrary
                     .filter((game) => !showPlayableOnly || isGamePlayable(game))
+                    .filter(
+                      (game) => !isGameHiddenInSidebar(getGameCollectionIds(game))
+                    )
                     .map((game) => (
                       <SidebarGameItem
                         key={game.id}
@@ -811,6 +992,26 @@ export function Sidebar() {
       <CreateCollectionModal
         visible={showCreateCollectionModal}
         onClose={() => setShowCreateCollectionModal(false)}
+      />
+
+      <CollectionPinModal
+        visible={pinModal.visible}
+        mode={pinModal.mode}
+        onClose={() => {
+          setPinModal((prev) => ({ ...prev, visible: false }));
+          setPendingLockCollectionId(null);
+        }}
+        onCreate={handleCreatePin}
+        onUnlock={unlock}
+      />
+
+      <ManageCollectionGamesModal
+        visible={manageGamesCollection !== null}
+        collection={manageGamesCollection}
+        onClose={() => setManageGamesCollection(null)}
+        onApplied={() => {
+          void loadCollections();
+        }}
       />
 
       <ContextMenu
@@ -899,6 +1100,7 @@ export function Sidebar() {
 
       <Tooltip id="add-custom-game-tooltip" />
       <Tooltip id="create-collection-tooltip" />
+      <Tooltip id="reveal-locked-tooltip" />
       <Tooltip id="show-playable-only-tooltip" />
     </aside>
   );
