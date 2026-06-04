@@ -65,23 +65,6 @@
       width: 50%;
     }
 
-    &--collapsed {
-      max-height: 300px;
-      overflow: hidden;
-      position: relative;
-
-      &::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        background: linear-gradient(transparent, globals.$background-color);
-        pointer-events: none;
-      }
-    }
-
     &--expanded {
       max-height: none;
     }
@@ -108,25 +91,6 @@
     .bb_tag {
       margin-top: calc(globals.$spacing-unit * 2);
       margin-bottom: calc(globals.$spacing-unit * 2);
-    }
-  }
-
-  &__description-toggle {
-    background: none;
-    border: 1px solid globals.$border-color;
-    color: globals.$body-color;
-    padding: calc(globals.$spacing-unit * 0.75)
-      calc(globals.$spacing-unit * 1.5);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: globals.$body-font-size;
-    margin-top: calc(globals.$spacing-unit * 1.5);
-    transition: all 0.2s ease;
-    align-self: center;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.1);
     }
   }
 

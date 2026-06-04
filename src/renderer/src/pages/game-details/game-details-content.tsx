@@ -82,7 +82,6 @@ export function GameDetailsContent() {
   }, [shopDetails, t, game?.shop]);
 
   const [backdropOpacity, setBackdropOpacity] = useState(1);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     setBackdropOpacity(1);
@@ -172,22 +171,8 @@ export function GameDetailsContent() {
               dangerouslySetInnerHTML={{
                 __html: aboutTheGame,
               }}
-              className={`game-details__description ${
-                isDescriptionExpanded
-                  ? "game-details__description--expanded"
-                  : "game-details__description--collapsed"
-              }`}
+              className="game-details__description game-details__description--expanded"
             />
-
-            {aboutTheGame && aboutTheGame.length > 500 && (
-              <button
-                type="button"
-                className="game-details__description-toggle"
-                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-              >
-                {isDescriptionExpanded ? t("show_less") : t("show_more")}
-              </button>
-            )}
           </div>
 
           {shop !== "custom" && <Sidebar />}
