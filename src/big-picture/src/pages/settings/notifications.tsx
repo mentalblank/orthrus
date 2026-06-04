@@ -34,7 +34,7 @@ export function NotificationsSettingsSection({
         firstItemUpTarget={{
           type: "item",
           itemId:
-            NOTIFICATIONS_LIBRARY_ITEM_FOCUS_IDS.friendStartGameNotificationsEnabled,
+            NOTIFICATIONS_LIBRARY_ITEM_FOCUS_IDS.repackUpdatesNotificationsEnabled,
         }}
       />
     </div>

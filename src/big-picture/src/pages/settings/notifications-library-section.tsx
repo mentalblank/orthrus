@@ -20,8 +20,6 @@ interface NotificationsLibrarySectionProps {
 interface NotificationsLibraryForm {
   downloadNotificationsEnabled: boolean;
   repackUpdatesNotificationsEnabled: boolean;
-  friendRequestNotificationsEnabled: boolean;
-  friendStartGameNotificationsEnabled: boolean;
 }
 
 interface NotificationsLibraryItem {
@@ -35,8 +33,6 @@ interface NotificationsLibraryItem {
 const DEFAULT_FORM: NotificationsLibraryForm = {
   downloadNotificationsEnabled: false,
   repackUpdatesNotificationsEnabled: false,
-  friendRequestNotificationsEnabled: false,
-  friendStartGameNotificationsEnabled: true,
 };
 
 export function NotificationsLibrarySection({
@@ -54,10 +50,6 @@ export function NotificationsLibrarySection({
         userPreferences.downloadNotificationsEnabled ?? false,
       repackUpdatesNotificationsEnabled:
         userPreferences.repackUpdatesNotificationsEnabled ?? false,
-      friendRequestNotificationsEnabled:
-        userPreferences.friendRequestNotificationsEnabled ?? false,
-      friendStartGameNotificationsEnabled:
-        userPreferences.friendStartGameNotificationsEnabled ?? true,
     });
   }, [userPreferences]);
 
@@ -90,28 +82,6 @@ export function NotificationsLibrarySection({
         onChange: (checked: boolean) =>
           void updateUserPreferences({
             repackUpdatesNotificationsEnabled: checked,
-          }),
-      },
-      {
-        id: "friend-request-notifications-enabled",
-        focusId:
-          NOTIFICATIONS_LIBRARY_ITEM_FOCUS_IDS.friendRequestNotificationsEnabled,
-        label: "Enable friend request notifications",
-        checked: form.friendRequestNotificationsEnabled,
-        onChange: (checked: boolean) =>
-          void updateUserPreferences({
-            friendRequestNotificationsEnabled: checked,
-          }),
-      },
-      {
-        id: "friend-start-game-notifications-enabled",
-        focusId:
-          NOTIFICATIONS_LIBRARY_ITEM_FOCUS_IDS.friendStartGameNotificationsEnabled,
-        label: "Enable friend start game notifications",
-        checked: form.friendStartGameNotificationsEnabled,
-        onChange: (checked: boolean) =>
-          void updateUserPreferences({
-            friendStartGameNotificationsEnabled: checked,
           }),
       },
     ];

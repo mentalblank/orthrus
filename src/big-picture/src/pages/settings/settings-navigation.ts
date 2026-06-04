@@ -60,10 +60,6 @@ export const NOTIFICATIONS_LIBRARY_ITEM_FOCUS_IDS = {
   downloadNotificationsEnabled: "notifications-library-download-notifications",
   repackUpdatesNotificationsEnabled:
     "notifications-library-repack-updates-notifications",
-  friendRequestNotificationsEnabled:
-    "notifications-library-friend-request-notifications",
-  friendStartGameNotificationsEnabled:
-    "notifications-library-friend-start-game-notifications",
 } as const;
 
 export const NOTIFICATIONS_ACHIEVEMENTS_ITEM_FOCUS_IDS = {
