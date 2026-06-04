@@ -463,13 +463,6 @@ contextBridge.exposeInMainWorld("electron", {
       ipcRenderer.invoke("clipboardWriteText", text) as Promise<void>,
   },
 
-  /* Clipboard (renderer-side `navigator.clipboard.*` is deprecated in Electron 40+;
-     direct `electron.clipboard` access from preload is also deprecated, so go through main via IPC) */
-  clipboard: {
-    writeText: (text: string) =>
-      ipcRenderer.invoke("clipboardWriteText", text) as Promise<void>,
-  },
-
   /* Misc */
   ping: () => ipcRenderer.invoke("ping"),
   getVersion: () => ipcRenderer.invoke("getVersion"),
