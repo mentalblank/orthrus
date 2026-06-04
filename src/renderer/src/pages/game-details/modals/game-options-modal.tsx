@@ -637,8 +637,8 @@ export function GameOptionsModal({
         icon: <ImageIcon size={16} />,
       },
       {
-        id: "hydra_cloud" as const,
-        label: t("settings_category_hydra_cloud"),
+        id: "save_backups" as const,
+        label: t("settings_category_backups"),
         icon: <CloudIcon size={16} />,
       },
       ...(shouldShowWinePrefixConfiguration
@@ -849,7 +849,7 @@ export function GameOptionsModal({
                 onGameUpdated={updateGame}
               />
             )}
-            {selectedCategory === "hydra_cloud" && (
+            {selectedCategory === "save_backups" && (
               <HydraCloudSettingsSection
                 game={game}
                 automaticCloudSync={automaticCloudSync}

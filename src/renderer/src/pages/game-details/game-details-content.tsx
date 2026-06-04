@@ -89,7 +89,7 @@ export function GameDetailsContent() {
   }, [objectId]);
 
   const handleCloudSaveButtonClick = () => {
-    setGameOptionsInitialCategory("hydra_cloud");
+    setGameOptionsInitialCategory("save_backups");
     setShowGameOptionsModal(true);
   };
 

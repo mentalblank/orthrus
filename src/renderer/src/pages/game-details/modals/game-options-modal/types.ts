@@ -2,7 +2,7 @@ export type GameSettingsCategoryId =
   | "general"
   | "locations"
   | "assets"
-  | "hydra_cloud"
+  | "save_backups"
   | "compatibility"
   | "downloads"
   | "danger_zone";
