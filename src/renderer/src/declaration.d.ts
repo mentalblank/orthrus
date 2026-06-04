@@ -11,12 +11,9 @@ import type {
   PremiumizeUser,
   AllDebridUser,
   UserProfile,
-  FriendRequestAction,
   UpdateProfileRequest,
   GameStats,
   UserDetails,
-  FriendRequestSync,
-  NotificationSync,
   LudusaviBackup,
   UserAchievement,
   ComparedAchievements,
@@ -33,7 +30,6 @@ import type {
   Game,
   DiskUsage,
   DownloadSource,
-  LocalNotification,
   ProtonVersion,
   CreateSteamShortcutOptions,
   TorrentFilesResponse,
@@ -493,28 +489,9 @@ declare global {
         rotation?: number;
       }
     ) => Promise<{ imagePath: string }>;
-    onSyncFriendRequests: (
-      cb: (friendRequests: FriendRequestSync) => void
-    ) => () => Electron.IpcRenderer;
-    onSyncNotificationCount: (
-      cb: (notification: NotificationSync) => void
-    ) => () => Electron.IpcRenderer;
-    updateFriendRequest: (
-      userId: string,
-      action: FriendRequestAction
-    ) => Promise<void>;
 
     /* Notifications */
     publishNewRepacksNotification: (newRepacksCount: number) => Promise<void>;
-    getLocalNotifications: () => Promise<LocalNotification[]>;
-    getLocalNotificationsCount: () => Promise<number>;
-    markLocalNotificationRead: (id: string) => Promise<void>;
-    markAllLocalNotificationsRead: () => Promise<void>;
-    deleteLocalNotification: (id: string) => Promise<void>;
-    clearAllLocalNotifications: () => Promise<void>;
-    onLocalNotificationCreated: (
-      cb: (notification: LocalNotification) => void
-    ) => () => Electron.IpcRenderer;
     onAchievementUnlocked: (
       cb: (
         position?: AchievementCustomNotificationPosition,
