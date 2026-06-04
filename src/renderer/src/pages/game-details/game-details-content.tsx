@@ -8,11 +8,9 @@ import { GallerySlider } from "./gallery-slider/gallery-slider";
 import { Sidebar } from "./sidebar/sidebar";
 import { GameLogo } from "./game-logo";
 
-import { AuthPage } from "@shared";
-import { cloudSyncContext, gameDetailsContext } from "@renderer/context";
+import { gameDetailsContext } from "@renderer/context";
 
 import cloudIconAnimated from "@renderer/assets/icons/cloud-animated.gif";
-import { useUserDetails } from "@renderer/hooks";
 import "./game-details.scss";
 import "./hero.scss";
 
@@ -63,10 +61,6 @@ export function GameDetailsContent() {
     setGameOptionsInitialCategory,
   } = useContext(gameDetailsContext);
 
-  const { userDetails, hasActiveSubscription } = useUserDetails();
-
-  const { getGameArtifacts } = useContext(cloudSyncContext);
-
   const aboutTheGame = useMemo(() => {
     const aboutTheGame = shopDetails?.about_the_game;
     if (aboutTheGame) {
@@ -95,17 +89,6 @@ export function GameDetailsContent() {
   }, [objectId]);
 
   const handleCloudSaveButtonClick = () => {
-    if (!userDetails) {
-      window.electron.openAuthWindow(AuthPage.SignIn);
-      return;
-    }
-
-    if (!hasActiveSubscription) {
-      setGameOptionsInitialCategory("hydra_cloud");
-      setShowGameOptionsModal(true);
-      return;
-    }
-
     setGameOptionsInitialCategory("hydra_cloud");
     setShowGameOptionsModal(true);
   };
@@ -114,10 +97,6 @@ export function GameDetailsContent() {
     setGameOptionsInitialCategory("assets");
     setShowGameOptionsModal(true);
   };
-
-  useEffect(() => {
-    getGameArtifacts();
-  }, [getGameArtifacts]);
 
   const isCustomGame = game?.shop === "custom";
 

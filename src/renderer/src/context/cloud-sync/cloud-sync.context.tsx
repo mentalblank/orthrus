@@ -1,6 +1,6 @@
 import { useToast } from "@renderer/hooks";
 import { logger } from "@renderer/logger";
-import type { LudusaviBackup, GameArtifact, GameShop } from "@types";
+import type { LudusaviBackup, GameShop } from "@types";
 import React, {
   createContext,
   useCallback,
@@ -19,41 +19,24 @@ export enum CloudSyncState {
 
 export interface CloudSyncContext {
   backupPreview: LudusaviBackup | null;
-  artifacts: GameArtifact[];
   showCloudSyncFilesModal: boolean;
   backupState: CloudSyncState;
-  downloadGameArtifact: (gameArtifactId: string) => Promise<void>;
   uploadSaveGame: (downloadOptionTitle: string | null) => Promise<void>;
-  deleteGameArtifact: (gameArtifactId: string) => Promise<void>;
   setShowCloudSyncFilesModal: React.Dispatch<React.SetStateAction<boolean>>;
   getGameBackupPreview: () => Promise<void>;
-  getGameArtifacts: () => Promise<void>;
-  toggleArtifactFreeze: (
-    gameArtifactId: string,
-    freeze: boolean
-  ) => Promise<void>;
-  restoringBackup: boolean;
   uploadingBackup: boolean;
   loadingPreview: boolean;
-  freezingArtifact: boolean;
 }
 
 export const cloudSyncContext = createContext<CloudSyncContext>({
   backupPreview: null,
   backupState: CloudSyncState.Unknown,
-  downloadGameArtifact: async () => {},
   uploadSaveGame: async () => {},
-  artifacts: [],
-  deleteGameArtifact: async () => {},
   showCloudSyncFilesModal: false,
   setShowCloudSyncFilesModal: () => {},
   getGameBackupPreview: async () => {},
-  toggleArtifactFreeze: async () => {},
-  getGameArtifacts: async () => {},
-  restoringBackup: false,
   uploadingBackup: false,
   loadingPreview: false,
-  freezingArtifact: false,
 });
 
 const { Provider } = cloudSyncContext;
@@ -72,46 +55,14 @@ export function CloudSyncContextProvider({
 }: CloudSyncContextProviderProps) {
   const { t } = useTranslation("game_details");
 
-  const [artifacts, setArtifacts] = useState<GameArtifact[]>([]);
   const [backupPreview, setBackupPreview] = useState<LudusaviBackup | null>(
     null
   );
-  const [restoringBackup, setRestoringBackup] = useState(false);
   const [uploadingBackup, setUploadingBackup] = useState(false);
   const [showCloudSyncFilesModal, setShowCloudSyncFilesModal] = useState(false);
   const [loadingPreview, setLoadingPreview] = useState(false);
-  const [freezingArtifact, setFreezingArtifact] = useState(false);
 
   const { showSuccessToast, showErrorToast } = useToast();
-
-  const downloadGameArtifact = useCallback(
-    async (gameArtifactId: string) => {
-      setRestoringBackup(true);
-      window.electron.downloadGameArtifact(objectId, shop, gameArtifactId);
-    },
-    [objectId, shop]
-  );
-
-  const getGameArtifacts = useCallback(async () => {
-    if (shop === "custom") {
-      setArtifacts([]);
-      return;
-    }
-
-    const params = new URLSearchParams({
-      objectId,
-      shop,
-    });
-
-    const results = await window.electron.hydraApi
-      .get<GameArtifact[]>(`/profile/games/artifacts?${params.toString()}`, {
-        needsSubscription: true,
-      })
-      .catch(() => {
-        return [];
-      });
-    setArtifacts(results);
-  }, [objectId, shop]);
 
   const getGameBackupPreview = useCallback(async () => {
     setLoadingPreview(true);
@@ -144,25 +95,6 @@ export function CloudSyncContextProvider({
     [objectId, shop, t, showErrorToast]
   );
 
-  const toggleArtifactFreeze = useCallback(
-    async (gameArtifactId: string, freeze: boolean) => {
-      setFreezingArtifact(true);
-      try {
-        const endpoint = freeze ? "freeze" : "unfreeze";
-        await window.electron.hydraApi.put(
-          `/profile/games/artifacts/${gameArtifactId}/${endpoint}`
-        );
-        getGameArtifacts();
-      } catch (err) {
-        logger.error("Failed to toggle artifact freeze", objectId, shop, err);
-        throw err;
-      } finally {
-        setFreezingArtifact(false);
-      }
-    },
-    [objectId, shop, getGameArtifacts]
-  );
-
   useEffect(() => {
     const removeUploadCompleteListener = window.electron.onUploadComplete(
       objectId,
@@ -170,49 +102,17 @@ export function CloudSyncContextProvider({
       () => {
         showSuccessToast(t("backup_uploaded"));
         setUploadingBackup(false);
-        getGameArtifacts();
         getGameBackupPreview();
       }
     );
 
-    const removeDownloadCompleteListener =
-      window.electron.onBackupDownloadComplete(objectId, shop, () => {
-        showSuccessToast(t("backup_restored"));
-
-        setRestoringBackup(false);
-        getGameArtifacts();
-        getGameBackupPreview();
-      });
-
     return () => {
       removeUploadCompleteListener();
-      removeDownloadCompleteListener();
     };
-  }, [
-    objectId,
-    shop,
-    showSuccessToast,
-    t,
-    getGameBackupPreview,
-    getGameArtifacts,
-  ]);
-
-  const deleteGameArtifact = useCallback(
-    async (gameArtifactId: string) => {
-      return window.electron.hydraApi
-        .delete<{ ok: boolean }>(`/profile/games/artifacts/${gameArtifactId}`)
-        .then(() => {
-          getGameBackupPreview();
-          getGameArtifacts();
-        });
-    },
-    [getGameBackupPreview, getGameArtifacts]
-  );
+  }, [objectId, shop, showSuccessToast, t, getGameBackupPreview]);
 
   useEffect(() => {
     setBackupPreview(null);
-    setArtifacts([]);
-    setRestoringBackup(false);
     setUploadingBackup(false);
   }, [objectId, shop]);
 
@@ -230,20 +130,13 @@ export function CloudSyncContextProvider({
     <Provider
       value={{
         backupPreview,
-        artifacts,
         backupState,
-        restoringBackup,
         uploadingBackup,
         showCloudSyncFilesModal,
         loadingPreview,
-        freezingArtifact,
         uploadSaveGame,
-        downloadGameArtifact,
-        deleteGameArtifact,
         setShowCloudSyncFilesModal,
         getGameBackupPreview,
-        getGameArtifacts,
-        toggleArtifactFreeze,
       }}
     >
       {children}

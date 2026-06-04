@@ -405,7 +405,6 @@ declare global {
         options?: {
           params?: unknown;
           needsAuth?: boolean;
-          needsSubscription?: boolean;
           ifModifiedSince?: Date;
         }
       ) => Promise<T>;
@@ -414,7 +413,6 @@ declare global {
         options?: {
           data?: unknown;
           needsAuth?: boolean;
-          needsSubscription?: boolean;
         }
       ) => Promise<T>;
       put: <T = unknown>(
@@ -422,7 +420,6 @@ declare global {
         options?: {
           data?: unknown;
           needsAuth?: boolean;
-          needsSubscription?: boolean;
         }
       ) => Promise<T>;
       patch: <T = unknown>(
@@ -430,14 +427,12 @@ declare global {
         options?: {
           data?: unknown;
           needsAuth?: boolean;
-          needsSubscription?: boolean;
         }
       ) => Promise<T>;
       delete: <T = unknown>(
         url: string,
         options?: {
           needsAuth?: boolean;
-          needsSubscription?: boolean;
         }
       ) => Promise<T>;
     };

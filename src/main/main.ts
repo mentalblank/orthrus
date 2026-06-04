@@ -92,9 +92,6 @@ export const loadState = async () => {
     uploadGamesBatch();
     void migrateDownloadSources();
 
-    const { syncDownloadSourcesFromApi } = await import("./services/user");
-    void syncDownloadSourcesFromApi();
-
     // Check for new download options on startup (if enabled)
     (async () => {
       await DownloadSourcesChecker.checkForChanges();

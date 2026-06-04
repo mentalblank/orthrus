@@ -4,18 +4,17 @@ import url from "url";
 import { uploadGamesBatch } from "./library-sync";
 import { clearGamesRemoteIds } from "./library-sync/clear-games-remote-id";
 import { networkLogger as logger } from "./logger";
-import { UserNotLoggedInError, SubscriptionRequiredError } from "@shared";
+import { UserNotLoggedInError } from "@shared";
 import { omit } from "lodash-es";
 import { appVersion } from "@main/constants";
 import { getUserData } from "./user/get-user-data";
 import { db } from "@main/level";
 import { levelKeys } from "@main/level/sublevels";
-import type { Auth, User } from "@types";
+import type { Auth } from "@types";
 import { WSClient } from "./ws";
 
 export interface HydraApiOptions {
   needsAuth?: boolean;
-  needsSubscription?: boolean;
   ifModifiedSince?: Date;
 }
 
@@ -23,7 +22,6 @@ interface HydraApiUserAuth {
   authToken: string;
   refreshToken: string;
   expirationTimestamp: number;
-  subscription: { expiresAt: Date | string | null } | null;
 }
 
 export class HydraApi {
@@ -40,16 +38,10 @@ export class HydraApi {
     authToken: "",
     refreshToken: "",
     expirationTimestamp: 0,
-    subscription: null,
   };
 
   public static isLoggedIn() {
     return this.userAuth.authToken !== "";
-  }
-
-  public static hasActiveSubscription() {
-    const expiresAt = new Date(this.userAuth.subscription?.expiresAt ?? 0);
-    return expiresAt > new Date();
   }
 
   static async handleExternalAuth(uri: string) {
@@ -71,7 +63,6 @@ export class HydraApi {
       authToken: accessToken,
       refreshToken: refreshToken,
       expirationTimestamp: tokenExpirationTimestamp,
-      subscription: null,
     };
 
     logger.log(
@@ -90,15 +81,7 @@ export class HydraApi {
       { valueEncoding: "json" }
     );
 
-    await getUserData().then((userDetails) => {
-      if (userDetails?.subscription) {
-        this.userAuth.subscription = {
-          expiresAt: userDetails.subscription.expiresAt
-            ? new Date(userDetails.subscription.expiresAt)
-            : null,
-        };
-      }
-    });
+    await getUserData();
 
     if (WindowManager.mainWindow) {
       WindowManager.mainWindow.webContents.send("on-signin");
@@ -107,9 +90,6 @@ export class HydraApi {
 
       WSClient.close();
       WSClient.connect();
-
-      const { syncDownloadSourcesFromApi } = await import("./user");
-      syncDownloadSourcesFromApi();
     }
   }
 
@@ -118,7 +98,6 @@ export class HydraApi {
       authToken: "",
       refreshToken: "",
       expirationTimestamp: 0,
-      subscription: null,
     };
 
     this.post("/auth/logout", {}, { needsAuth: false }).catch(() => {});
@@ -211,24 +190,14 @@ export class HydraApi {
     });
 
     const userAuth = result.at(0) as Auth | undefined;
-    const user = result.at(1) as User | undefined;
 
     this.userAuth = {
       authToken: userAuth?.accessToken ?? "",
       refreshToken: userAuth?.refreshToken ?? "",
       expirationTimestamp: userAuth?.tokenExpirationTimestamp ?? 0,
-      subscription: user?.subscription
-        ? { expiresAt: user.subscription?.expiresAt }
-        : null,
     };
 
-    const updatedUserData = await getUserData();
-
-    this.userAuth.subscription = updatedUserData?.subscription
-      ? {
-          expiresAt: updatedUserData.subscription.expiresAt,
-        }
-      : null;
+    await getUserData();
   }
 
   private static sendSignOutEvent() {
@@ -304,7 +273,6 @@ export class HydraApi {
         authToken: "",
         expirationTimestamp: 0,
         refreshToken: "",
-        subscription: null,
       };
 
       db.batch([
@@ -326,15 +294,10 @@ export class HydraApi {
 
   private static async validateOptions(options?: HydraApiOptions) {
     const needsAuth = options?.needsAuth == undefined || options.needsAuth;
-    const needsSubscription = options?.needsSubscription === true;
 
     if (needsAuth) {
       if (!this.isLoggedIn()) throw new UserNotLoggedInError();
       await this.revalidateAccessTokenIfExpired();
-    }
-
-    if (needsSubscription && !this.hasActiveSubscription()) {
-      throw new SubscriptionRequiredError();
     }
   }
 

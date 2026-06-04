@@ -6,11 +6,6 @@ import type { GameShop, UnlockedAchievement } from "./game.types";
 export type FriendRequestAction = "ACCEPTED" | "REFUSED" | "CANCEL";
 export * from "./download-contract";
 
-export type HydraCloudFeature =
-  | "achievements"
-  | "backup"
-  | "achievements-points";
-
 export interface DiskUsage {
   free: number;
   total: number;
