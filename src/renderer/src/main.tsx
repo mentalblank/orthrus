@@ -31,6 +31,7 @@ import Achievements from "./pages/achievements/achievements";
 import AchievementsStats from "./pages/achievements-stats/achievements-stats";
 import ThemeEditor from "./pages/theme-editor/theme-editor";
 import Library from "./pages/library/library";
+import Collections from "./pages/collections/collections";
 import { AchievementNotification } from "./pages/achievements/notification/achievement-notification";
 import { AchievementNotificationOverlay } from "./components/achievements/notification/achievement-notification-overlay";
 import GameLauncher from "./pages/game-launcher/game-launcher";
@@ -90,6 +91,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/" element={<Home />} />
             <Route path="/catalogue" element={<Catalogue />} />
             <Route path="/library" element={<Library />} />
+            <Route path="/collections" element={<Collections />} />
             <Route path="/downloads" element={<Downloads />} />
             <Route path="/game/:shop/:objectId" element={<GameDetails />} />
             <Route path="/settings" element={<Settings />} />

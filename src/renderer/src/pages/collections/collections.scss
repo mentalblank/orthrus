@@ -1,0 +1,95 @@
+@use "../../scss/globals.scss";
+
+.collections {
+  display: flex;
+  flex-direction: column;
+  gap: calc(globals.$spacing-unit * 3);
+  padding: calc(globals.$spacing-unit * 3);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: globals.$spacing-unit * 2;
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  &__empty {
+    color: globals.$muted-color;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: calc(globals.$spacing-unit * 2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    background-color: globals.$dark-background-color;
+    border: 1px solid globals.$border-color;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: globals.$brand-teal;
+    }
+  }
+
+  &__card-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: globals.$spacing-unit;
+    padding: calc(globals.$spacing-unit * 2);
+    color: globals.$body-color;
+    cursor: pointer;
+    flex: 1;
+    text-align: left;
+  }
+
+  &__card-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+  }
+
+  &__card-count {
+    font-size: globals.$small-font-size;
+    color: globals.$muted-color;
+  }
+
+  &__card-actions {
+    display: flex;
+    border-top: 1px solid globals.$border-color;
+
+    button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: globals.$spacing-unit;
+      color: globals.$muted-color;
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: globals.$body-color;
+      }
+
+      &:not(:last-child) {
+        border-right: 1px solid globals.$border-color;
+      }
+    }
+  }
+}
