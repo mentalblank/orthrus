@@ -82,9 +82,9 @@ export function useCollectionSettings() {
 
   const isChipVisibleInSidebar = useCallback(
     (collectionId: string): boolean => {
-      const { showInSidebar, locked } = getSettings(collectionId);
+      const { locked } = getSettings(collectionId);
       if (unlocked) return true;
-      return showInSidebar && !(locked && !unlocked);
+      return !(locked && !unlocked);
     },
     [getSettings, unlocked]
   );
