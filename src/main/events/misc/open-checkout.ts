@@ -21,10 +21,10 @@ const openCheckout = async (_event: Electron.IpcMainInvokeEvent) => {
     token: paymentToken,
   });
 
-  const checkoutUrl = import.meta.env.MAIN_VITE_CHECKOUT_URL || "https://checkout.hydralauncher.gg";
-  shell.openExternal(
-    `${checkoutUrl}?${params.toString()}`
-  );
+  const checkoutUrl =
+    import.meta.env.MAIN_VITE_CHECKOUT_URL ||
+    "https://checkout.hydralauncher.gg";
+  shell.openExternal(`${checkoutUrl}?${params.toString()}`);
 };
 
 registerEvent("openCheckout", openCheckout);
