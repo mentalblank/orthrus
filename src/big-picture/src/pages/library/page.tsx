@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useSearchParams } from "react-router-dom";
 import { IS_DESKTOP } from "../../constants";
 import { buildLibraryToastOptions } from "../../helpers";
 import {
@@ -110,8 +111,10 @@ export default function LibraryPage() {
   const { showSuccessToast } = useBigPictureToast();
   const { library, updateLibrary } = useLibrary();
   const { collections, loadCollections } = useGameCollections();
-  const [selectedFilterTab, setSelectedFilterTab] =
-    useState<LibraryFilterTab>("all");
+  const [searchParams] = useSearchParams();
+  const [selectedFilterTab, setSelectedFilterTab] = useState<LibraryFilterTab>(
+    () => (searchParams.get("tab") as LibraryFilterTab) || "all"
+  );
   const [viewMode, setViewMode] = useState<LibraryViewMode>(
     getInitialLibraryViewMode
   );

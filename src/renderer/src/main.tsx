@@ -43,6 +43,7 @@ import BigPictureHome from "../../big-picture/src/pages/home/home";
 import BigPictureSettings from "../../big-picture/src/pages/settings/settings";
 import BigPictureLibrary from "../../big-picture/src/pages/library/page";
 import BigPictureAchievementsStats from "../../big-picture/src/pages/achievements-stats/achievements-stats";
+import BigPictureCollections from "../../big-picture/src/pages/collections/collections";
 import BigPictureGame from "../../big-picture/src/pages/game/game";
 import BigPictureGameAchievements from "../../big-picture/src/pages/game-achievements/game-achievements";
 
@@ -114,6 +115,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="downloads" element={<BigPictureDownloads />} />
             <Route path="settings" element={<BigPictureSettings />} />
             <Route path="library" element={<BigPictureLibrary />} />
+            <Route path="collections" element={<BigPictureCollections />} />
             <Route
               path="achievements-stats"
               element={<BigPictureAchievementsStats />}
