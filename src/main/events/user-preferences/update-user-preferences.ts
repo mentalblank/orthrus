@@ -4,7 +4,6 @@ import type { UserPreferences } from "@types";
 import i18next from "i18next";
 import { defaultDownloadsPath } from "@main/constants";
 import { db, levelKeys } from "@main/level";
-import { patchUserProfile } from "../profile/update-profile";
 import { DownloadManager } from "@main/services";
 import { WindowManager } from "@main/services/window-manager";
 import { getDownloadDirectoryPreferences } from "@shared";
@@ -24,7 +23,6 @@ const updateUserPreferences = async (
     });
 
     i18next.changeLanguage(preferences.language);
-    patchUserProfile({ language: preferences.language }).catch(() => {});
   }
 
   const mergedPreferences = {

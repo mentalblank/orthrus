@@ -21,7 +21,6 @@ import {
   DeckyPlugin,
   DownloadSourcesChecker,
   DownloadOrchestrator,
-  WSClient,
   WindowManager,
   logger,
 } from "@main/services";
@@ -96,7 +95,6 @@ export const loadState = async () => {
     (async () => {
       await DownloadSourcesChecker.checkForChanges();
     })();
-    WSClient.connect();
   });
 
   const downloadToResume =

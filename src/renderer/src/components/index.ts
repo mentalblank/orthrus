@@ -1,4 +1,3 @@
-export * from "./avatar/avatar";
 export * from "./bottom-panel/bottom-panel";
 export * from "./button/button";
 export * from "./game-card/game-card";

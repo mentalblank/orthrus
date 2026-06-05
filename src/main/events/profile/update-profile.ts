@@ -4,10 +4,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type { UpdateProfileRequest, User, UserProfile } from "@types";
 import { ASSETS_PATH } from "@main/constants";
-import {
-  toUserProfile,
-  updateLocalUser,
-} from "@main/services/user/local-user";
+import { toUserProfile, updateLocalUser } from "@main/services/user/local-user";
 
 /* Copies a picked image into the local assets dir and returns a local: url. */
 const persistImage = (imagePath: string): string => {
@@ -21,11 +18,6 @@ const persistImage = (imagePath: string): string => {
   );
   fs.copyFileSync(imagePath, dest);
   return `local:${dest}`;
-};
-
-/* Local-only no-op kept for callers that synced language to the cloud. */
-export const patchUserProfile = async (_updateProfile: UpdateProfileRequest) => {
-  return undefined;
 };
 
 const updateProfile = async (

@@ -24,7 +24,6 @@ import {
   Tooltip,
   Typography,
   UserDiskItem,
-  UserProfile,
   VerticalGameCard,
 } from "../../components";
 import {
@@ -54,8 +53,6 @@ const CARD_IMAGE =
   "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=80";
 const ALT_CARD_IMAGE =
   "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80";
-const PROFILE_IMAGE =
-  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=160&q=80";
 const POSTER_IMAGE =
   "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80";
 const HOVER_POSTER_IMAGE =
@@ -542,12 +539,6 @@ export default function ComponentLab() {
                   <CloudArrowDown size={18} />
                 </Button>
               }
-            />
-
-            <UserProfile
-              image={PROFILE_IMAGE}
-              name="UserProfile"
-              friendCode="HYDRA-2026"
             />
           </div>
         </ShowcaseSection>
