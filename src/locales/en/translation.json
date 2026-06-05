@@ -573,7 +573,7 @@
     "about": "About",
     "about_description": "Orthrus Launcher is a privacy-focused, local-only fork of Hydra Launcher. It manages your game library, achievements, and save backups entirely on your machine — no account, cloud sync, or telemetry.",
     "about_repository": "Orthrus on GitHub",
-    "about_upstream_repository": "Orthrus (upstream) on GitHub",
+    "about_upstream_repository": "Hydra (upstream) on GitHub",
     "about_upstream_site": "hydralauncher.gg",
     "about_credit": "All credit for the original application goes to the Hydra Launcher team. Please consider supporting the upstream project.",
     "language": "Language",
