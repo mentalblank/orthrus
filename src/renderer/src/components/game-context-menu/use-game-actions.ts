@@ -129,6 +129,20 @@ export function useGameActions(game: LibraryGame) {
     }
   };
 
+  const handleTogglePin = async (isPinned = Boolean(game.isPinned)) => {
+    try {
+      await window.electron.toggleGamePin(game.shop, game.objectId, !isPinned);
+      showSuccessToast(
+        isPinned ? t("game_removed_from_pinned") : t("game_added_to_pinned")
+      );
+      updateLibrary();
+    } catch (error) {
+      showErrorToast(t("failed_update_pin"));
+      logger.error("Failed to toggle pin", error);
+      throw error;
+    }
+  };
+
   const handleCreateShortcut = async () => {
     try {
       setCreatingShortcut(true);
@@ -289,6 +303,7 @@ export function useGameActions(game: LibraryGame) {
     handlePlayGame,
     handleCloseGame,
     handleToggleFavorite,
+    handleTogglePin,
     handleCreateShortcut,
     handleCreateSteamShortcut,
     handleOpenFolder,

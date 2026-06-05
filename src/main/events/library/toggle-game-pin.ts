@@ -1,8 +1,9 @@
 import { registerEvent } from "../register-event";
 import { gamesSublevel, levelKeys } from "@main/level";
-import { HydraApi, logger } from "@main/services";
-import type { GameShop, UserGame } from "@types";
+import { logger } from "@main/services";
+import type { GameShop } from "@types";
 
+/* Local-only: pin state lives on the game record in LevelDB. */
 const toggleGamePin = async (
   _event: Electron.IpcMainInvokeEvent,
   shop: GameShop,
@@ -15,25 +16,11 @@ const toggleGamePin = async (
     const game = await gamesSublevel.get(gameKey);
     if (!game) return;
 
-    if (pin) {
-      const response = await HydraApi.put<UserGame>(
-        `/profile/games/${shop}/${objectId}/pin`
-      );
-
-      await gamesSublevel.put(gameKey, {
-        ...game,
-        isPinned: pin,
-        pinnedDate: new Date(response.pinnedDate!),
-      });
-    } else {
-      await HydraApi.put(`/profile/games/${shop}/${objectId}/unpin`);
-
-      await gamesSublevel.put(gameKey, {
-        ...game,
-        isPinned: pin,
-        pinnedDate: null,
-      });
-    }
+    await gamesSublevel.put(gameKey, {
+      ...game,
+      isPinned: pin,
+      pinnedDate: pin ? new Date() : null,
+    });
   } catch (error) {
     logger.error("Failed to update game pinned status", error);
     throw new Error(`Failed to update game pinned status: ${error}`);
