@@ -20,7 +20,6 @@ import type {
   GameRunning,
   TorBoxUser,
   Theme,
-  Auth,
   ShortcutLocation,
   ShopAssets,
   ShopDetailsWithAssets,
@@ -483,11 +482,6 @@ declare global {
     checkForUpdates: () => Promise<boolean>;
     restartAndInstallUpdate: () => Promise<void>;
 
-    /* Auth */
-    getAuth: () => Promise<Auth | null>;
-    signOut: () => Promise<void>;
-    getSessionHash: () => Promise<string | null>;
-    onSignIn: (cb: () => void) => () => Electron.IpcRenderer;
     onAccountUpdated: (cb: () => void) => () => Electron.IpcRenderer;
     onSignOut: (cb: () => void) => () => Electron.IpcRenderer;
 

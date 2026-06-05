@@ -64,7 +64,7 @@ export function App() {
 
   const toast = useAppSelector((state) => state.toast);
 
-  const { showSuccessToast, showErrorToast } = useToast();
+  const { showErrorToast } = useToast();
 
   const [showArchiveDeletionModal, setShowArchiveDeletionModal] =
     useState(false);
@@ -169,15 +169,6 @@ export function App() {
     setupExternalResources();
   }, [setupExternalResources]);
 
-  const onSignIn = useCallback(() => {
-    fetchUserDetails().then((response) => {
-      if (response) {
-        updateUserDetails(response);
-        showSuccessToast(t("successfully_signed_in"));
-      }
-    });
-  }, [fetchUserDetails, t, showSuccessToast, updateUserDetails]);
-
   useEffect(() => {
     const unsubscribe = window.electron.onGamesRunning((gamesRunning) => {
       if (gamesRunning.length) {
@@ -206,7 +197,6 @@ export function App() {
 
   useEffect(() => {
     const listeners = [
-      window.electron.onSignIn(onSignIn),
       window.electron.onLibraryBatchComplete(() => {
         updateLibrary();
       }),
@@ -238,7 +228,7 @@ export function App() {
     return () => {
       listeners.forEach((unsubscribe) => unsubscribe());
     };
-  }, [onSignIn, updateLibrary, clearUserDetails, dispatch, showErrorToast, t]);
+  }, [updateLibrary, clearUserDetails, dispatch, showErrorToast, t]);
 
   useEffect(() => {
     if (contentRef.current) contentRef.current.scrollTop = 0;

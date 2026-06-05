@@ -1,7 +1,6 @@
 import { appVersion, defaultDownloadsPath, isStaging } from "@main/constants";
 import { ipcMain } from "electron";
 
-import "./auth";
 import "./autoupdater";
 import "./big-picture";
 import "./catalogue";

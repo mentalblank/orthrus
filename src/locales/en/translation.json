@@ -1,8 +1,5 @@
 {
   "language_name": "English",
-  "app": {
-    "successfully_signed_in": "Successfully signed in"
-  },
   "home": {
     "surprise_me": "Surprise me",
     "hot": "Hot now",

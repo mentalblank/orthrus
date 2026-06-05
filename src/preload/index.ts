@@ -641,15 +641,6 @@ contextBridge.exposeInMainWorld("electron", {
   getUnlockedAchievements: (objectId: string, shop: GameShop) =>
     ipcRenderer.invoke("getUnlockedAchievements", objectId, shop),
 
-  /* Auth */
-  getAuth: () => ipcRenderer.invoke("getAuth"),
-  signOut: () => ipcRenderer.invoke("signOut"),
-  getSessionHash: () => ipcRenderer.invoke("getSessionHash"),
-  onSignIn: (cb: () => void) => {
-    const listener = (_event: Electron.IpcRendererEvent) => cb();
-    ipcRenderer.on("on-signin", listener);
-    return () => ipcRenderer.removeListener("on-signin", listener);
-  },
   onAccountUpdated: (cb: () => void) => {
     const listener = (_event: Electron.IpcRendererEvent) => cb();
     ipcRenderer.on("on-account-updated", listener);

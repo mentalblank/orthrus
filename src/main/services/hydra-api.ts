@@ -40,16 +40,6 @@ export class HydraApi {
     return this.userAuth.authToken !== "";
   }
 
-  static handleSignOut() {
-    this.userAuth = {
-      authToken: "",
-      refreshToken: "",
-      expirationTimestamp: 0,
-    };
-
-    this.post("/auth/logout", {}, { needsAuth: false }).catch(() => {});
-  }
-
   static async setupApi() {
     this.instance = axios.create({
       baseURL:

@@ -18,12 +18,6 @@ export function useUserDetails() {
     globalThis.window.localStorage.removeItem("userDetails");
   }, [dispatch]);
 
-  const signOut = useCallback(async () => {
-    clearUserDetails();
-
-    return globalThis.window.electron.signOut();
-  }, [clearUserDetails]);
-
   const updateUserDetails = useCallback(
     async (userDetails: UserDetails) => {
       dispatch(setUserDetails(userDetails));
@@ -63,7 +57,6 @@ export function useUserDetails() {
     userDetails,
     profileBackground,
     fetchUserDetails,
-    signOut,
     clearUserDetails,
     updateUserDetails,
     patchUser,

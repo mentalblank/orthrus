@@ -61,9 +61,6 @@ export function useUserDetails() {
       globalThis.window.electron.onAccountUpdated(() => {
         void fetchUserDetails();
       });
-    const unsubscribeSignIn = globalThis.window.electron.onSignIn(() => {
-      void fetchUserDetails();
-    });
     const unsubscribeSignOut = globalThis.window.electron.onSignOut(() => {
       persistUserDetails(null);
       setUserDetails(null);
@@ -71,7 +68,6 @@ export function useUserDetails() {
 
     return () => {
       unsubscribeAccountUpdated();
-      unsubscribeSignIn();
       unsubscribeSignOut();
     };
   }, [fetchUserDetails]);
