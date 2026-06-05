@@ -264,6 +264,25 @@ export const watchProcesses = async () => {
   }
 };
 
+/* Persists playtime fields while preserving user-owned fields (collections,
+   favorite, auto-backup) that may have changed since the watcher snapshot. */
+const persistPlaytime = async (gameKey: string, updatedGame: Game) => {
+  const current = await gamesSublevel.get(gameKey);
+
+  if (!current) {
+    await gamesSublevel.put(gameKey, updatedGame);
+    return;
+  }
+
+  await gamesSublevel.put(gameKey, {
+    ...updatedGame,
+    collectionIds: current.collectionIds ?? updatedGame.collectionIds,
+    favorite: current.favorite ?? updatedGame.favorite,
+    automaticCloudSync:
+      current.automaticCloudSync ?? updatedGame.automaticCloudSync,
+  });
+};
+
 function onOpenGame(game: Game) {
   const now = performance.now();
   const gameKey = levelKeys.game(game.shop, game.objectId);
@@ -372,7 +391,7 @@ function onTickGame(game: Game) {
     lastTimePlayed: new Date(),
   };
 
-  gamesSublevel.put(levelKeys.game(game.shop, game.objectId), updatedGame);
+  void persistPlaytime(levelKeys.game(game.shop, game.objectId), updatedGame);
 
   gamesPlaytime.set(levelKeys.game(game.shop, game.objectId), {
     ...gamePlaytime,
@@ -404,7 +423,7 @@ function onTickGame(game: Game) {
           deltaToSync,
         });
 
-        gamesSublevel.put(levelKeys.game(game.shop, game.objectId), {
+        void persistPlaytime(levelKeys.game(game.shop, game.objectId), {
           ...updatedGame,
           unsyncedDeltaPlayTimeInMilliseconds: 0,
         });
@@ -416,7 +435,7 @@ function onTickGame(game: Game) {
           error: error instanceof Error ? error.message : String(error),
         });
 
-        gamesSublevel.put(levelKeys.game(game.shop, game.objectId), {
+        void persistPlaytime(levelKeys.game(game.shop, game.objectId), {
           ...updatedGame,
           unsyncedDeltaPlayTimeInMilliseconds: deltaToSync,
         });
@@ -454,7 +473,7 @@ const onCloseGame = (game: Game) => {
     lastTimePlayed: new Date(),
   };
 
-  gamesSublevel.put(gameKey, updatedGame);
+  void persistPlaytime(gameKey, updatedGame);
 
   if (game.shop === "custom") return;
 
@@ -487,7 +506,7 @@ const onCloseGame = (game: Game) => {
           deltaToSync,
         });
 
-        return gamesSublevel.put(gameKey, {
+        return persistPlaytime(gameKey, {
           ...updatedGame,
           unsyncedDeltaPlayTimeInMilliseconds: 0,
         });
@@ -498,7 +517,7 @@ const onCloseGame = (game: Game) => {
           error: error instanceof Error ? error.message : String(error),
         });
 
-        return gamesSublevel.put(gameKey, {
+        return persistPlaytime(gameKey, {
           ...updatedGame,
           unsyncedDeltaPlayTimeInMilliseconds: deltaToSync,
         });

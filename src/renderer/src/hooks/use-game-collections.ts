@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import type { GameCollection, LibraryGame } from "@types";
+import type { LibraryGame } from "@types";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
   addCollection,
@@ -23,40 +23,34 @@ const getNormalizedCollectionIds = (
 
 export function useGameCollections() {
   const dispatch = useAppDispatch();
-  const loadCollectionsRequestRef = useRef<Promise<GameCollection[]> | null>(
-    null
-  );
+  // Monotonic guard: only the most recent load may write redux, so a slow,
+  // stale read (started before an assign) can't revert a newer one.
+  const loadSeqRef = useRef(0);
   const collections = useAppSelector((state) => state.collections.items);
   const isLoading = useAppSelector((state) => state.collections.isLoading);
   const hasLoaded = useAppSelector((state) => state.collections.hasLoaded);
   const library = useAppSelector((state) => state.library.value);
 
   const loadCollections = useCallback(async () => {
-    if (loadCollectionsRequestRef.current) {
-      return loadCollectionsRequestRef.current;
-    }
+    const seq = ++loadSeqRef.current;
+    dispatch(setCollectionsLoading(true));
 
-    const request = (async () => {
-      dispatch(setCollectionsLoading(true));
+    try {
+      const response = await window.electron.getCollections();
 
-      try {
-        const response = await window.electron.getCollections();
-
+      if (seq === loadSeqRef.current) {
         dispatch(setCollections(response));
-        return response;
-      } catch (error) {
-        void error;
-        // Keep existing collections in redux; don't wipe on transient error.
-        return [];
-      } finally {
-        dispatch(setCollectionsLoading(false));
-        loadCollectionsRequestRef.current = null;
       }
-    })();
-
-    loadCollectionsRequestRef.current = request;
-
-    return request;
+      return response;
+    } catch (error) {
+      void error;
+      // Keep existing collections in redux; don't wipe on transient error.
+      return [];
+    } finally {
+      if (seq === loadSeqRef.current) {
+        dispatch(setCollectionsLoading(false));
+      }
+    }
   }, [dispatch]);
 
   const assignGameToCollection = useCallback(
@@ -93,10 +87,11 @@ export function useGameCollections() {
         })
       );
 
-      // Re-sync counts from the DB so stale in-flight loads can't revert them.
-      dispatch(setCollections(await window.electron.getCollections()));
+      // Authoritative re-sync; bumps the load sequence so any stale in-flight
+      // load resolved afterwards is ignored.
+      await loadCollections();
     },
-    [dispatch, library]
+    [dispatch, library, loadCollections]
   );
 
   const bulkAssignGamesToCollection = useCallback(
@@ -152,10 +147,11 @@ export function useGameCollections() {
         await apply(game, false);
       }
 
-      // Re-sync counts from the DB so stale in-flight loads can't revert them.
-      dispatch(setCollections(await window.electron.getCollections()));
+      // Authoritative re-sync; bumps the load sequence so any stale in-flight
+      // load resolved afterwards is ignored.
+      await loadCollections();
     },
-    [dispatch, library]
+    [dispatch, library, loadCollections]
   );
 
   const createCollection = useCallback(
