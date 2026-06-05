@@ -481,6 +481,10 @@ contextBridge.exposeInMainWorld("electron", {
   exportBackup: (scope: "all" | "saves") =>
     ipcRenderer.invoke("exportBackup", scope),
   restoreBackup: () => ipcRenderer.invoke("restoreBackup"),
+  exportGameSave: (shop: GameShop, objectId: string) =>
+    ipcRenderer.invoke("exportGameSave", shop, objectId),
+  importGameSave: (shop: GameShop, objectId: string) =>
+    ipcRenderer.invoke("importGameSave", shop, objectId),
   showItemInFolder: (path: string) =>
     ipcRenderer.invoke("showItemInFolder", path),
   getImageDataUrl: (imageUrl: string) =>

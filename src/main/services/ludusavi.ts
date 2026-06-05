@@ -102,6 +102,32 @@ export class Ludusavi {
     });
   }
 
+  public static async restoreGame(
+    objectId: string,
+    backupPath: string,
+    winePrefix?: string | null
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const args = [
+        "--config",
+        this.configPath,
+        "restore",
+        objectId,
+        "--api",
+        "--force",
+        "--path",
+        backupPath,
+      ];
+
+      if (winePrefix) args.push("--wine-prefix", winePrefix);
+
+      cp.execFile(this.binaryPath, args, (err: cp.ExecFileException | null) => {
+        if (err) return reject(err);
+        return resolve();
+      });
+    });
+  }
+
   public static async getBackupPreview(
     _shop: GameShop,
     objectId: string,

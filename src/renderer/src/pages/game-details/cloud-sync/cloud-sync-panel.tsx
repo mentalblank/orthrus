@@ -2,8 +2,9 @@ import { Button, CheckboxField } from "@renderer/components";
 import { useContext, useEffect, useMemo } from "react";
 import type { ChangeEvent } from "react";
 import { cloudSyncContext, gameDetailsContext } from "@renderer/context";
+import { useToast } from "@renderer/hooks";
 import "./cloud-sync-panel.scss";
-import { SyncIcon, UploadIcon } from "@primer/octicons-react";
+import { DownloadIcon, SyncIcon, UploadIcon } from "@primer/octicons-react";
 import { useTranslation } from "react-i18next";
 
 interface CloudSyncPanelProps {
@@ -26,12 +27,40 @@ export function CloudSyncPanel({
     getGameBackupPreview,
   } = useContext(cloudSyncContext);
 
-  const { lastDownloadedOption, game } = useContext(gameDetailsContext);
+  const { lastDownloadedOption, game, objectId, shop } =
+    useContext(gameDetailsContext);
+  const { showSuccessToast, showErrorToast } = useToast();
 
   useEffect(() => {
     /* Local-only: load the Ludusavi save preview so backups can be created. */
     getGameBackupPreview();
   }, [getGameBackupPreview]);
+
+  const handleExportSave = async () => {
+    if (!objectId || !shop) return;
+    try {
+      const result = await window.electron.exportGameSave(shop, objectId);
+      if (!result.canceled && result.path) {
+        showSuccessToast(t("save_exported"));
+        window.electron.showItemInFolder(result.path);
+      }
+    } catch {
+      showErrorToast(t("save_export_failed"));
+    }
+  };
+
+  const handleImportSave = async () => {
+    if (!objectId || !shop) return;
+    try {
+      const result = await window.electron.importGameSave(shop, objectId);
+      if (!result.canceled && result.restored) {
+        showSuccessToast(t("save_imported"));
+        getGameBackupPreview();
+      }
+    } catch {
+      showErrorToast(t("save_import_failed"));
+    }
+  };
 
   const backupStateLabel = useMemo(() => {
     if (uploadingBackup) {
@@ -96,6 +125,23 @@ export function CloudSyncPanel({
             <UploadIcon />
           )}
           {t("create_backup")}
+        </Button>
+      </div>
+
+      <div className="cloud-sync-panel__transfer-buttons">
+        <Button
+          type="button"
+          theme="outline"
+          onClick={handleExportSave}
+          disabled={uploadingBackup || !backupPreview?.overall.totalGames}
+        >
+          <UploadIcon />
+          {t("export_save")}
+        </Button>
+
+        <Button type="button" theme="outline" onClick={handleImportSave}>
+          <DownloadIcon />
+          {t("import_save")}
         </Button>
       </div>
     </>
