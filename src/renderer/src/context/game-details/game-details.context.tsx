@@ -225,7 +225,7 @@ export function GameDetailsContextProvider({
         setIsLoading(false);
       });
 
-    if (userDetails && shop !== "custom") {
+    if (shop !== "custom") {
       window.electron
         .getUnlockedAchievements(objectId, shop)
         .then((achievements) => {
@@ -363,7 +363,6 @@ export function GameDetailsContextProvider({
       objectId,
       shop,
       (achievements) => {
-        if (!userDetails) return;
         setAchievements(achievements);
       }
     );

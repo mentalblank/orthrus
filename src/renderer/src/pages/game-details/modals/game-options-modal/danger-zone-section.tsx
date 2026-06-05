@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@renderer/components";
-import type { LibraryGame, UserDetails } from "@types";
+import type { LibraryGame } from "@types";
 
 interface DangerZoneSectionProps {
   game: LibraryGame;
@@ -9,7 +9,6 @@ interface DangerZoneSectionProps {
   isDeletingAchievements: boolean;
   hasAchievements: boolean;
   isGameDownloading: boolean;
-  userDetails: UserDetails | null;
   onOpenRemoveFromLibrary: () => void;
   onOpenResetAchievements: () => void;
   onOpenChangePlaytime: () => void;
@@ -22,7 +21,6 @@ export function DangerZoneSection({
   isDeletingAchievements,
   hasAchievements,
   isGameDownloading,
-  userDetails,
   onOpenRemoveFromLibrary,
   onOpenResetAchievements,
   onOpenChangePlaytime,
@@ -52,12 +50,7 @@ export function DangerZoneSection({
           <Button
             onClick={onOpenResetAchievements}
             theme="danger"
-            disabled={
-              deleting ||
-              isDeletingAchievements ||
-              !hasAchievements ||
-              !userDetails
-            }
+            disabled={deleting || isDeletingAchievements || !hasAchievements}
           >
             {t("reset_achievements")}
           </Button>

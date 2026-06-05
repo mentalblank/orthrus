@@ -1,5 +1,5 @@
 import { setHeaderTitle } from "@renderer/features";
-import { useAppDispatch, useUserDetails } from "@renderer/hooks";
+import { useAppDispatch } from "@renderer/hooks";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   buildGameDetailsPath,
@@ -13,9 +13,6 @@ import { AchievementPanel } from "./achievement-panel";
 import "./achievements-content.scss";
 
 interface UserInfo {
-  id: string;
-  displayName: string;
-  profileImageUrl: string | null;
   totalAchievementCount: number;
   unlockedAchievementCount: number;
 }
@@ -62,7 +59,6 @@ export function AchievementsContent() {
 
   const dispatch = useAppDispatch();
 
-  const { userDetails } = useUserDetails();
   useEffect(() => {
     dispatch(setHeaderTitle(gameTitle));
   }, [dispatch, gameTitle]);
@@ -80,7 +76,7 @@ export function AchievementsContent() {
     }
   };
 
-  if (!objectId || !shop || !gameTitle || !userDetails) return null;
+  if (!objectId || !shop || !gameTitle) return null;
 
   return (
     <div className="achievements-content__achievements-list">
@@ -116,7 +112,6 @@ export function AchievementsContent() {
           <div className="achievements-content__achievements-list__section__container__achievements-summary-wrapper">
             <AchievementSummary
               user={{
-                ...userDetails,
                 totalAchievementCount: achievements!.length,
                 unlockedAchievementCount: achievements!.filter(
                   (achievement) => achievement.unlocked

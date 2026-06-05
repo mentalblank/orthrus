@@ -18,7 +18,6 @@ import {
   useGameCollections,
   useLibrary,
   useToast,
-  useUserDetails,
 } from "@renderer/hooks";
 import { RemoveGameFromLibraryModal } from "./remove-from-library-modal";
 import { ResetAchievementsModal } from "./reset-achievements-modal";
@@ -126,7 +125,6 @@ export function GameOptionsModal({
     isGameDeleting,
     cancelDownload,
   } = useDownload();
-  const { userDetails } = useUserDetails();
   const userPreferences = useAppSelector(
     (state) => state.userPreferences.value
   );
@@ -895,7 +893,6 @@ export function GameOptionsModal({
                 isDeletingAchievements={isDeletingAchievements}
                 hasAchievements={hasAchievements}
                 isGameDownloading={isGameDownloading}
-                userDetails={userDetails}
                 onOpenRemoveFromLibrary={() => setShowRemoveGameModal(true)}
                 onOpenResetAchievements={() =>
                   setShowResetAchievementsModal(true)
