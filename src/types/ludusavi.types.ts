@@ -39,13 +39,6 @@ export interface LudusaviConfig {
     files: string[];
     registry: [];
   }[];
-  backup?: {
-    retention?: {
-      full?: number;
-      differential?: number;
-    };
-    [key: string]: unknown;
-  };
 }
 
 export interface LudusaviBackupMapping {

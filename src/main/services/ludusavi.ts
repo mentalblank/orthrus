@@ -29,24 +29,6 @@ export class Ludusavi {
     return config;
   }
 
-  /* Keeps the last `full` backups per game (incremental retention). */
-  public static async setBackupRetention(full: number) {
-    const configFilePath = path.join(this.configPath, "config.yaml");
-    const config = (YAML.parse(fs.readFileSync(configFilePath, "utf-8")) ??
-      {}) as LudusaviConfig;
-
-    config.backup = {
-      ...config.backup,
-      retention: {
-        ...config.backup?.retention,
-        full: Math.max(1, full),
-        differential: 0,
-      },
-    };
-
-    fs.writeFileSync(configFilePath, YAML.stringify(config));
-  }
-
   public static async copyConfigFileToUserData() {
     if (!fs.existsSync(this.configPath)) {
       fs.mkdirSync(this.configPath, { recursive: true });

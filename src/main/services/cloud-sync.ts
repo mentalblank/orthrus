@@ -1,7 +1,7 @@
-import { levelKeys, gamesSublevel, db } from "@main/level";
+import { levelKeys, gamesSublevel } from "@main/level";
 import path from "node:path";
 import fs from "node:fs";
-import type { GameShop, UserPreferences } from "@types";
+import type { GameShop } from "@types";
 import { backupsPath } from "@main/constants";
 import { normalizePath, parseRegFile } from "@main/helpers";
 import { WindowManager } from "./window-manager";
@@ -69,7 +69,7 @@ export class CloudSync {
     _downloadOptionTitle: string | null,
     _label?: string
   ) {
-    /* Local-only incremental backup: keep the last N versions, never wipe history. */
+    /* Local-only: keep a single replaceable backup per game. */
     const game = await gamesSublevel.get(levelKeys.game(shop, objectId));
     const effectiveWinePrefixPath = Wine.getEffectivePrefixPath(
       game?.winePrefixPath,
@@ -78,13 +78,9 @@ export class CloudSync {
 
     const backupPath = path.join(backupsPath, `${shop}-${objectId}`);
 
-    const userPreferences = await db
-      .get<string, UserPreferences>(levelKeys.userPreferences, {
-        valueEncoding: "json",
-      })
-      .catch(() => null);
-
-    await Ludusavi.setBackupRetention(userPreferences?.backupsToKeep ?? 5);
+    if (fs.existsSync(backupPath)) {
+      await fs.promises.rm(backupPath, { recursive: true, force: true });
+    }
 
     await Ludusavi.backupGame(
       shop,
