@@ -22,9 +22,7 @@ import {
   useGameCollections,
   useLibrary,
   useToast,
-  useUserDetails,
 } from "@renderer/hooks";
-import { AuthPage } from "@shared";
 
 import { routes } from "./routes";
 
@@ -96,8 +94,6 @@ export function Sidebar() {
     return sortBy(library, (game) => game.title);
   }, [library]);
 
-  const { userDetails } = useUserDetails();
-
   const { lastPacket, progress } = useDownload();
 
   const { showWarningToast, showSuccessToast, showErrorToast } = useToast();
@@ -163,11 +159,6 @@ export function Sidebar() {
   };
 
   const handleCreateCollectionButtonClick = () => {
-    if (!userDetails) {
-      window.electron.openAuthWindow(AuthPage.SignIn);
-      return;
-    }
-
     setShowCreateCollectionModal(true);
   };
 
@@ -238,9 +229,9 @@ export function Sidebar() {
   }, []);
 
   useEffect(() => {
-    if (!userDetails || hasLoadedCollections) return;
+    if (hasLoadedCollections) return;
     void loadCollections();
-  }, [hasLoadedCollections, loadCollections, userDetails]);
+  }, [hasLoadedCollections, loadCollections]);
 
   const sidebarRef = useRef<HTMLElement>(null);
 

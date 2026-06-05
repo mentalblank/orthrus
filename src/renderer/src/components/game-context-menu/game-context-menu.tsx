@@ -27,7 +27,7 @@ import {
   CreateCollectionModal,
   useGameActions,
 } from "..";
-import { useGameCollections, useToast, useUserDetails } from "@renderer/hooks";
+import { useGameCollections, useToast } from "@renderer/hooks";
 
 interface GameContextMenuProps extends Omit<ContextMenuProps, "items"> {
   game: LibraryGame;
@@ -54,7 +54,6 @@ export function GameContextMenu({
 }: GameContextMenuProps) {
   const { t } = useTranslation("game_details");
   const { showSuccessToast, showErrorToast } = useToast();
-  const { userDetails } = useUserDetails();
   const [searchParams] = useSearchParams();
   const [showConfirmRemoveLibrary, setShowConfirmRemoveLibrary] =
     useState(false);
@@ -105,9 +104,9 @@ export function GameContextMenu({
   const selectedCollectionId = searchParams.get("collection");
 
   useEffect(() => {
-    if (!visible || !userDetails) return;
+    if (!visible) return;
     void loadCollections();
-  }, [visible, game.shop, loadCollections, userDetails]);
+  }, [visible, game.shop, loadCollections]);
 
   useEffect(() => {
     if (!visible) return;
