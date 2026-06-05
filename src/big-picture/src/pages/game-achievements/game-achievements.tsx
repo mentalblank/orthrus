@@ -14,7 +14,6 @@ import {
   useGameDetails,
   useHeaderTitle,
   useNavigationScreenActions,
-  useUserDetails,
 } from "../../hooks";
 import "./styles.scss";
 
@@ -25,7 +24,6 @@ export default function GameAchievements() {
     objectId!,
     shop!
   );
-  const { userDetails } = useUserDetails();
 
   const unlockedCount = useMemo(
     () => achievements.filter((a) => a.unlocked).length,
@@ -73,7 +71,6 @@ export default function GameAchievements() {
 
         <div className="game-achievements-page__content">
           <UserAchievementsSummary
-            userDetails={userDetails}
             unlockedCount={unlockedCount}
             totalCount={achievements.length}
           />

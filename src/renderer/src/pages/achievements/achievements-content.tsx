@@ -5,7 +5,7 @@ import {
   buildGameDetailsPath,
   formatDownloadProgress,
 } from "@renderer/helpers";
-import { PersonIcon, TrophyIcon } from "@primer/octicons-react";
+import { TrophyIcon } from "@primer/octicons-react";
 import { gameDetailsContext } from "@renderer/context";
 import { Link } from "@renderer/components";
 import { AchievementList } from "./achievement-list";
@@ -25,29 +25,9 @@ interface AchievementSummaryProps {
 }
 
 function AchievementSummary({ user }: AchievementSummaryProps) {
-  const getProfileImage = (
-    user: Pick<UserInfo, "profileImageUrl" | "displayName">
-  ) => {
-    return (
-      <div className="achievements-content__profile-avatar">
-        {user.profileImageUrl ? (
-          <img
-            className="achievements-content__profile-avatar"
-            src={user.profileImageUrl}
-            alt={user.displayName}
-          />
-        ) : (
-          <PersonIcon size={24} />
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="achievements-content__user-summary">
-      {getProfileImage(user)}
       <div className="achievements-content__user-summary__container">
-        <h1>{user.displayName}</h1>
         <div className="achievements-content__user-summary__container__stats">
           <div className="achievements-content__user-summary__container__stats__trophy-count">
             <TrophyIcon size={13} />

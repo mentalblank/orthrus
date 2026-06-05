@@ -1,14 +1,11 @@
-import { TrophyIcon, UserIcon } from "@phosphor-icons/react";
-import type { UserDetails } from "@types";
+import { TrophyIcon } from "@phosphor-icons/react";
 
 export interface UserAchievementsSummaryProps {
-  userDetails: UserDetails | null;
   unlockedCount: number;
   totalCount: number;
 }
 
 export function UserAchievementsSummary({
-  userDetails,
   unlockedCount,
   totalCount,
 }: Readonly<UserAchievementsSummaryProps>) {
@@ -20,24 +17,9 @@ export function UserAchievementsSummary({
 
   return (
     <div className="game-achievements-page__summary">
-      <div className="game-achievements-page__summary-avatar">
-        {userDetails?.profileImageUrl ? (
-          <img
-            src={userDetails.profileImageUrl}
-            alt={userDetails.displayName}
-            draggable={false}
-          />
-        ) : (
-          <UserIcon size={32} />
-        )}
-      </div>
-
       <div className="game-achievements-page__summary-content">
         <div className="game-achievements-page__summary-row">
           <div className="game-achievements-page__summary-info">
-            <p className="game-achievements-page__summary-name">
-              {userDetails?.displayName ?? "Anonymous"}
-            </p>
             <div className="game-achievements-page__summary-count">
               <TrophyIcon size={20} />
               <span>
