@@ -24,8 +24,24 @@ import { useNavigate } from "react-router-dom";
 import { setFilters, clearFilters } from "@renderer/features";
 import { levelDBService } from "@renderer/services/leveldb.service";
 import { orderBy } from "lodash-es";
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  PinIcon,
+} from "@primer/octicons-react";
 import "./settings-download-sources.scss";
 import { logger } from "@renderer/logger";
+
+const sortDownloadSources = (sources: DownloadSource[]) =>
+  orderBy(
+    sources,
+    [
+      (source) => (source.pinned ? 0 : 1),
+      (source) => source.order ?? Number.MAX_SAFE_INTEGER,
+      "createdAt",
+    ],
+    ["asc", "asc", "desc"]
+  );
 
 export function SettingsDownloadSources() {
   const [
@@ -59,7 +75,7 @@ export function SettingsDownloadSources() {
       const sources = (await levelDBService.values(
         "downloadSources"
       )) as DownloadSource[];
-      const sorted = orderBy(sources, "createdAt", "desc");
+      const sorted = sortDownloadSources(sources);
       setDownloadSources(sorted);
     };
 
@@ -83,7 +99,7 @@ export function SettingsDownloadSources() {
         const sources = (await levelDBService.values(
           "downloadSources"
         )) as DownloadSource[];
-        const sorted = orderBy(sources, "createdAt", "desc");
+        const sorted = sortDownloadSources(sources);
         setDownloadSources(sorted);
       } catch (error) {
         logger.error("Failed to fetch download sources:", error);
@@ -93,6 +109,26 @@ export function SettingsDownloadSources() {
     return () => clearInterval(intervalId);
   }, [downloadSources]);
 
+  const handleTogglePinSource = async (source: DownloadSource) => {
+    await window.electron.updateDownloadSource(source.id, {
+      pinned: !source.pinned,
+    });
+    const sources = (await levelDBService.values(
+      "downloadSources"
+    )) as DownloadSource[];
+    setDownloadSources(sortDownloadSources(sources));
+  };
+
+  const handleMoveSource = async (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= downloadSources.length) return;
+
+    const next = [...downloadSources];
+    [next[index], next[target]] = [next[target], next[index]];
+    setDownloadSources(next);
+    await window.electron.reorderDownloadSources(next.map((s) => s.id));
+  };
+
   const handleRemoveSource = async (downloadSource: DownloadSource) => {
     setIsRemovingDownloadSource(true);
 
@@ -101,7 +137,7 @@ export function SettingsDownloadSources() {
       const sources = (await levelDBService.values(
         "downloadSources"
       )) as DownloadSource[];
-      const sorted = orderBy(sources, "createdAt", "desc");
+      const sorted = sortDownloadSources(sources);
       setDownloadSources(sorted);
       showSuccessToast(t("removed_download_source"));
     } catch (error) {
@@ -119,7 +155,7 @@ export function SettingsDownloadSources() {
       const sources = (await levelDBService.values(
         "downloadSources"
       )) as DownloadSource[];
-      const sorted = orderBy(sources, "createdAt", "desc");
+      const sorted = sortDownloadSources(sources);
       setDownloadSources(sorted);
       showSuccessToast(t("removed_all_download_sources"));
     } catch (error) {
@@ -135,7 +171,7 @@ export function SettingsDownloadSources() {
       const sources = (await levelDBService.values(
         "downloadSources"
       )) as DownloadSource[];
-      const sorted = orderBy(sources, "createdAt", "desc");
+      const sorted = sortDownloadSources(sources);
       setDownloadSources(sorted);
     } catch (error) {
       logger.error("Failed to refresh download sources:", error);
@@ -149,7 +185,7 @@ export function SettingsDownloadSources() {
       const sources = (await levelDBService.values(
         "downloadSources"
       )) as DownloadSource[];
-      const sorted = orderBy(sources, "createdAt", "desc");
+      const sorted = sortDownloadSources(sources);
       setDownloadSources(sorted);
 
       showSuccessToast(t("download_sources_synced_successfully"));
@@ -248,7 +284,7 @@ export function SettingsDownloadSources() {
       </div>
 
       <ul className="settings-download-sources__list">
-        {downloadSources.map((downloadSource) => {
+        {downloadSources.map((downloadSource, index) => {
           const isPendingOrMatching =
             downloadSource.status === DownloadSourceStatus.PendingMatching ||
             downloadSource.status === DownloadSourceStatus.Matching;
@@ -260,6 +296,35 @@ export function SettingsDownloadSources() {
             >
               <div className="settings-download-sources__item-header">
                 <h2>{downloadSource.name}</h2>
+
+                <div className="settings-download-sources__item-controls">
+                  <button
+                    type="button"
+                    title={t("pin_download_source")}
+                    className={`settings-download-sources__icon-button ${downloadSource.pinned ? "settings-download-sources__icon-button--active" : ""}`}
+                    onClick={() => handleTogglePinSource(downloadSource)}
+                  >
+                    <PinIcon />
+                  </button>
+                  <button
+                    type="button"
+                    title={t("reorder_move_up")}
+                    className="settings-download-sources__icon-button"
+                    disabled={index === 0}
+                    onClick={() => handleMoveSource(index, -1)}
+                  >
+                    <ChevronUpIcon />
+                  </button>
+                  <button
+                    type="button"
+                    title={t("reorder_move_down")}
+                    className="settings-download-sources__icon-button"
+                    disabled={index === downloadSources.length - 1}
+                    onClick={() => handleMoveSource(index, 1)}
+                  >
+                    <ChevronDownIcon />
+                  </button>
+                </div>
 
                 <div style={{ display: "flex" }}>
                   <Badge>

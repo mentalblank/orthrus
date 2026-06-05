@@ -117,7 +117,15 @@ export function RepacksModal({
       const sources = (await levelDBService.values(
         "downloadSources"
       )) as DownloadSource[];
-      const sorted = orderBy(sources, "createdAt", "desc");
+      const sorted = orderBy(
+        sources,
+        [
+          (source) => (source.pinned ? 0 : 1),
+          (source) => source.order ?? Number.MAX_SAFE_INTEGER,
+          "createdAt",
+        ],
+        ["asc", "asc", "desc"]
+      );
       setDownloadSources(sorted);
     };
 
@@ -176,10 +184,22 @@ export function RepacksModal({
     }
   }, [visible, game, dispatch]);
 
+  const pinnedSourceNames = useMemo(
+    () =>
+      new Set(
+        downloadSources
+          .filter((source) => source.pinned)
+          .map((source) => source.name)
+      ),
+    [downloadSources]
+  );
+
   const sortedRepacks = useMemo(() => {
     return orderBy(
       repacks,
       [
+        // Repacks from pinned sources surface at the top.
+        (repack) => (pinnedSourceNames.has(repack.downloadSourceName) ? 1 : 0),
         (repack) => {
           const magnet = repack.uris.find((uri) => uri.startsWith("magnet:"));
           const hash = magnet ? getHashFromMagnet(magnet) : null;
@@ -187,9 +207,9 @@ export function RepacksModal({
         },
         (repack) => repack.uploadDate,
       ],
-      ["desc", "desc"]
+      ["desc", "desc", "desc"]
     );
-  }, [repacks, hashesInDebrid]);
+  }, [repacks, hashesInDebrid, pinnedSourceNames]);
 
   const getRepackAvailabilityStatus = (
     repack: GameRepack

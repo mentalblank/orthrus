@@ -172,6 +172,10 @@ contextBridge.exposeInMainWorld("electron", {
   removeDownloadSource: (url: string, removeAll?: boolean) =>
     ipcRenderer.invoke("removeDownloadSource", url, removeAll),
   getDownloadSources: () => ipcRenderer.invoke("getDownloadSources"),
+  updateDownloadSource: (id: string, patch: { pinned?: boolean }) =>
+    ipcRenderer.invoke("updateDownloadSource", id, patch),
+  reorderDownloadSources: (orderedIds: string[]) =>
+    ipcRenderer.invoke("reorderDownloadSources", orderedIds),
   syncDownloadSources: () => ipcRenderer.invoke("syncDownloadSources"),
   getDownloadSourcesCheckBaseline: () =>
     ipcRenderer.invoke("getDownloadSourcesCheckBaseline"),

@@ -335,6 +335,11 @@ declare global {
       downloadSourceId?: string
     ) => Promise<void>;
     getDownloadSources: () => Promise<DownloadSource[]>;
+    updateDownloadSource: (
+      id: string,
+      patch: { pinned?: boolean }
+    ) => Promise<void>;
+    reorderDownloadSources: (orderedIds: string[]) => Promise<void>;
     syncDownloadSources: () => Promise<void>;
     getDownloadSourcesCheckBaseline: () => Promise<string | null>;
     getDownloadSourcesSinceValue: () => Promise<string | null>;

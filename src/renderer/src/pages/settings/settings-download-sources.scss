@@ -79,3 +79,35 @@
     gap: globals.$spacing-unit;
   }
 }
+
+.settings-download-sources__item-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.settings-download-sources__icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  &--active {
+    color: var(--brand-teal, #1dd3b0);
+  }
+}
