@@ -5,6 +5,20 @@ import type { GameShop, UnlockedAchievement } from "./game.types";
 
 export * from "./download-contract";
 
+export interface BackupSelection {
+  database?: boolean;
+  themes?: boolean;
+  assets?: boolean;
+  saves?: { all?: boolean; games?: string[] };
+}
+
+export interface BackupArchiveContents {
+  database: boolean;
+  themes: boolean;
+  assets: boolean;
+  saves: string[];
+}
+
 export interface DiskUsage {
   free: number;
   total: number;

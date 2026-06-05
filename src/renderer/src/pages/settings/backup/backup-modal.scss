@@ -1,0 +1,48 @@
+@use "../../../scss/globals.scss";
+
+.backup-modal {
+  display: flex;
+  flex-direction: column;
+  gap: calc(globals.$spacing-unit * 3);
+  min-width: 380px;
+  max-width: 460px;
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: globals.$spacing-unit;
+  }
+
+  &__group-title {
+    font-size: globals.$small-font-size;
+    font-weight: 600;
+    color: globals.$muted-color;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__nested {
+    display: flex;
+    flex-direction: column;
+    gap: globals.$spacing-unit;
+    padding-left: calc(globals.$spacing-unit * 3);
+    margin-top: globals.$spacing-unit;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: globals.$spacing-unit;
+    max-height: 220px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: globals.$spacing-unit;
+  }
+}

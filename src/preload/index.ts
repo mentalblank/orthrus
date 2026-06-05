@@ -478,9 +478,11 @@ contextBridge.exposeInMainWorld("electron", {
   openExternal: (src: string) => ipcRenderer.invoke("openExternal", src),
   showOpenDialog: (options: Electron.OpenDialogOptions) =>
     ipcRenderer.invoke("showOpenDialog", options),
-  exportBackup: (scope: "all" | "saves") =>
-    ipcRenderer.invoke("exportBackup", scope),
-  restoreBackup: () => ipcRenderer.invoke("restoreBackup"),
+  exportBackup: (selection: unknown) =>
+    ipcRenderer.invoke("exportBackup", selection),
+  openBackupArchive: () => ipcRenderer.invoke("openBackupArchive"),
+  restoreBackup: (archivePath: string, selection: unknown) =>
+    ipcRenderer.invoke("restoreBackup", archivePath, selection),
   exportGameSave: (shop: GameShop, objectId: string) =>
     ipcRenderer.invoke("exportGameSave", shop, objectId),
   importGameSave: (shop: GameShop, objectId: string) =>

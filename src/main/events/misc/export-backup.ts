@@ -12,18 +12,17 @@ import {
   backupsPath,
   levelDatabasePath,
 } from "@main/constants";
-
-export type BackupScope = "all" | "saves";
+import type { BackupSelection } from "@types";
 
 export interface ExportBackupResult {
   canceled: boolean;
   path?: string;
 }
 
-/* Bundles local app data (and/or Ludusavi save backups) into a .tar.gz the user picks. */
+/* Bundles the selected local data and/or save backups into a .tar.gz. */
 const exportBackup = async (
   event: Electron.IpcMainInvokeEvent,
-  scope: BackupScope = "all"
+  selection: BackupSelection
 ): Promise<ExportBackupResult> => {
   const senderWindow =
     BrowserWindow.fromWebContents(event.sender) ?? WindowManager.mainWindow;
@@ -33,11 +32,34 @@ const exportBackup = async (
   }
 
   const userData = SystemPath.getPath("userData");
+  const targets: string[] = [];
+
+  if (selection.database) targets.push(levelDatabasePath);
+  if (selection.themes) targets.push(THEMES_PATH);
+  if (selection.assets) targets.push(ASSETS_PATH);
+
+  if (selection.saves?.all) {
+    targets.push(backupsPath);
+  } else if (selection.saves?.games?.length) {
+    for (const name of selection.saves.games) {
+      targets.push(path.join(backupsPath, name));
+    }
+  }
+
+  const entries = targets
+    .filter((dir) => fs.existsSync(dir))
+    .map((dir) => path.relative(userData, dir));
+
+  if (entries.length === 0) {
+    throw new Error("Nothing to export");
+  }
+
+  const onlySaves =
+    !selection.database && !selection.themes && !selection.assets;
   const timestamp = new Date().toISOString().slice(0, 10);
-  const defaultName =
-    scope === "saves"
-      ? `orthrus-saves-${timestamp}.tar.gz`
-      : `orthrus-backup-${timestamp}.tar.gz`;
+  const defaultName = onlySaves
+    ? `orthrus-saves-${timestamp}.tar.gz`
+    : `orthrus-backup-${timestamp}.tar.gz`;
 
   const { canceled, filePath } = await dialog.showSaveDialog(senderWindow, {
     defaultPath: defaultName,
@@ -48,22 +70,9 @@ const exportBackup = async (
     return { canceled: true };
   }
 
-  const targets =
-    scope === "saves"
-      ? [backupsPath]
-      : [levelDatabasePath, backupsPath, ASSETS_PATH, THEMES_PATH];
-
-  const entries = targets
-    .filter((dir) => fs.existsSync(dir))
-    .map((dir) => path.relative(userData, dir));
-
-  if (entries.length === 0) {
-    throw new Error("Nothing to export");
-  }
-
   await tar.create({ gzip: true, file: filePath, cwd: userData }, entries);
 
-  logger.info("Exported backup archive", { filePath, scope });
+  logger.info("Exported backup archive", { filePath, entries });
   return { canceled: false, path: filePath };
 };
 

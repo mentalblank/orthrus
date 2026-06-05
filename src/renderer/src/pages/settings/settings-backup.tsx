@@ -1,34 +1,40 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  DownloadIcon,
+  FileDirectoryIcon,
+  UploadIcon,
+} from "@primer/octicons-react";
 
 import { Button } from "@renderer/components";
 import { useToast } from "@renderer/hooks";
+import type { BackupArchiveContents } from "@types";
+import { ExportBackupModal } from "./backup/export-backup-modal";
+import { ImportBackupModal } from "./backup/import-backup-modal";
 import "./settings-backup.scss";
 
 export function SettingsBackup() {
   const { t } = useTranslation("settings");
-  const { showSuccessToast, showErrorToast } = useToast();
+  const { showErrorToast } = useToast();
 
-  const [isExporting, setIsExporting] = useState<"all" | "saves" | null>(null);
+  const [showExport, setShowExport] = useState(false);
+  const [importState, setImportState] = useState<{
+    path: string;
+    contents: BackupArchiveContents;
+  } | null>(null);
 
-  const handleExportBackup = async (scope: "all" | "saves") => {
-    setIsExporting(scope);
+  const handleOpenImport = async () => {
     try {
-      const result = await window.electron.exportBackup(scope);
-      if (!result.canceled && result.path) {
-        showSuccessToast(t("backup_exported"));
-        window.electron.showItemInFolder(result.path);
+      const result = await window.electron.openBackupArchive();
+      if (result.canceled || !result.path || !result.contents) return;
+
+      const { database, themes, assets, saves } = result.contents;
+      if (!database && !themes && !assets && saves.length === 0) {
+        showErrorToast(t("backup_archive_empty"));
+        return;
       }
-    } catch {
-      showErrorToast(t("backup_export_failed"));
-    } finally {
-      setIsExporting(null);
-    }
-  };
 
-  const handleRestoreBackup = async () => {
-    try {
-      await window.electron.restoreBackup();
+      setImportState({ path: result.path, contents: result.contents });
     } catch {
       showErrorToast(t("backup_restore_failed"));
     }
@@ -36,45 +42,61 @@ export function SettingsBackup() {
 
   return (
     <div className="settings-backup">
-      <div className="settings-backup__group">
-        <h3>{t("data_backup")}</h3>
-        <p>{t("export_backup_description")}</p>
-
-        <div className="settings-backup__buttons">
-          <Button
-            theme="outline"
-            onClick={() => handleExportBackup("all")}
-            disabled={isExporting !== null}
-          >
-            {isExporting === "all" ? t("exporting") : t("export_all_data")}
-          </Button>
-
-          <Button
-            theme="outline"
-            onClick={() => handleExportBackup("saves")}
-            disabled={isExporting !== null}
-          >
-            {isExporting === "saves"
-              ? t("exporting")
-              : t("export_save_backups")}
-          </Button>
-
-          <Button
-            theme="outline"
-            onClick={handleRestoreBackup}
-            disabled={isExporting !== null}
-          >
-            {t("restore_backup")}
-          </Button>
-
-          <Button
-            theme="outline"
-            onClick={() => window.electron.openBackupsFolder()}
-          >
-            {t("open_backups_folder")}
-          </Button>
+      <div className="settings-backup__card">
+        <div className="settings-backup__card-header">
+          <UploadIcon size={20} />
+          <div>
+            <h3>{t("export_data")}</h3>
+            <p>{t("export_data_description")}</p>
+          </div>
         </div>
+        <Button theme="outline" onClick={() => setShowExport(true)}>
+          {t("export_data")}
+        </Button>
       </div>
+
+      <div className="settings-backup__card">
+        <div className="settings-backup__card-header">
+          <DownloadIcon size={20} />
+          <div>
+            <h3>{t("import_data")}</h3>
+            <p>{t("import_data_description")}</p>
+          </div>
+        </div>
+        <Button theme="outline" onClick={handleOpenImport}>
+          {t("import_data")}
+        </Button>
+      </div>
+
+      <div className="settings-backup__card">
+        <div className="settings-backup__card-header">
+          <FileDirectoryIcon size={20} />
+          <div>
+            <h3>{t("open_backups_folder")}</h3>
+          </div>
+        </div>
+        <Button
+          theme="outline"
+          onClick={() => window.electron.openBackupsFolder()}
+        >
+          {t("open_backups_folder")}
+        </Button>
+      </div>
+
+      <ExportBackupModal
+        visible={showExport}
+        onClose={() => setShowExport(false)}
+      />
+
+      {importState && (
+        <ImportBackupModal
+          visible
+          archivePath={importState.path}
+          contents={importState.contents}
+          onClose={() => setImportState(null)}
+          onRestored={() => setImportState(null)}
+        />
+      )}
     </div>
   );
 }

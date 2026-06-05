@@ -28,6 +28,8 @@ import type {
   AchievementNotificationInfo,
   Game,
   GameCollection,
+  BackupSelection,
+  BackupArchiveContents,
   DiskUsage,
   DownloadSource,
   ProtonVersion,
@@ -383,9 +385,21 @@ declare global {
       options: Electron.OpenDialogOptions
     ) => Promise<Electron.OpenDialogReturnValue>;
     exportBackup: (
-      scope: "all" | "saves"
+      selection: BackupSelection
     ) => Promise<{ canceled: boolean; path?: string }>;
-    restoreBackup: () => Promise<{ canceled: boolean; restored?: boolean }>;
+    openBackupArchive: () => Promise<{
+      canceled: boolean;
+      path?: string;
+      contents?: BackupArchiveContents;
+    }>;
+    restoreBackup: (
+      archivePath: string,
+      selection: BackupSelection
+    ) => Promise<{
+      canceled: boolean;
+      restored?: boolean;
+      relaunched?: boolean;
+    }>;
     openBackupsFolder: () => Promise<void>;
     exportGameSave: (
       shop: GameShop,
