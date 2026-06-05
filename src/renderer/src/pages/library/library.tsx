@@ -46,6 +46,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { LibraryGameCard } from "./library-game-card";
 import { LibraryGameCardLarge } from "./library-game-card-large";
+import { LibraryGameListItem } from "./library-game-list-item";
 import { ViewOptions, ViewMode } from "./view-options";
 import { FilterOptions, SortOption } from "./filter-options";
 import "./library.scss";
@@ -939,10 +940,10 @@ export default function Library() {
         !shouldShowFavoritesEmptyState &&
         !shouldShowCollectionEmptyState && (
           <AnimatePresence mode="wait">
-            {(viewMode === "large" || viewMode === "list") && (
+            {viewMode === "large" && (
               <motion.div
-                key={`${sortBy}-${viewMode}`}
-                className={`library__games-list library__games-list--${viewMode}`}
+                key={`${sortBy}-large`}
+                className="library__games-list library__games-list--large"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
@@ -950,6 +951,28 @@ export default function Library() {
               >
                 {filteredLibrary.map((game) => (
                   <LibraryGameCardLarge
+                    key={`${game.shop}-${game.objectId}`}
+                    game={game}
+                    onContextMenu={handleOpenContextMenu}
+                    selectable={selectionMode}
+                    selected={selectedGameKeys.has(gameKey(game))}
+                    onToggleSelect={handleToggleSelect}
+                  />
+                ))}
+              </motion.div>
+            )}
+
+            {viewMode === "list" && (
+              <motion.div
+                key={`${sortBy}-list`}
+                className="library__games-list library__games-list--list"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                {filteredLibrary.map((game) => (
+                  <LibraryGameListItem
                     key={`${game.shop}-${game.objectId}`}
                     game={game}
                     onContextMenu={handleOpenContextMenu}
