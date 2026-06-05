@@ -82,7 +82,7 @@ export default function AchievementsStats() {
     },
     {
       label: t("points_earned"),
-      value: `${numberFormatter.format(stats.pointsEarned)} / ${numberFormatter.format(stats.pointsTotal)}`,
+      value: numberFormatter.format(stats.pointsEarned),
     },
     { label: t("completion"), value: `${stats.completion}%` },
   ];
