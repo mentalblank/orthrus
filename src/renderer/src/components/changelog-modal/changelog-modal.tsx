@@ -68,7 +68,7 @@ export function ChangelogModal({ visible, onClose }: ChangelogModalProps) {
       setError(null);
       try {
         const response = await fetch(
-          "https://api.github.com/repos/mentalblank/hydra/releases"
+          "https://api.github.com/repos/mentalblank/orthrus/releases"
         );
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.statusText}`);

@@ -835,7 +835,7 @@ export class WindowManager {
       tray.popUpContextMenu(contextMenu);
     };
 
-    tray.setToolTip("Hydra Launcher");
+    tray.setToolTip("Orthrus Launcher");
 
     if (process.platform === "win32") {
       await updateSystemTray();

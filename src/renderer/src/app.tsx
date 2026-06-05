@@ -306,7 +306,7 @@ export function App() {
     <>
       {window.electron.platform === "win32" && (
         <div className="title-bar">
-          <h4>Hydra (Fork)</h4>
+          <h4>Orthrus</h4>
         </div>
       )}
 

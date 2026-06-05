@@ -1,12 +1,12 @@
 {
-  "name": "hydralauncher",
+  "name": "orthrus",
   "version": "3.9.9",
-  "description": "Hydra",
+  "description": "Orthrus Launcher",
   "main": "./out/main/index.js",
-  "author": "Los Broxas",
+  "author": "mentalblank",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mentalblank/hydra.git"
+    "url": "https://github.com/mentalblank/orthrus.git"
   },
   "type": "module",
   "engines": {
