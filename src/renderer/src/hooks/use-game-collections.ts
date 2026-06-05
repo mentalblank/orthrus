@@ -46,7 +46,7 @@ export function useGameCollections() {
         return response;
       } catch (error) {
         void error;
-        return [];
+        return collections;
       } finally {
         dispatch(setCollectionsLoading(false));
         loadCollectionsRequestRef.current = null;
@@ -56,7 +56,7 @@ export function useGameCollections() {
     loadCollectionsRequestRef.current = request;
 
     return request;
-  }, [dispatch]);
+  }, [dispatch, collections]);
 
   const assignGameToCollection = useCallback(
     async (
@@ -101,8 +101,6 @@ export function useGameCollections() {
       games: { add: LibraryGame[]; remove: LibraryGame[] }
     ) => {
       const apply = async (game: LibraryGame, shouldBeMember: boolean) => {
-        if (game.shop === "custom") return;
-
         const currentGame = library.find(
           (libraryGame) =>
             libraryGame.shop === game.shop &&

@@ -38,10 +38,7 @@ export function ManageCollectionGamesModal({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isApplying, setIsApplying] = useState(false);
 
-  const eligibleGames = useMemo(
-    () => library.filter((game) => game.shop !== "custom"),
-    [library]
-  );
+  const eligibleGames = library;
 
   const gameKey = (game: LibraryGame) => `${game.shop}:${game.objectId}`;
 

@@ -1,10 +1,6 @@
 import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "./redux";
-import {
-  setProfileBackground,
-  setUserDetails,
-  clearCollections,
-} from "@renderer/features";
+import { setProfileBackground, setUserDetails } from "@renderer/features";
 import type { UpdateProfileRequest, UserDetails } from "@types";
 
 export function useUserDetails() {
@@ -14,10 +10,10 @@ export function useUserDetails() {
     (state) => state.userDetails
   );
 
+  /* Local-only: collections are local, not tied to the user session. */
   const clearUserDetails = useCallback(async () => {
     dispatch(setUserDetails(null));
     dispatch(setProfileBackground(null));
-    dispatch(clearCollections());
 
     globalThis.window.localStorage.removeItem("userDetails");
   }, [dispatch]);
