@@ -17,6 +17,9 @@ import { charMap } from "./char-map";
 import { Downloader } from "./constants";
 import { format } from "date-fns";
 import { AchievementNotificationInfo } from "@types";
+import { BRAND_ICON_DATA_URL } from "./brand-icon";
+
+export { BRAND_ICON_DATA_URL } from "./brand-icon";
 
 export * from "./constants";
 export * from "./download-directories";
@@ -210,7 +213,7 @@ export const generateAchievementCustomNotificationTest = (
       ns: "notifications",
       lng: language ?? "en",
     }),
-    iconUrl: "https://cdn.losbroxas.org/favicon.svg",
+    iconUrl: BRAND_ICON_DATA_URL,
     points: 2440,
     isHidden: options.isHidden ?? false,
     isRare: options.isRare ?? false,

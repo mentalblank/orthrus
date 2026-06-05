@@ -10,6 +10,7 @@ import {
   getAchievementSoundUrl,
   getAchievementSoundVolume,
 } from "@renderer/helpers";
+import { BRAND_ICON_DATA_URL } from "@shared";
 import { AchievementNotificationItem } from "@renderer/components/achievements/notification/achievement-notification";
 import { levelDBService } from "@renderer/services/leveldb.service";
 import app from "../../../app.scss?inline";
@@ -62,7 +63,7 @@ export function AchievementNotification() {
             isHidden: false,
             isRare: false,
             isPlatinum: false,
-            iconUrl: "https://cdn.losbroxas.org/favicon.svg",
+            iconUrl: BRAND_ICON_DATA_URL,
           },
         ]);
 
