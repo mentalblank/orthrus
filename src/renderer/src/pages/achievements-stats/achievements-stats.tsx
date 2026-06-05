@@ -4,18 +4,28 @@ import { TrophyIcon, SearchIcon } from "@primer/octicons-react";
 import { MedalIcon } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
 
-import { useAppDispatch, useFormat } from "@renderer/hooks";
+import { useAppDispatch, useFormat, useCollectionSettings } from "@renderer/hooks";
 import { setHeaderTitle } from "@renderer/features";
 import { buildGameAchievementPath } from "@renderer/helpers";
 import type { LibraryGame } from "@types";
 
 import "./achievements-stats.scss";
 
+const getGameCollectionIds = (game: LibraryGame): string[] => {
+  if (Array.isArray(game.collectionIds)) return game.collectionIds;
+
+  const legacyCollectionId = (game as { collectionId?: string | null })
+    .collectionId;
+
+  return legacyCollectionId ? [legacyCollectionId] : [];
+};
+
 export default function AchievementsStats() {
   const { t } = useTranslation("achievements_stats");
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { numberFormatter } = useFormat();
+  const { getSettings, unlocked } = useCollectionSettings();
 
   const [games, setGames] = useState<LibraryGame[]>([]);
   const [search, setSearch] = useState("");
@@ -25,23 +35,33 @@ export default function AchievementsStats() {
     window.electron.getLibrary().then(setGames);
   }, [dispatch, t]);
 
+  const filteredGames = useMemo(() => {
+    return games.filter((game) => {
+      const collectionIds = getGameCollectionIds(game);
+      const hasLockedCollection = collectionIds.some(
+        (id) => getSettings(id).locked
+      );
+      return !hasLockedCollection || unlocked;
+    });
+  }, [games, getSettings, unlocked]);
+
   const stats = useMemo(() => {
     const reduce = (key: keyof LibraryGame) =>
-      games.reduce((sum, game) => sum + ((game[key] as number) ?? 0), 0);
+      filteredGames.reduce((sum, game) => sum + ((game[key] as number) ?? 0), 0);
 
-    const unlocked = reduce("unlockedAchievementCount");
+    const unlockedAchievementCount = reduce("unlockedAchievementCount");
     const total = reduce("achievementCount");
 
     return {
-      gamesCount: games.length,
+      gamesCount: filteredGames.length,
       totalPlaytimeMs: reduce("playTimeInMilliseconds"),
-      unlocked,
+      unlocked: unlockedAchievementCount,
       total,
       pointsEarned: reduce("achievementsPointsEarnedSum"),
       pointsTotal: reduce("achievementsPointsTotal"),
-      completion: total > 0 ? Math.round((unlocked / total) * 100) : 0,
+      completion: total > 0 ? Math.round((unlockedAchievementCount / total) * 100) : 0,
     };
-  }, [games]);
+  }, [filteredGames]);
 
   const formatPlaytime = (milliseconds: number) => {
     const minutes = milliseconds / 1000 / 60;
@@ -58,14 +78,14 @@ export default function AchievementsStats() {
   const gamesWithAchievements = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return games
+    return filteredGames
       .filter((game) => (game.achievementCount ?? 0) > 0)
       .filter((game) => !query || game.title.toLowerCase().includes(query))
       .sort(
         (a, b) =>
           (b.unlockedAchievementCount ?? 0) - (a.unlockedAchievementCount ?? 0)
       );
-  }, [games, search]);
+  }, [filteredGames, search]);
 
   const statCards = [
     {

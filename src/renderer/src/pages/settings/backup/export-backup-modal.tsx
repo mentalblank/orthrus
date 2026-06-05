@@ -2,14 +2,23 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button, CheckboxField, Modal, TextField } from "@renderer/components";
-import { useLibrary, useToast } from "@renderer/hooks";
-import type { BackupSelection } from "@types";
+import { useLibrary, useToast, useCollectionSettings } from "@renderer/hooks";
+import type { BackupSelection, LibraryGame } from "@types";
 import "./backup-modal.scss";
 
 interface ExportBackupModalProps {
   visible: boolean;
   onClose: () => void;
 }
+
+const getGameCollectionIds = (game: LibraryGame): string[] => {
+  if (Array.isArray(game.collectionIds)) return game.collectionIds;
+
+  const legacyCollectionId = (game as { collectionId?: string | null })
+    .collectionId;
+
+  return legacyCollectionId ? [legacyCollectionId] : [];
+};
 
 export function ExportBackupModal({
   visible,
@@ -18,6 +27,7 @@ export function ExportBackupModal({
   const { t } = useTranslation("settings");
   const { library } = useLibrary();
   const { showSuccessToast, showErrorToast } = useToast();
+  const { getSettings, unlocked } = useCollectionSettings();
 
   const [database, setDatabase] = useState(true);
   const [themes, setThemes] = useState(false);
@@ -31,9 +41,16 @@ export function ExportBackupModal({
   const games = useMemo(() => {
     const query = search.trim().toLowerCase();
     return [...library]
+      .filter((game) => {
+        const collectionIds = getGameCollectionIds(game);
+        const hasLockedCollection = collectionIds.some(
+          (id) => getSettings(id).locked
+        );
+        return !hasLockedCollection || unlocked;
+      })
       .sort((a, b) => a.title.localeCompare(b.title))
       .filter((game) => !query || game.title.toLowerCase().includes(query));
-  }, [library, search]);
+  }, [library, search, getSettings, unlocked]);
 
   const folderName = (shop: string, objectId: string) => `${shop}-${objectId}`;
 
@@ -47,14 +64,39 @@ export function ExportBackupModal({
   };
 
   const handleExport = async () => {
+    const lockedGameIds = new Set<string>();
+    library.forEach((game) => {
+      const collectionIds = getGameCollectionIds(game);
+      const hasLockedCollection = collectionIds.some(
+        (id) => getSettings(id).locked
+      );
+      if (hasLockedCollection && !unlocked) {
+        lockedGameIds.add(folderName(game.shop, game.objectId));
+      }
+    });
+
+    const isAllSavesFiltered = allSaves && lockedGameIds.size > 0;
+
     const selection: BackupSelection = {
       database,
       themes,
       assets,
       saves: saves
         ? {
-            all: allSaves,
-            games: allSaves ? undefined : Array.from(selectedSaves),
+            all: isAllSavesFiltered ? false : allSaves,
+            games: isAllSavesFiltered
+              ? library
+                  .filter((game) => {
+                    const collectionIds = getGameCollectionIds(game);
+                    const hasLockedCollection = collectionIds.some(
+                      (id) => getSettings(id).locked
+                    );
+                    return !hasLockedCollection;
+                  })
+                  .map((game) => folderName(game.shop, game.objectId))
+              : allSaves
+                ? undefined
+                : Array.from(selectedSaves).filter((name) => !lockedGameIds.has(name)),
           }
         : undefined,
     };

@@ -1,7 +1,7 @@
 import { setHeaderTitle } from "@renderer/features";
-import { useAppDispatch } from "@renderer/hooks";
-import type { GameShop } from "@types";
-import { useEffect } from "react";
+import { useAppDispatch, useLibrary, useCollectionSettings } from "@renderer/hooks";
+import type { GameShop, LibraryGame } from "@types";
+import { useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   GameDetailsContextConsumer,
@@ -11,6 +11,15 @@ import { SkeletonTheme } from "react-loading-skeleton";
 import { AchievementsSkeleton } from "./achievements-skeleton";
 import { AchievementsContent } from "./achievements-content";
 
+const getGameCollectionIds = (game: LibraryGame): string[] => {
+  if (Array.isArray(game.collectionIds)) return game.collectionIds;
+
+  const legacyCollectionId = (game as { collectionId?: string | null })
+    .collectionId;
+
+  return legacyCollectionId ? [legacyCollectionId] : [];
+};
+
 export default function Achievements() {
   const [searchParams] = useSearchParams();
   const objectId = searchParams.get("objectId");
@@ -18,12 +27,30 @@ export default function Achievements() {
   const title = searchParams.get("title");
 
   const dispatch = useAppDispatch();
+  const { library } = useLibrary();
+  const { getSettings, unlocked } = useCollectionSettings();
+
+  const isLocked = useMemo(() => {
+    const game = library.find(
+      (g) => g.objectId === objectId && g.shop === shop
+    );
+    if (!game) return false;
+    const collectionIds = getGameCollectionIds(game);
+    const hasLockedCollection = collectionIds.some(
+      (id) => getSettings(id).locked
+    );
+    return hasLockedCollection && !unlocked;
+  }, [library, objectId, shop, getSettings, unlocked]);
 
   useEffect(() => {
-    if (title) {
+    if (title && !isLocked) {
       dispatch(setHeaderTitle(title));
     }
-  }, [dispatch, title]);
+  }, [dispatch, title, isLocked]);
+
+  if (isLocked) {
+    return null;
+  }
 
   return (
     <GameDetailsContextProvider

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { GameCollection, LibraryGame } from "@types";
 
 import { Button, CheckboxField, Modal, TextField } from "@renderer/components";
-import { useGameCollections, useLibrary, useToast } from "@renderer/hooks";
+import { useGameCollections, useLibrary, useToast, useCollectionSettings } from "@renderer/hooks";
 
 import "./manage-collection-games-modal.scss";
 
@@ -33,12 +33,21 @@ export function ManageCollectionGamesModal({
   const { library } = useLibrary();
   const { bulkAssignGamesToCollection } = useGameCollections();
   const { showSuccessToast, showErrorToast } = useToast();
+  const { getSettings, unlocked } = useCollectionSettings();
 
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isApplying, setIsApplying] = useState(false);
 
-  const eligibleGames = library;
+  const eligibleGames = useMemo(() => {
+    return library.filter((game) => {
+      const collectionIds = getGameCollectionIds(game);
+      const hasLockedCollection = collectionIds.some(
+        (id) => getSettings(id).locked
+      );
+      return !hasLockedCollection || unlocked;
+    });
+  }, [library, getSettings, unlocked]);
 
   const gameKey = (game: LibraryGame) => `${game.shop}:${game.objectId}`;
 
