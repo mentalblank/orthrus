@@ -14,7 +14,7 @@
   "sidebar": {
     "catalogue": "Catalogue",
     "library": "Library",
-    "achievements_stats": "Achievements & Stats",
+    "achievements_stats": "Achievements",
     "downloads": "Downloads",
     "settings": "Settings",
     "my_library": "My library",
@@ -1044,7 +1044,7 @@
     "how_to_earn_achievements_points": "How to earn achievement points?"
   },
   "achievements_stats": {
-    "title": "Achievements & Stats",
+    "title": "Achievements",
     "games_in_library": "Games in library",
     "total_playtime": "Total playtime",
     "achievements_unlocked": "Achievements unlocked",

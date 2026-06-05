@@ -3,7 +3,7 @@ import type { UserAchievement } from "@types";
 import { useTranslation } from "react-i18next";
 import "./achievements.scss";
 import { EyeClosedIcon } from "@primer/octicons-react";
-import HydraIcon from "@renderer/assets/icons/hydra.svg?react";
+import { MedalIcon } from "@phosphor-icons/react";
 
 interface AchievementListProps {
   achievements: UserAchievement[];
@@ -49,7 +49,10 @@ export function AchievementList({
                   points: achievement.points,
                 })}
               >
-                <HydraIcon className="achievements__item-points-icon" />
+                <MedalIcon
+                  weight="fill"
+                  className="achievements__item-points-icon"
+                />
                 <p className="achievements__item-points-value">
                   {achievement.points}
                 </p>

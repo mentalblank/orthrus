@@ -147,7 +147,8 @@ export default function Catalogue() {
 
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem("catalogue-view-mode");
-    return (saved as ViewMode) || "grid";
+    // List view not supported in the catalogue.
+    return saved && saved !== "list" ? (saved as ViewMode) : "grid";
   });
 
   const handleViewModeChange = (mode: ViewMode) => {
@@ -640,6 +641,7 @@ export default function Catalogue() {
             <ViewOptions
               viewMode={viewMode}
               onViewModeChange={handleViewModeChange}
+              availableModes={["compact", "grid", "large"]}
             />
           </div>
         </div>

@@ -3,7 +3,7 @@ import {
   AchievementNotificationInfo,
 } from "@types";
 import cn from "classnames";
-import HydraIcon from "@renderer/assets/icons/hydra.svg?react";
+import { MedalIcon } from "@phosphor-icons/react";
 import { EyeClosedIcon } from "@primer/octicons-react";
 import Ellipses from "@renderer/assets/icons/ellipses.png";
 import "./achievement-notification.scss";
@@ -33,7 +33,10 @@ export function AchievementNotificationItem({
     >
       {achievement.points !== undefined && (
         <div className="achievement-notification__chip">
-          <HydraIcon className="achievement-notification__chip__icon" />
+          <MedalIcon
+            weight="fill"
+            className="achievement-notification__chip__icon"
+          />
           <span className="achievement-notification__chip__label">
             +{achievement.points}
           </span>

@@ -25,7 +25,7 @@ export default function AchievementsStats() {
   const navigate = useNavigate();
   const { library } = useLibrary();
 
-  useHeaderTitle("Achievements & Stats");
+  useHeaderTitle("Achievements");
 
   useNavigationScreenActions({
     press: {
@@ -73,7 +73,7 @@ export default function AchievementsStats() {
     <VerticalFocusGroup regionId={ACHIEVEMENTS_STATS_PAGE_REGION_ID} asChild>
       <div className="bp-achievements-stats">
         <Typography className="bp-achievements-stats__title">
-          Achievements &amp; Stats
+          Achievements
         </Typography>
 
         <div className="bp-achievements-stats__cards">

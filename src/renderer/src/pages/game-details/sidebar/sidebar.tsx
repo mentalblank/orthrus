@@ -15,7 +15,7 @@ import { DownloadIcon, PeopleIcon, StarIcon } from "@primer/octicons-react";
 import { HowLongToBeatSection } from "./how-long-to-beat-section";
 import { SidebarSection } from "../sidebar-section/sidebar-section";
 import { buildGameAchievementPath } from "@renderer/helpers";
-import HydraIcon from "@renderer/assets/icons/hydra.svg?react";
+import { MedalIcon } from "@phosphor-icons/react";
 import "./sidebar.scss";
 import { GameLanguageSection } from "./game-language-section";
 
@@ -139,7 +139,10 @@ export function Sidebar() {
         >
           {achievements.some((a) => a.points != null) && (
             <div className="content-sidebar__achievement-points">
-              <HydraIcon className="content-sidebar__achievement-points-icon" />
+              <MedalIcon
+                weight="fill"
+                className="content-sidebar__achievement-points-icon"
+              />
               <span>
                 {t("achievement_points_earned", {
                   earned: achievements.reduce(

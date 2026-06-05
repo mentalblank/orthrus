@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import HydraIcon from "@renderer/assets/icons/hydra.svg?react";
+import { MedalIcon } from "@phosphor-icons/react";
 import { UserAchievement } from "@types";
 import "./achievement-panel.scss";
 
@@ -25,7 +25,7 @@ export function AchievementPanel({ achievements }: AchievementPanelProps) {
     <div className="achievement-panel">
       <div className="achievement-panel__content">
         {t("earned_points")}{" "}
-        <HydraIcon className="achievement-panel__content-icon" />
+        <MedalIcon weight="fill" className="achievement-panel__content-icon" />
         {achievementsPointsEarnedSum} / {achievementsPointsTotal}
       </div>
     </div>

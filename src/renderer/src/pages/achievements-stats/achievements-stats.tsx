@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TrophyIcon, SearchIcon } from "@primer/octicons-react";
+import { MedalIcon } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useFormat } from "@renderer/hooks";
 import { setHeaderTitle } from "@renderer/features";
 import { buildGameAchievementPath } from "@renderer/helpers";
-import HydraIcon from "@renderer/assets/icons/hydra.svg?react";
 import type { LibraryGame } from "@types";
 
 import "./achievements-stats.scss";
@@ -180,7 +180,10 @@ export default function AchievementsStats() {
                       </span>
                       {pointsTotal > 0 && (
                         <span className="achievements-stats__item-points">
-                          <HydraIcon className="achievements-stats__item-points-icon" />
+                          <MedalIcon
+                            weight="fill"
+                            className="achievements-stats__item-points-icon"
+                          />
                           {numberFormatter.format(
                             game.achievementsPointsEarnedSum ?? 0
                           )}{" "}
