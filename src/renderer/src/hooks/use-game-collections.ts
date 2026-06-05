@@ -46,7 +46,8 @@ export function useGameCollections() {
         return response;
       } catch (error) {
         void error;
-        return collections;
+        // Keep existing collections in redux; don't wipe on transient error.
+        return [];
       } finally {
         dispatch(setCollectionsLoading(false));
         loadCollectionsRequestRef.current = null;
@@ -56,7 +57,7 @@ export function useGameCollections() {
     loadCollectionsRequestRef.current = request;
 
     return request;
-  }, [dispatch, collections]);
+  }, [dispatch]);
 
   const assignGameToCollection = useCallback(
     async (
