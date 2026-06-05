@@ -286,8 +286,6 @@ contextBridge.exposeInMainWorld("electron", {
   deleteCollection: (id: string) => ipcRenderer.invoke("deleteCollection", id),
   clearNewDownloadOptions: (shop: GameShop, objectId: string) =>
     ipcRenderer.invoke("clearNewDownloadOptions", shop, objectId),
-  toggleGamePin: (shop: GameShop, objectId: string, pinned: boolean) =>
-    ipcRenderer.invoke("toggleGamePin", shop, objectId, pinned),
   updateLaunchOptions: (
     shop: GameShop,
     objectId: string,

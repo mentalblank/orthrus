@@ -422,8 +422,6 @@
     "download_error_not_cached_on_hydra": "This download is not available on Nimbus.",
     "game_removed_from_favorites": "Game removed from favorites",
     "game_added_to_favorites": "Game added to favorites",
-    "game_removed_from_pinned": "Game removed from pinned",
-    "game_added_to_pinned": "Game added to pinned",
     "add_to_favorites": "Add to favorites",
     "remove_from_favorites": "Remove from favorites",
     "pin_game": "Pin",

@@ -213,11 +213,6 @@ declare global {
       shop: GameShop,
       objectId: string
     ) => Promise<void>;
-    toggleGamePin: (
-      shop: GameShop,
-      objectId: string,
-      pinned: boolean
-    ) => Promise<void>;
     updateLaunchOptions: (
       shop: GameShop,
       objectId: string,

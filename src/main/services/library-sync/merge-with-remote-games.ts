@@ -11,7 +11,6 @@ type ProfileGame = {
   playTimeInMilliseconds: number;
   hasManuallyUpdatedPlaytime: boolean;
   isFavorite?: boolean;
-  isPinned?: boolean;
   achievementCount: number;
   unlockedAchievementCount: number;
 } & ShopAssets;
@@ -89,7 +88,6 @@ export const mergeWithRemoteGames = async () => {
             lastTimePlayed: updatedLastTimePlayed,
             playTimeInMilliseconds: updatedPlayTime,
             favorite: game.isFavorite ?? localGame.favorite,
-            isPinned: game.isPinned ?? localGame.isPinned,
             collectionIds: mergedCollectionIds,
             achievementCount: game.achievementCount,
             unlockedAchievementCount: game.unlockedAchievementCount,
@@ -109,7 +107,6 @@ export const mergeWithRemoteGames = async () => {
             hasManuallyUpdatedPlaytime: game.hasManuallyUpdatedPlaytime,
             isDeleted: false,
             favorite: game.isFavorite ?? false,
-            isPinned: game.isPinned ?? false,
             collectionIds: mergedCollectionIds,
             achievementCount: game.achievementCount,
             unlockedAchievementCount: game.unlockedAchievementCount,

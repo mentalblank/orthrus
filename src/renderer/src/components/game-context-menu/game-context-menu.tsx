@@ -12,8 +12,6 @@ import {
   PencilIcon,
   FileDirectoryIcon,
   LinkIcon,
-  PinIcon,
-  PinSlashIcon,
   TrashIcon,
   XIcon,
 } from "@primer/octicons-react";
@@ -91,7 +89,6 @@ export function GameContextMenu({
     handlePlayGame,
     handleCloseGame,
     handleToggleFavorite,
-    handleTogglePin,
     handleCreateShortcut,
     handleCreateSteamShortcut,
     handleOpenFolder,
@@ -281,16 +278,6 @@ export function GameContextMenu({
       },
       closeOnClick: false,
       disabled: isDeleting || isFavoritePending,
-    },
-    {
-      id: "pin-toggle",
-      label: game.isPinned ? t("unpin_game") : t("pin_game"),
-      icon: game.isPinned ? <PinSlashIcon size={16} /> : <PinIcon size={16} />,
-      onClick: () => {
-        void handleTogglePin();
-      },
-      closeOnClick: false,
-      disabled: isDeleting,
     },
     {
       id: "collection",

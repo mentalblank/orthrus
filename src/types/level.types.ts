@@ -53,10 +53,8 @@ export interface Game {
   autoRunMangohud?: boolean | null;
   autoRunGamemode?: boolean | null;
   favorite?: boolean;
-  isPinned?: boolean;
   achievementCount?: number;
   unlockedAchievementCount?: number;
-  pinnedDate?: Date | null;
   automaticCloudSync?: boolean;
   hasManuallyUpdatedPlaytime?: boolean;
   newDownloadOptionsCount?: number;

@@ -100,8 +100,6 @@ export type UserGame = {
   achievementsPointsEarnedSum: number;
   hasManuallyUpdatedPlaytime: boolean;
   isFavorite: boolean;
-  isPinned: boolean;
-  pinnedDate?: Date | null;
 } & ShopAssets;
 
 export interface UserLibraryResponse {
