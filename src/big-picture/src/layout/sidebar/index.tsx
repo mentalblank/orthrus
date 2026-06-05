@@ -1,7 +1,6 @@
 import {
   BookOpenIcon,
   DownloadSimpleIcon,
-  FolderIcon,
   GearIcon,
   HouseIcon,
   MagnifyingGlassIcon,
@@ -77,12 +76,6 @@ function SidebarRouter() {
         label: "Library",
         path: `${basePath}/library`,
         icon: BookOpenIcon,
-      },
-      {
-        key: "collections",
-        label: "Collections",
-        path: `${basePath}/collections`,
-        icon: FolderIcon,
       },
       {
         key: "achievementsStats",

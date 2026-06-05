@@ -31,7 +31,6 @@ import Achievements from "./pages/achievements/achievements";
 import AchievementsStats from "./pages/achievements-stats/achievements-stats";
 import ThemeEditor from "./pages/theme-editor/theme-editor";
 import Library from "./pages/library/library";
-import Collections from "./pages/collections/collections";
 import { AchievementNotification } from "./pages/achievements/notification/achievement-notification";
 import { AchievementNotificationOverlay } from "./components/achievements/notification/achievement-notification-overlay";
 import GameLauncher from "./pages/game-launcher/game-launcher";
@@ -43,7 +42,6 @@ import BigPictureHome from "../../big-picture/src/pages/home/home";
 import BigPictureSettings from "../../big-picture/src/pages/settings/settings";
 import BigPictureLibrary from "../../big-picture/src/pages/library/page";
 import BigPictureAchievementsStats from "../../big-picture/src/pages/achievements-stats/achievements-stats";
-import BigPictureCollections from "../../big-picture/src/pages/collections/collections";
 import BigPictureGame from "../../big-picture/src/pages/game/game";
 import BigPictureGameAchievements from "../../big-picture/src/pages/game-achievements/game-achievements";
 
@@ -93,7 +91,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/" element={<Home />} />
             <Route path="/catalogue" element={<Catalogue />} />
             <Route path="/library" element={<Library />} />
-            <Route path="/collections" element={<Collections />} />
             <Route path="/downloads" element={<Downloads />} />
             <Route path="/game/:shop/:objectId" element={<GameDetails />} />
             <Route path="/settings" element={<Settings />} />
@@ -115,7 +112,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="downloads" element={<BigPictureDownloads />} />
             <Route path="settings" element={<BigPictureSettings />} />
             <Route path="library" element={<BigPictureLibrary />} />
-            <Route path="collections" element={<BigPictureCollections />} />
             <Route
               path="achievements-stats"
               element={<BigPictureAchievementsStats />}
