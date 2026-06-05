@@ -294,8 +294,6 @@ const GAMEPAD_LAYOUTS: GamepadLayout[] = [
   },
 ];
 
-export const gamepadLayouts = GAMEPAD_LAYOUTS;
-
 function getGamepadPlatform(): GamepadPlatform {
   const platformText = getNavigatorPlatformText();
 

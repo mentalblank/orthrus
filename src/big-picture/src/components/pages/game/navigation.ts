@@ -7,9 +7,7 @@ export const GAME_MEDIA_CAROUSEL_REGION_ID = "game-media-carousel";
 export const GAME_DESCRIPTION_REGION_ID = "game-description";
 export const GAME_DESCRIPTION_BODY_ID = "game-description-body";
 export const GAME_DESCRIPTION_BOTTOM_ENTRY_ID = "game-description-bottom-entry";
-export const GAME_COMMENTS_REGION_ID = "game-comments";
 export const GAME_COMMENTS_ACTION_ROWS_REGION_ID = "game-comments-action-rows";
-export const GAME_COMMENTS_LOAD_MORE_ID = "game-comments-load-more";
 export const GAME_SIDEBAR_REGION_ID = "game-sidebar";
 export const GAME_SIDEBAR_STATS_ID = "game-sidebar-stats";
 export const GAME_SIDEBAR_HLTB_ID = "game-sidebar-hltb";
@@ -21,11 +19,4 @@ export const GAME_SIDEBAR_LANGUAGES_ID = "game-sidebar-languages";
 
 export function getGameMediaCarouselItemId(index: number) {
   return `game-media-carousel-item-${index}`;
-}
-
-export function getGameCommentVoteItemId(
-  reviewId: string,
-  voteType: "upvote" | "downvote"
-) {
-  return `game-comment-${reviewId}-${voteType}`;
 }

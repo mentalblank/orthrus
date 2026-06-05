@@ -9,7 +9,6 @@ export const CATALOGUE_SORT_SELECT_ID = "catalogue-sort-select";
 export const CATALOGUE_CLEAR_FILTERS_ID = "catalogue-clear-filters";
 export const CATALOGUE_PAGINATION_FIRST_ID = "catalogue-pagination:first";
 export const CATALOGUE_PAGINATION_PREVIOUS_ID = "catalogue-pagination:previous";
-export const CATALOGUE_PAGINATION_JUMP_ID = "catalogue-pagination:jump";
 export const CATALOGUE_PAGINATION_NEXT_ID = "catalogue-pagination:next";
 export const CATALOGUE_PAGINATION_LAST_ID = "catalogue-pagination:last";
 const CATALOGUE_CARD_FOCUS_ID_PREFIX = "catalogue-card:";

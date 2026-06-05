@@ -50,42 +50,6 @@ function isFeatureEnabledForDownloader(
   return enabledFeatures?.includes(requiredFeature) ?? false;
 }
 
-function getDownloaderSortRank(
-  downloader: Downloader,
-  preferences?: UserPreferences | null
-) {
-  if (downloader === Downloader.Torrent) {
-    return 2;
-  }
-
-  if (isConfiguredDownloader(downloader, preferences)) {
-    return 0;
-  }
-
-  return 1;
-}
-
-export function sortAvailableDownloaders(
-  downloaders: Downloader[],
-  preferences?: UserPreferences | null
-) {
-  const originalOrder = new Map(
-    downloaders.map((downloader, index) => [downloader, index])
-  );
-
-  return [...downloaders].sort((left, right) => {
-    const rankDifference =
-      getDownloaderSortRank(left, preferences) -
-      getDownloaderSortRank(right, preferences);
-
-    if (rankDifference !== 0) {
-      return rankDifference;
-    }
-
-    return (originalOrder.get(left) ?? 0) - (originalOrder.get(right) ?? 0);
-  });
-}
-
 export function getDownloaderAvailabilityOptions(
   repack: Pick<GameRepack, "uris" | "unavailableUris">,
   preferences?: UserPreferences | null,

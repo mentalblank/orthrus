@@ -30,7 +30,6 @@ export const NOTIFICATIONS_ACHIEVEMENTS_TEST_BUTTON_ID =
   "notifications-achievements-test-button";
 export const CONTENT_SECTION_REGION_ID = "content-section-region";
 export const COMPATIBILITY_SECTION_REGION_ID = "compatibility-section-region";
-export const INTEGRATIONS_SECTION_REGION_ID = "integrations-section-region";
 export const COMPATIBILITY_GAMEMODE_FOCUS_ID = "compatibility-gamemode";
 export const COMPATIBILITY_MANGOHUD_FOCUS_ID = "compatibility-mangohud";
 export const COMPATIBILITY_COMMON_REDIST_BUTTON_ID =
@@ -132,8 +131,4 @@ export function getDownloadsSourceRemoveButtonFocusId(sourceId: string) {
 
 export function getCompatibilityProtonOptionFocusId(path: string) {
   return `compatibility-proton-option-${path.replaceAll(/[^a-z0-9_-]/gi, "-").toLowerCase()}`;
-}
-
-export function getAccountPrivacyBlockedUserButtonFocusId(userId: string) {
-  return `account-privacy-blocked-user-${userId}`;
 }

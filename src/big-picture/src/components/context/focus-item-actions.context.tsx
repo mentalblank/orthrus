@@ -1,5 +1,5 @@
 import type { FocusItemActionsMeta } from "../../types";
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 
 const defaultFocusItemActionsMeta: FocusItemActionsMeta = {
   hasPrimary: false,
@@ -15,7 +15,3 @@ const defaultFocusItemActionsMeta: FocusItemActionsMeta = {
 export const FocusItemActionsMetaContext = createContext<FocusItemActionsMeta>(
   defaultFocusItemActionsMeta
 );
-
-export function useFocusItemActionsMeta() {
-  return useContext(FocusItemActionsMetaContext);
-}

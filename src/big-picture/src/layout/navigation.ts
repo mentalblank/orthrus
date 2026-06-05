@@ -150,27 +150,6 @@ export function getBigPictureContentEntryRegionIdFromPathname(
   return null;
 }
 
-export function getBigPictureContentRouteEntryTargetFromPathname(
-  pathname: string
-): FocusOverrideTarget {
-  const regionId = getBigPictureContentEntryRegionIdFromPathname(pathname);
-
-  if (!regionId) {
-    return {
-      type: "region",
-      regionId: BIG_PICTURE_CONTENT_REGION_ID,
-      entryDirection: "right",
-    };
-  }
-
-  return {
-    type: "region",
-    regionId,
-    entryDirection: "right",
-    preferRememberedFocus: false,
-  };
-}
-
 export function getBigPictureContentSidebarReturnTargetFromPathname(
   pathname: string
 ): FocusOverrideTarget {
