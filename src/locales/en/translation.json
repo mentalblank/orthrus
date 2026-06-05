@@ -725,7 +725,15 @@
     "hide_to_tray_on_game_start": "Hide Orthrus to tray on game startup",
     "downloads": "Downloads",
     "create_shortcuts_on_download": "Create desktop and Start Menu shortcuts when a game finishes downloading",
-    "default_proton_version_description": "Select the Proton version used by Auto mode when a game has no custom override"
+    "default_proton_version_description": "Select the Proton version used by Auto mode when a game has no custom override",
+    "collection_pin_settings": "Category Lock Settings",
+    "forgot_pin_description": "If you forgot your PIN, you can reset it. This will permanently delete all locked collections, completely remove any games inside them from your library, and clear the PIN.",
+    "reset_pin_and_locked_categories": "Reset PIN & Delete Locked Collections",
+    "forgot_pin_confirm_title": "Reset PIN & Locked Collections?",
+    "forgot_pin_confirm_description": "This action is permanent. All locked collections will be deleted, and any games within them will be completely removed from your library.",
+    "forgot_pin_success": "PIN and locked collections reset successfully.",
+    "yes_reset": "Yes, reset everything",
+    "resetting": "Resetting..."
   },
   "notifications": {
     "download_complete": "Download complete",

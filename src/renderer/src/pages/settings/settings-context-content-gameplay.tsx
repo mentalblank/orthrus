@@ -1,9 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CheckboxField } from "@renderer/components";
+import { CheckboxField, Button, ConfirmationModal } from "@renderer/components";
 import { settingsContext } from "@renderer/context";
-import { useAppSelector } from "@renderer/hooks";
+import {
+  useAppSelector,
+  useCollectionSettings,
+  useGameCollections,
+  useLibrary,
+  useToast,
+} from "@renderer/hooks";
 import { QuestionIcon } from "@primer/octicons-react";
 
 import "./settings-behavior.scss";
@@ -11,6 +17,13 @@ import "./settings-behavior.scss";
 export function SettingsContextContentGameplay() {
   const { t } = useTranslation("settings");
   const { updateUserPreferences } = useContext(settingsContext);
+  const { resetPinAndLockedCategories, hasPin } = useCollectionSettings();
+  const { collections, loadCollections } = useGameCollections();
+  const { library, updateLibrary } = useLibrary();
+  const { showSuccessToast } = useToast();
+
+  const [showConfirmReset, setShowConfirmReset] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const userPreferences = useAppSelector(
     (state) => state.userPreferences.value
@@ -41,6 +54,20 @@ export function SettingsContextContentGameplay() {
   const handleChange = (values: Partial<typeof form>) => {
     setForm((prev) => ({ ...prev, ...values }));
     updateUserPreferences(values);
+  };
+
+  const handleResetPin = async () => {
+    setIsResetting(true);
+    try {
+      await resetPinAndLockedCategories(collections, library);
+      await Promise.all([updateLibrary(), loadCollections()]);
+      showSuccessToast(t("forgot_pin_success"));
+      setShowConfirmReset(false);
+    } catch (error) {
+      void error;
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   return (
@@ -111,6 +138,37 @@ export function SettingsContextContentGameplay() {
           }
         />
       </div>
+
+      {hasPin && (
+        <div className="settings-context-panel__group">
+          <h3>{t("collection_pin_settings")}</h3>
+          <p className="settings-behavior__description" style={{ marginBottom: "12px", fontSize: "13px", color: "#8a8a8a" }}>
+            {t("forgot_pin_description")}
+          </p>
+          <div>
+            <Button
+              type="button"
+              theme="danger"
+              onClick={() => setShowConfirmReset(true)}
+              disabled={isResetting}
+            >
+              {isResetting ? t("resetting") : t("reset_pin_and_locked_categories")}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <ConfirmationModal
+        visible={showConfirmReset}
+        title={t("forgot_pin_confirm_title")}
+        descriptionText={t("forgot_pin_confirm_description")}
+        onClose={() => setShowConfirmReset(false)}
+        onConfirm={() => {
+          void handleResetPin();
+        }}
+        confirmButtonLabel={t("yes_reset")}
+        cancelButtonLabel={t("cancel")}
+      />
     </div>
   );
 }

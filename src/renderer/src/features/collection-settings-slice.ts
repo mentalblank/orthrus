@@ -44,8 +44,18 @@ export const collectionSettingsSlice = createSlice({
     setHasPin: (state, action: PayloadAction<boolean>) => {
       state.hasPin = action.payload;
     },
+    replaceSettings: (
+      state,
+      action: PayloadAction<Record<string, CollectionSettings>>
+    ) => {
+      state.settings = action.payload;
+    },
   },
 });
 
-export const { setCollectionSettings, setUnlocked, setHasPin } =
-  collectionSettingsSlice.actions;
+export const {
+  setCollectionSettings,
+  setUnlocked,
+  setHasPin,
+  replaceSettings,
+} = collectionSettingsSlice.actions;
