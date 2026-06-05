@@ -1,4 +1,3 @@
-import { HydraApi } from "@main/services";
 import { registerEvent } from "../register-event";
 import { GameShop } from "@types";
 import { gamesSublevel, levelKeys } from "@main/level";
@@ -13,12 +12,6 @@ const changeGamePlaytime = async (
     const gameKey = levelKeys.game(shop, objectId);
     const game = await gamesSublevel.get(gameKey);
     if (!game) return;
-
-    if (game.remoteId) {
-      await HydraApi.put(`/profile/games/${shop}/${objectId}/playtime`, {
-        playTimeInSeconds,
-      });
-    }
 
     await gamesSublevel.put(gameKey, {
       ...game,

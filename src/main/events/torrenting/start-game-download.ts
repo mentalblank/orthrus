@@ -3,11 +3,9 @@ import type { Download, StartGameDownloadPayload } from "@types";
 import {
   DownloadManager,
   DownloadOrchestrator,
-  HydraApi,
   logger,
 } from "@main/services";
-import { createGame } from "@main/services/library-sync";
-import { downloadsSublevel, gamesSublevel, levelKeys } from "@main/level";
+import { downloadsSublevel, levelKeys } from "@main/level";
 import {
   handleDownloadError,
   isKnownDownloadError,
@@ -66,15 +64,8 @@ const startGameDownload = async (
     await downloadsSublevel.put(gameKey, download);
     await DownloadOrchestrator.startPreparedDownload(download);
 
-    const updatedGame = await gamesSublevel.get(gameKey);
 
-    await Promise.all([
-      createGame(updatedGame!).catch(() => {}),
-      HydraApi.post(`/games/${shop}/${objectId}/download`, null, {
-        needsAuth: false,
-      }).catch(() => {}),
-    ]);
-
+    // Local-only: do not notify remote server or sync game.
     return { ok: true };
   } catch (err: unknown) {
     await downloadsSublevel.del(gameKey).catch(() => null);

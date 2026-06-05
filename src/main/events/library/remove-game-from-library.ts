@@ -1,5 +1,5 @@
 import { registerEvent } from "../register-event";
-import { HydraApi, logger } from "@main/services";
+import { logger } from "@main/services";
 import { gamesSublevel, gamesShopAssetsSublevel, levelKeys } from "@main/level";
 import type { GameShop, Game } from "@types";
 import fs from "node:fs";
@@ -84,9 +84,6 @@ const removeGameFromLibrary = async (
     await resetShopAssets(gameKey);
   }
 
-  if (game.remoteId) {
-    HydraApi.delete(`/profile/games/${game.remoteId}`).catch(() => {});
-  }
 
   await deleteAssetFiles(assetPathsToDelete);
 };

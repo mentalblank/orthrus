@@ -1,7 +1,7 @@
 import { registerEvent } from "../register-event";
 import { findAchievementFiles } from "@main/services/achievements/find-achivement-files";
 import fs from "fs";
-import { achievementsLogger, HydraApi, WindowManager } from "@main/services";
+import { achievementsLogger, WindowManager } from "@main/services";
 import { getUnlockedAchievements } from "../user/get-unlocked-achievements";
 import {
   gameAchievementsSublevel,
@@ -41,12 +41,6 @@ const resetGameAchievements = async (
         }
       });
 
-    await HydraApi.delete(`/profile/games/achievements/${game.remoteId}`).then(
-      () =>
-        achievementsLogger.log(
-          `Deleted achievements from ${game.remoteId} - ${game.objectId} - ${game.title}`
-        )
-    );
 
     const gameAchievements = await getUnlockedAchievements(
       game.objectId,
