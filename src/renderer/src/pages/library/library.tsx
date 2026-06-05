@@ -25,6 +25,7 @@ import {
   EyeClosedIcon,
   LockIcon,
   UnlockIcon,
+  KeyIcon,
   ListUnorderedIcon,
   CheckIcon,
   ChecklistIcon,
@@ -87,6 +88,7 @@ export default function Library() {
     unlocked,
     setPin,
     unlock,
+    changePin,
     lockSession,
     isChipVisibleInLibrary,
     isGameHiddenInLibrary,
@@ -126,7 +128,7 @@ export default function Library() {
   const [isDeletingCollection, setIsDeletingCollection] = useState(false);
   const [pinModal, setPinModal] = useState<{
     visible: boolean;
-    mode: "create" | "enter";
+    mode: "create" | "enter" | "change";
   }>({ visible: false, mode: "enter" });
   const [pendingLockCollectionId, setPendingLockCollectionId] = useState<
     string | null
@@ -476,6 +478,18 @@ export default function Library() {
         onClick: handleToggleLock,
         disabled: isCollectionActionBusy,
       },
+      ...(hasPin
+        ? [
+            {
+              id: "change-pin",
+              label: t("change_pin"),
+              icon: <KeyIcon size={16} />,
+              onClick: () =>
+                setPinModal({ visible: true, mode: "change" as const }),
+              disabled: isCollectionActionBusy,
+            },
+          ]
+        : []),
       {
         id: "manage-games",
         label: t("manage_games"),
@@ -503,6 +517,7 @@ export default function Library() {
   }, [
     collectionContextMenu.collection,
     getSettings,
+    hasPin,
     handleToggleShowInLibrary,
     handleToggleShowInSidebar,
     handleToggleLock,
@@ -1046,6 +1061,7 @@ export default function Library() {
         }}
         onCreate={handleCreatePin}
         onUnlock={unlock}
+        onChangePin={changePin}
       />
 
       <ManageCollectionGamesModal

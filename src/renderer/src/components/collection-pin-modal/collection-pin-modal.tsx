@@ -5,7 +5,7 @@ import { Button, Modal, TextField } from "@renderer/components";
 
 import "./collection-pin-modal.scss";
 
-export type CollectionPinMode = "create" | "enter";
+export type CollectionPinMode = "create" | "enter" | "change";
 
 export interface CollectionPinModalProps {
   visible: boolean;
@@ -13,6 +13,7 @@ export interface CollectionPinModalProps {
   onClose: () => void;
   onCreate: (pin: string) => Promise<void> | void;
   onUnlock: (pin: string) => Promise<boolean>;
+  onChangePin?: (currentPin: string, newPin: string) => Promise<boolean>;
 }
 
 const PIN_MAX_LENGTH = 12;
@@ -23,9 +24,11 @@ export function CollectionPinModal({
   onClose,
   onCreate,
   onUnlock,
+  onChangePin,
 }: Readonly<CollectionPinModalProps>) {
   const { t } = useTranslation("library");
 
+  const [currentPin, setCurrentPin] = useState("");
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +36,7 @@ export function CollectionPinModal({
 
   useEffect(() => {
     if (!visible) return;
+    setCurrentPin("");
     setPin("");
     setConfirmPin("");
     setError(null);
@@ -65,6 +69,22 @@ export function CollectionPinModal({
         return;
       }
 
+      if (mode === "change") {
+        if (pin !== confirmPin) {
+          setError(t("pin_mismatch"));
+          return;
+        }
+
+        const changed = await onChangePin?.(currentPin, pin);
+        if (!changed) {
+          setError(t("incorrect_pin"));
+          return;
+        }
+
+        onClose();
+        return;
+      }
+
       const matched = await onUnlock(pin);
       if (!matched) {
         setError(t("incorrect_pin"));
@@ -77,20 +97,54 @@ export function CollectionPinModal({
     }
   };
 
+  const title =
+    mode === "create"
+      ? t("set_pin")
+      : mode === "change"
+        ? t("change_pin")
+        : t("enter_pin");
+
+  const description =
+    mode === "create"
+      ? t("set_pin_description")
+      : mode === "change"
+        ? t("change_pin_description")
+        : t("enter_pin_description");
+
+  const submitLabel =
+    mode === "create"
+      ? t("set_pin")
+      : mode === "change"
+        ? t("change_pin")
+        : t("unlock_collection");
+
+  const showConfirm = mode === "create" || mode === "change";
+
   return (
     <Modal
       visible={visible}
-      title={mode === "create" ? t("set_pin") : t("enter_pin")}
-      description={
-        mode === "create"
-          ? t("set_pin_description")
-          : t("enter_pin_description")
-      }
+      title={title}
+      description={description}
       onClose={handleClose}
     >
       <div className="collection-pin-modal">
+        {mode === "change" && (
+          <TextField
+            label={t("current_pin")}
+            type="password"
+            value={currentPin}
+            onChange={(event) => {
+              setCurrentPin(event.target.value);
+              if (error) setError(null);
+            }}
+            theme="dark"
+            disabled={isSubmitting}
+            maxLength={PIN_MAX_LENGTH}
+          />
+        )}
+
         <TextField
-          label={t("enter_pin")}
+          label={mode === "change" ? t("new_pin") : t("enter_pin")}
           type="password"
           value={pin}
           onChange={(event) => {
@@ -103,7 +157,7 @@ export function CollectionPinModal({
           error={mode === "enter" ? error : null}
         />
 
-        {mode === "create" && (
+        {showConfirm && (
           <TextField
             label={t("confirm_pin")}
             type="password"
@@ -137,7 +191,7 @@ export function CollectionPinModal({
             }}
             disabled={!pin.trim() || isSubmitting}
           >
-            {mode === "create" ? t("set_pin") : t("unlock_collection")}
+            {submitLabel}
           </Button>
         </div>
       </div>

@@ -67,6 +67,21 @@ export function useCollectionSettings() {
     [dispatch]
   );
 
+  const changePin = useCallback(
+    async (currentPin: string, newPin: string): Promise<boolean> => {
+      const storedHash = loadPinHash();
+      if (!storedHash) return false;
+
+      const matches = (await hashPin(currentPin)) === storedHash;
+      if (!matches) return false;
+
+      persistPinHash(await hashPin(newPin));
+      dispatch(setUnlocked(true));
+      return true;
+    },
+    [dispatch]
+  );
+
   const lockSession = useCallback(() => {
     dispatch(setUnlocked(false));
   }, [dispatch]);
@@ -114,6 +129,7 @@ export function useCollectionSettings() {
     updateSettings,
     setPin,
     unlock,
+    changePin,
     lockSession,
     isChipVisibleInLibrary,
     isChipVisibleInSidebar,

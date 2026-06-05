@@ -45,6 +45,7 @@ import {
   EyeClosedIcon,
   LockIcon,
   UnlockIcon,
+  KeyIcon,
   ListUnorderedIcon,
   CheckIcon,
 } from "@primer/octicons-react";
@@ -133,13 +134,14 @@ export function Sidebar() {
     unlocked,
     setPin,
     unlock,
+    changePin,
     lockSession,
     isChipVisibleInSidebar,
     isGameHiddenInSidebar,
   } = useCollectionSettings();
   const [pinModal, setPinModal] = useState<{
     visible: boolean;
-    mode: "create" | "enter";
+    mode: "create" | "enter" | "change";
   }>({ visible: false, mode: "enter" });
   const [pendingLockCollectionId, setPendingLockCollectionId] = useState<
     string | null
@@ -602,6 +604,18 @@ export function Sidebar() {
         onClick: handleToggleLock,
         disabled: isCollectionActionBusy,
       },
+      ...(hasPin
+        ? [
+            {
+              id: "change-pin",
+              label: t("change_pin", { ns: "library" }),
+              icon: <KeyIcon size={16} />,
+              onClick: () =>
+                setPinModal({ visible: true, mode: "change" as const }),
+              disabled: isCollectionActionBusy,
+            },
+          ]
+        : []),
       {
         id: "manage-games",
         label: t("manage_games", { ns: "library" }),
@@ -629,6 +643,7 @@ export function Sidebar() {
   }, [
     collectionContextMenu.collection,
     getSettings,
+    hasPin,
     handleToggleShowInLibrary,
     handleToggleShowInSidebar,
     handleToggleLock,
@@ -980,6 +995,7 @@ export function Sidebar() {
         }}
         onCreate={handleCreatePin}
         onUnlock={unlock}
+        onChangePin={changePin}
       />
 
       <ManageCollectionGamesModal
