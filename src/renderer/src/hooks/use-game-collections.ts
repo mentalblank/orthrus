@@ -91,6 +91,9 @@ export function useGameCollections() {
           nextCollectionIds: collectionIds,
         })
       );
+
+      // Re-sync counts from the DB so stale in-flight loads can't revert them.
+      dispatch(setCollections(await window.electron.getCollections()));
     },
     [dispatch, library]
   );
@@ -147,6 +150,9 @@ export function useGameCollections() {
       for (const game of games.remove) {
         await apply(game, false);
       }
+
+      // Re-sync counts from the DB so stale in-flight loads can't revert them.
+      dispatch(setCollections(await window.electron.getCollections()));
     },
     [dispatch, library]
   );
