@@ -289,13 +289,7 @@ export default function Library() {
     setIsRenamingCollection(true);
 
     try {
-      await window.electron.hydraApi.put(
-        `/profile/games/collections/${activeCollection.id}`,
-        {
-          data: { name: nextName },
-          needsAuth: true,
-        }
-      );
+      await window.electron.renameCollection(activeCollection.id, nextName);
 
       await loadCollections();
       showSuccessToast(t("collection_renamed"));
@@ -340,10 +334,7 @@ export default function Library() {
     setIsDeletingCollection(true);
 
     try {
-      await window.electron.hydraApi.delete(
-        `/profile/games/collections/${activeCollection.id}`,
-        { needsAuth: true }
-      );
+      await window.electron.deleteCollection(activeCollection.id);
 
       if (selectedCollectionId === activeCollection.id) {
         handleCollectionSelect(null);

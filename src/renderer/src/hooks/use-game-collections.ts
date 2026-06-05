@@ -40,10 +40,7 @@ export function useGameCollections() {
       dispatch(setCollectionsLoading(true));
 
       try {
-        const response = await window.electron.hydraApi.get<GameCollection[]>(
-          "/profile/games/collections",
-          { needsAuth: true }
-        );
+        const response = await window.electron.getCollections();
 
         dispatch(setCollections(response));
         return response;
@@ -168,13 +165,7 @@ export function useGameCollections() {
         throw new Error("game/collection-name-already-in-use");
       }
 
-      const response = await window.electron.hydraApi.post<GameCollection>(
-        "/profile/games/collections",
-        {
-          data: { name },
-          needsAuth: true,
-        }
-      );
+      const response = await window.electron.createCollection(name);
 
       dispatch(addCollection(response));
 

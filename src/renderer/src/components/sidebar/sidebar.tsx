@@ -436,17 +436,9 @@ export function Sidebar() {
     setIsRenamingCollection(true);
 
     try {
-      await window.electron.hydraApi.put(
-        `/profile/games/collections/${targetCollection.id}`,
-        {
-          data: { name: nextName },
-          needsAuth: true,
-        }
-      );
+      await window.electron.renameCollection(targetCollection.id, nextName);
 
-      const updatedCollections = await window.electron.hydraApi.get<
-        GameCollection[]
-      >("/profile/games/collections", { needsAuth: true });
+      const updatedCollections = await window.electron.getCollections();
       dispatch(setCollections(updatedCollections));
       showSuccessToast(t("collection_renamed", { ns: "library" }));
       handleCloseRenameCollectionModal();
@@ -483,10 +475,7 @@ export function Sidebar() {
     setIsDeletingCollection(true);
 
     try {
-      await window.electron.hydraApi.delete(
-        `/profile/games/collections/${targetCollection.id}`,
-        { needsAuth: true }
-      );
+      await window.electron.deleteCollection(targetCollection.id);
 
       if (selectedCollectionId === targetCollection.id) {
         const params = new URLSearchParams(searchParams);
@@ -494,11 +483,8 @@ export function Sidebar() {
         setSearchParams(params, { replace: true });
       }
 
-      const updatedCollectionsPromise = window.electron.hydraApi.get<
-        GameCollection[]
-      >("/profile/games/collections", { needsAuth: true });
       await updateLibrary();
-      const updatedCollections = await updatedCollectionsPromise;
+      const updatedCollections = await window.electron.getCollections();
       dispatch(setCollections(updatedCollections));
       showSuccessToast(t("collection_deleted", { ns: "library" }));
       handleCloseDeleteCollectionModal();

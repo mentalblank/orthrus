@@ -274,6 +274,12 @@ contextBridge.exposeInMainWorld("electron", {
     collectionIds: string[]
   ) =>
     ipcRenderer.invoke("assignGameToCollection", shop, objectId, collectionIds),
+  getCollections: () => ipcRenderer.invoke("getCollections"),
+  createCollection: (name: string) =>
+    ipcRenderer.invoke("createCollection", name),
+  renameCollection: (id: string, name: string) =>
+    ipcRenderer.invoke("renameCollection", id, name),
+  deleteCollection: (id: string) => ipcRenderer.invoke("deleteCollection", id),
   clearNewDownloadOptions: (shop: GameShop, objectId: string) =>
     ipcRenderer.invoke("clearNewDownloadOptions", shop, objectId),
   toggleGamePin: (shop: GameShop, objectId: string, pinned: boolean) =>

@@ -27,6 +27,7 @@ import type {
   AchievementCustomNotificationPosition,
   AchievementNotificationInfo,
   Game,
+  GameCollection,
   DiskUsage,
   DownloadSource,
   ProtonVersion,
@@ -202,6 +203,10 @@ declare global {
       objectId: string,
       collectionIds: string[]
     ) => Promise<void>;
+    getCollections: () => Promise<GameCollection[]>;
+    createCollection: (name: string) => Promise<GameCollection>;
+    renameCollection: (id: string, name: string) => Promise<void>;
+    deleteCollection: (id: string) => Promise<void>;
     clearNewDownloadOptions: (
       shop: GameShop,
       objectId: string
