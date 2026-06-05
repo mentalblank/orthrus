@@ -53,25 +53,15 @@ export function useUserDetails() {
       return updateUserDetails({
         ...response,
         username: userDetails?.username || "",
-        subscription: userDetails?.subscription || null,
         karma: userDetails?.karma || 0,
       });
     },
-    [
-      updateUserDetails,
-      userDetails?.username,
-      userDetails?.subscription,
-      userDetails?.karma,
-    ]
+    [updateUserDetails, userDetails?.username, userDetails?.karma]
   );
-
-  /* Local-only: subscriptions removed, no paywalls. */
-  const hasActiveSubscription = false;
 
   return {
     userDetails,
     profileBackground,
-    hasActiveSubscription,
     fetchUserDetails,
     signOut,
     clearUserDetails,

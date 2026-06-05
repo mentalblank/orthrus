@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IS_DESKTOP } from "../constants";
-import type { UpdateProfileRequest, UserDetails, UserProfile } from "@types";
+import type { UserDetails } from "@types";
 
 const USER_DETAILS_STORAGE_KEY = "userDetails";
 
@@ -32,25 +32,6 @@ function persistUserDetails(userDetails: UserDetails | null) {
   );
 }
 
-function mergeUserProfileIntoDetails(
-  currentUserDetails: UserDetails | null,
-  updatedProfile: UserProfile
-): UserDetails {
-  return {
-    id: updatedProfile.id,
-    username: currentUserDetails?.username ?? "",
-    email: updatedProfile.email,
-    displayName: updatedProfile.displayName,
-    profileImageUrl: updatedProfile.profileImageUrl,
-    backgroundImageUrl: updatedProfile.backgroundImageUrl,
-    profileVisibility: updatedProfile.profileVisibility,
-    bio: updatedProfile.bio,
-    subscription: currentUserDetails?.subscription ?? null,
-    karma: currentUserDetails?.karma ?? 0,
-    quirks: updatedProfile.quirks,
-  };
-}
-
 export function useUserDetails() {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(
     getInitialUserDetails
@@ -69,34 +50,6 @@ export function useUserDetails() {
       setUserDetails(null);
       return null;
     }
-  }, []);
-
-  const updateUserDetails = useCallback((nextDetails: UserDetails | null) => {
-    persistUserDetails(nextDetails);
-    setUserDetails(nextDetails);
-    return nextDetails;
-  }, []);
-
-  const patchUser = useCallback(
-    async (values: UpdateProfileRequest) => {
-      const updatedProfile = (await window.electron.updateProfile(
-        values
-      )) as UserProfile;
-      const nextUserDetails = mergeUserProfileIntoDetails(
-        userDetails,
-        updatedProfile
-      );
-
-      persistUserDetails(nextUserDetails);
-      setUserDetails(nextUserDetails);
-
-      return nextUserDetails;
-    },
-    [userDetails]
-  );
-
-  const unblockUser = useCallback(async (userId: string) => {
-    return globalThis.window.electron.hydraApi.post(`/users/${userId}/unblock`);
   }, []);
 
   useEffect(() => {
@@ -123,17 +76,8 @@ export function useUserDetails() {
     };
   }, [fetchUserDetails]);
 
-  const hasActiveSubscription = useMemo(() => {
-    const expiresAt = new Date(userDetails?.subscription?.expiresAt ?? 0);
-    return expiresAt > new Date();
-  }, [userDetails]);
-
   return {
     userDetails,
-    hasActiveSubscription,
     fetchUserDetails,
-    updateUserDetails,
-    patchUser,
-    unblockUser,
   };
 }

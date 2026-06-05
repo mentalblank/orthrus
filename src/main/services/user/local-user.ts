@@ -19,7 +19,6 @@ const createDefaultUser = (): User => ({
   displayName: defaultDisplayName(),
   profileImageUrl: null,
   backgroundImageUrl: null,
-  subscription: null,
   username: "",
   bio: "",
   profileVisibility: "PUBLIC",
@@ -41,9 +40,7 @@ export const getLocalUser = async (): Promise<User> => {
   return user;
 };
 
-export const updateLocalUser = async (
-  patch: Partial<User>
-): Promise<User> => {
+export const updateLocalUser = async (patch: Partial<User>): Promise<User> => {
   const current = await getLocalUser();
   const updated: User = { ...current, ...patch };
   await db.put<string, User>(levelKeys.user, updated, {
@@ -61,7 +58,6 @@ export const toUserDetails = (user: User): UserDetails => ({
   backgroundImageUrl: user.backgroundImageUrl,
   profileVisibility: user.profileVisibility ?? "PUBLIC",
   bio: user.bio ?? "",
-  subscription: null,
   karma: 0,
   quirks: { backupsPerGameLimit: 0 },
 });
@@ -80,7 +76,6 @@ export const toUserProfile = (user: User): UserProfile => ({
   relation: null,
   currentGame: null,
   bio: user.bio ?? "",
-  hasActiveSubscription: false,
   karma: 0,
   quirks: { backupsPerGameLimit: 0 },
   badges: [],

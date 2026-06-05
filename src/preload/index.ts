@@ -495,7 +495,6 @@ contextBridge.exposeInMainWorld("electron", {
       options?: {
         params?: unknown;
         needsAuth?: boolean;
-        needsSubscription?: boolean;
         ifModifiedSince?: Date;
       }
     ) =>
@@ -505,7 +504,6 @@ contextBridge.exposeInMainWorld("electron", {
         params: options?.params,
         options: {
           needsAuth: options?.needsAuth,
-          needsSubscription: options?.needsSubscription,
           ifModifiedSince: options?.ifModifiedSince,
         },
       }),
@@ -514,7 +512,6 @@ contextBridge.exposeInMainWorld("electron", {
       options?: {
         data?: unknown;
         needsAuth?: boolean;
-        needsSubscription?: boolean;
       }
     ) =>
       ipcRenderer.invoke("hydraApiCall", {
@@ -523,7 +520,6 @@ contextBridge.exposeInMainWorld("electron", {
         data: options?.data,
         options: {
           needsAuth: options?.needsAuth,
-          needsSubscription: options?.needsSubscription,
         },
       }),
     put: (
@@ -531,7 +527,6 @@ contextBridge.exposeInMainWorld("electron", {
       options?: {
         data?: unknown;
         needsAuth?: boolean;
-        needsSubscription?: boolean;
       }
     ) =>
       ipcRenderer.invoke("hydraApiCall", {
@@ -540,7 +535,6 @@ contextBridge.exposeInMainWorld("electron", {
         data: options?.data,
         options: {
           needsAuth: options?.needsAuth,
-          needsSubscription: options?.needsSubscription,
         },
       }),
     patch: (
@@ -548,7 +542,6 @@ contextBridge.exposeInMainWorld("electron", {
       options?: {
         data?: unknown;
         needsAuth?: boolean;
-        needsSubscription?: boolean;
       }
     ) =>
       ipcRenderer.invoke("hydraApiCall", {
@@ -557,14 +550,12 @@ contextBridge.exposeInMainWorld("electron", {
         data: options?.data,
         options: {
           needsAuth: options?.needsAuth,
-          needsSubscription: options?.needsSubscription,
         },
       }),
     delete: (
       url: string,
       options?: {
         needsAuth?: boolean;
-        needsSubscription?: boolean;
       }
     ) =>
       ipcRenderer.invoke("hydraApiCall", {
@@ -572,7 +563,6 @@ contextBridge.exposeInMainWorld("electron", {
         url,
         options: {
           needsAuth: options?.needsAuth,
-          needsSubscription: options?.needsSubscription,
         },
       }),
   },

@@ -6,16 +6,6 @@ import type {
 } from "./game.types";
 import type { DownloadStatus } from "./download.types";
 
-export type SubscriptionStatus = "active" | "pending" | "cancelled";
-
-export interface Subscription {
-  id: string;
-  status: SubscriptionStatus;
-  plan: { id: string; name: string };
-  expiresAt: string | null;
-  paymentMethod: "pix" | "paypal";
-}
-
 export interface Auth {
   accessToken: string;
   refreshToken: string;
@@ -27,7 +17,6 @@ export interface User {
   displayName: string;
   profileImageUrl: string | null;
   backgroundImageUrl: string | null;
-  subscription: Subscription | null;
   /* Local-only profile fields (no remote account) */
   username?: string;
   bio?: string;

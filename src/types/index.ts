@@ -1,6 +1,6 @@
 import type { Cracker, DownloadSourceStatus, Downloader } from "@shared";
 import type { SteamAppDetails } from "./steam.types";
-import type { Download, Game, Subscription } from "./level.types";
+import type { Download, Game } from "./level.types";
 import type { GameShop, UnlockedAchievement } from "./game.types";
 
 export * from "./download-contract";
@@ -188,7 +188,6 @@ export interface UserDetails {
   backgroundImageUrl: string | null;
   profileVisibility: ProfileVisibility;
   bio: string;
-  subscription: Subscription | null;
   karma: number;
   quirks?: {
     backupsPerGameLimit: number;
@@ -209,7 +208,6 @@ export interface UserProfile {
   relation: UserRelation | null;
   currentGame: UserProfileCurrentGame | null;
   bio: string;
-  hasActiveSubscription: boolean;
   karma: number;
   quirks: {
     backupsPerGameLimit: number;
