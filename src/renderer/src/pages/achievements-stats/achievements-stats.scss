@@ -6,6 +6,7 @@
   gap: globals.$spacing-unit * 3;
   padding: globals.$spacing-unit * 3;
   width: 100%;
+  color: globals.$body-color;
 
   &__cards {
     display: grid;
@@ -93,6 +94,7 @@
     width: 100%;
     text-align: left;
     cursor: pointer;
+    color: globals.$body-color;
     transition: border-color 0.2s ease;
 
     &:hover {
