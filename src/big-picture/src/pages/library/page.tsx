@@ -361,6 +361,12 @@ export default function LibraryPage() {
   }, [sortBy]);
 
   useEffect(() => {
+    // Wait until collections load before validating a collection tab
+    // (e.g. opening a collection via ?tab=<id> from the collections page).
+    if (collections.length === 0) {
+      return;
+    }
+
     if (
       isBuiltinLibraryTab(selectedFilterTab) ||
       collections.some((c) => c.id === selectedFilterTab)

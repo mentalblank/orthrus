@@ -19,6 +19,7 @@ import {
   CreateCollectionModal,
 } from "@renderer/components";
 import type { LibraryGame } from "@types";
+import { ViewOptions, ViewMode } from "../library/view-options";
 import "./collections.scss";
 
 const getCollectionIds = (game: LibraryGame): string[] => {
@@ -43,6 +44,16 @@ export default function Collections() {
   const { library } = useLibrary();
   const { getSettings, updateSettings, hasPin, setPin, unlock } =
     useCollectionSettings();
+
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem("collections-view-mode");
+    return saved && saved !== "list" ? (saved as ViewMode) : "grid";
+  });
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem("collections-view-mode", mode);
+  };
 
   const [showCreate, setShowCreate] = useState(false);
   const [pinModal, setPinModal] = useState<{
@@ -102,16 +113,23 @@ export default function Collections() {
     <section className="collections">
       <div className="collections__header">
         <h2>{t("collections", { ns: "sidebar" })}</h2>
-        <Button theme="outline" onClick={() => setShowCreate(true)}>
-          <PlusIcon size={16} />
-          {t("create_collection", { ns: "sidebar" })}
-        </Button>
+        <div className="collections__header-controls">
+          <ViewOptions
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+            availableModes={["compact", "grid", "large"]}
+          />
+          <Button theme="outline" onClick={() => setShowCreate(true)}>
+            <PlusIcon size={16} />
+            {t("create_collection", { ns: "sidebar" })}
+          </Button>
+        </div>
       </div>
 
       {collections.length === 0 ? (
         <p className="collections__empty">{t("collections_empty")}</p>
       ) : (
-        <ul className="collections__grid">
+        <ul className={`collections__grid collections__grid--${viewMode}`}>
           {collections.map((collection) => {
             const settings = getSettings(collection.id);
             const covers = coversByCollection.get(collection.id) ?? [];
