@@ -4,7 +4,12 @@ import type { ChangeEvent } from "react";
 import { cloudSyncContext, gameDetailsContext } from "@renderer/context";
 import { useToast } from "@renderer/hooks";
 import "./cloud-sync-panel.scss";
-import { DownloadIcon, SyncIcon, UploadIcon } from "@primer/octicons-react";
+import {
+  DownloadIcon,
+  FileDirectoryIcon,
+  SyncIcon,
+  UploadIcon,
+} from "@primer/octicons-react";
 import { useTranslation } from "react-i18next";
 
 interface CloudSyncPanelProps {
@@ -85,8 +90,10 @@ export function CloudSyncPanel({
     return "";
   }, [backupPreview, loadingPreview, t, uploadingBackup]);
 
+  const hasBackup = Boolean(backupPreview?.overall.totalGames);
+
   return (
-    <>
+    <div className="cloud-sync-panel">
       <div className="cloud-sync-panel__section-header">
         <h2>{t("backup")}</h2>
         <p>{t("backup_description")}</p>
@@ -101,39 +108,40 @@ export function CloudSyncPanel({
         />
       </div>
 
-      <div className="cloud-sync-panel__header">
-        <div className="cloud-sync-panel__title-container">
-          <p>{backupStateLabel}</p>
-          <button
-            type="button"
-            className="cloud-sync-panel__manage-files-button"
-            onClick={() => setShowCloudSyncFilesModal(true)}
-            disabled={uploadingBackup}
-          >
-            {t("manage_files")}
-          </button>
-        </div>
+      {backupStateLabel && (
+        <p className="cloud-sync-panel__status">{backupStateLabel}</p>
+      )}
 
+      <Button
+        type="button"
+        className="cloud-sync-panel__primary-action"
+        onClick={() => uploadSaveGame(lastDownloadedOption?.title ?? null)}
+        disabled={uploadingBackup || !hasBackup}
+      >
+        {uploadingBackup ? (
+          <SyncIcon className="cloud-sync-panel__sync-icon" />
+        ) : (
+          <UploadIcon />
+        )}
+        {t("create_backup")}
+      </Button>
+
+      <div className="cloud-sync-panel__actions">
         <Button
           type="button"
-          onClick={() => uploadSaveGame(lastDownloadedOption?.title ?? null)}
-          disabled={uploadingBackup || !backupPreview?.overall.totalGames}
+          theme="outline"
+          onClick={() => setShowCloudSyncFilesModal(true)}
+          disabled={uploadingBackup}
         >
-          {uploadingBackup ? (
-            <SyncIcon className="cloud-sync-panel__sync-icon" />
-          ) : (
-            <UploadIcon />
-          )}
-          {t("create_backup")}
+          <FileDirectoryIcon />
+          {t("manage_files")}
         </Button>
-      </div>
 
-      <div className="cloud-sync-panel__transfer-buttons">
         <Button
           type="button"
           theme="outline"
           onClick={handleExportSave}
-          disabled={uploadingBackup || !backupPreview?.overall.totalGames}
+          disabled={uploadingBackup || !hasBackup}
         >
           <UploadIcon />
           {t("export_save")}
@@ -144,6 +152,6 @@ export function CloudSyncPanel({
           {t("import_save")}
         </Button>
       </div>
-    </>
+    </div>
   );
 }

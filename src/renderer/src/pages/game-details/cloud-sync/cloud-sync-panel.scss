@@ -192,3 +192,25 @@
   gap: 8px;
   margin-top: 12px;
 }
+
+.cloud-sync-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cloud-sync-panel__status {
+  font-size: 13px;
+  opacity: 0.85;
+  margin: 0;
+}
+
+.cloud-sync-panel__primary-action {
+  align-self: flex-start;
+}
+
+.cloud-sync-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
