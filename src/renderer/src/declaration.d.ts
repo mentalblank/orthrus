@@ -486,7 +486,6 @@ declare global {
     /* Auth */
     getAuth: () => Promise<Auth | null>;
     signOut: () => Promise<void>;
-    openAuthWindow: (page: AuthPage) => Promise<void>;
     getSessionHash: () => Promise<string | null>;
     onSignIn: (cb: () => void) => () => Electron.IpcRenderer;
     onAccountUpdated: (cb: () => void) => () => Electron.IpcRenderer;

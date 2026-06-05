@@ -1,8 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { WindowManager } from "./window-manager";
-import url from "url";
-import { uploadGamesBatch } from "./library-sync";
-import { clearGamesRemoteIds } from "./library-sync/clear-games-remote-id";
 import { networkLogger as logger } from "./logger";
 import { UserNotLoggedInError } from "@shared";
 import { omit } from "lodash-es";
@@ -41,51 +38,6 @@ export class HydraApi {
 
   public static isLoggedIn() {
     return this.userAuth.authToken !== "";
-  }
-
-  static async handleExternalAuth(uri: string) {
-    const { payload } = url.parse(uri, true).query;
-
-    const decodedBase64 = atob(payload as string);
-    const jsonData = JSON.parse(decodedBase64);
-
-    const { accessToken, expiresIn, refreshToken } = jsonData;
-
-    const now = new Date();
-
-    const tokenExpirationTimestamp =
-      now.getTime() +
-      this.secondsToMilliseconds(expiresIn) -
-      this.EXPIRATION_OFFSET_IN_MS;
-
-    this.userAuth = {
-      authToken: accessToken,
-      refreshToken: refreshToken,
-      expirationTimestamp: tokenExpirationTimestamp,
-    };
-
-    logger.log(
-      "Sign in received. Token expiration timestamp:",
-      tokenExpirationTimestamp
-    );
-
-    db.put<string, Auth>(
-      levelKeys.auth,
-      {
-        accessToken,
-        refreshToken,
-        tokenExpirationTimestamp,
-      },
-      { valueEncoding: "json" }
-    );
-
-    await getUserData();
-
-    if (WindowManager.mainWindow) {
-      WindowManager.mainWindow.webContents.send("on-signin");
-      await clearGamesRemoteIds();
-      uploadGamesBatch();
-    }
   }
 
   static handleSignOut() {

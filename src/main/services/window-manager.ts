@@ -3,7 +3,7 @@ import { isStaging } from "@main/constants";
 import { db, gamesSublevel, levelKeys } from "@main/level";
 import icon from "@resources/icon.png?asset";
 import trayIcon from "@resources/tray-icon.png?asset";
-import { AuthPage, generateAchievementCustomNotificationTest } from "@shared";
+import { generateAchievementCustomNotificationTest } from "@shared";
 import type {
   AchievementCustomNotificationPosition,
   AchievementNotificationInfo,
@@ -25,7 +25,6 @@ import { t } from "i18next";
 import { orderBy, slice } from "lodash-es";
 import path from "node:path";
 import UserAgent from "user-agents";
-import { HydraApi } from "./hydra-api";
 import { logger } from "./logger";
 
 export class WindowManager {
@@ -361,53 +360,6 @@ export class WindowManager {
         main.focus();
       }
     });
-  }
-
-  public static openAuthWindow(page: AuthPage, searchParams: URLSearchParams) {
-    if (this.mainWindow) {
-      const authWindow = new BrowserWindow({
-        width: 600,
-        height: 640,
-        backgroundColor: "#1c1c1c",
-        parent: this.mainWindow,
-        modal: true,
-        show: false,
-        maximizable: false,
-        resizable: false,
-        minimizable: false,
-        webPreferences: {
-          sandbox: false,
-          nodeIntegrationInSubFrames: true,
-        },
-      });
-
-      authWindow.removeMenu();
-
-      if (!app.isPackaged) authWindow.webContents.openDevTools();
-
-      authWindow.loadURL(
-        `${import.meta.env.MAIN_VITE_AUTH_URL}${page}?${searchParams.toString()}`
-      );
-
-      authWindow.once("ready-to-show", () => {
-        authWindow.show();
-      });
-
-      authWindow.webContents.on("will-navigate", (_event, url) => {
-        if (url.startsWith("hydralauncher://auth")) {
-          authWindow.close();
-
-          HydraApi.handleExternalAuth(url);
-          return;
-        }
-
-        if (url.startsWith("hydralauncher://update-account")) {
-          authWindow.close();
-
-          WindowManager.mainWindow?.webContents.send("on-account-updated");
-        }
-      });
-    }
   }
 
   private static readonly NOTIFICATION_WINDOW_WIDTH = 360;

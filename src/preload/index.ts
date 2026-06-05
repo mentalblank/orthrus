@@ -21,7 +21,6 @@ import type {
   TorrentFilesResponse,
   DownloadLayoutState,
 } from "@types";
-import type { AuthPage } from "@shared";
 
 contextBridge.exposeInMainWorld("electron", {
   /* Torrenting */
@@ -645,8 +644,6 @@ contextBridge.exposeInMainWorld("electron", {
   /* Auth */
   getAuth: () => ipcRenderer.invoke("getAuth"),
   signOut: () => ipcRenderer.invoke("signOut"),
-  openAuthWindow: (page: AuthPage) =>
-    ipcRenderer.invoke("openAuthWindow", page),
   getSessionHash: () => ipcRenderer.invoke("getSessionHash"),
   onSignIn: (cb: () => void) => {
     const listener = (_event: Electron.IpcRendererEvent) => cb();
