@@ -36,8 +36,8 @@ const exportBackup = async (
   const timestamp = new Date().toISOString().slice(0, 10);
   const defaultName =
     scope === "saves"
-      ? `hydra-saves-${timestamp}.tar.gz`
-      : `hydra-backup-${timestamp}.tar.gz`;
+      ? `orthrus-saves-${timestamp}.tar.gz`
+      : `orthrus-backup-${timestamp}.tar.gz`;
 
   const { canceled, filePath } = await dialog.showSaveDialog(senderWindow, {
     defaultPath: defaultName,

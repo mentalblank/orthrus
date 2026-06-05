@@ -5,6 +5,7 @@ import "./close-game-launcher-window";
 import "./delete-temp-file";
 import "./export-backup";
 import "./restore-backup";
+import "./open-backups-folder";
 import "./show-game-launcher-window";
 import "./get-hydra-decky-plugin-info";
 import "./get-image-data-url";

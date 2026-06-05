@@ -485,6 +485,7 @@ contextBridge.exposeInMainWorld("electron", {
     ipcRenderer.invoke("exportGameSave", shop, objectId),
   importGameSave: (shop: GameShop, objectId: string) =>
     ipcRenderer.invoke("importGameSave", shop, objectId),
+  openBackupsFolder: () => ipcRenderer.invoke("openBackupsFolder"),
   showItemInFolder: (path: string) =>
     ipcRenderer.invoke("showItemInFolder", path),
   getImageDataUrl: (imageUrl: string) =>

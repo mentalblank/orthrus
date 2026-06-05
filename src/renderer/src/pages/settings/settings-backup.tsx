@@ -99,6 +99,13 @@ export function SettingsBackup() {
           >
             {t("restore_backup")}
           </Button>
+
+          <Button
+            theme="outline"
+            onClick={() => window.electron.openBackupsFolder()}
+          >
+            {t("open_backups_folder")}
+          </Button>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, dialog } from "electron";
 import * as tar from "tar";
+import i18next from "i18next";
 
 import { registerEvent } from "../register-event";
 import { WindowManager, logger } from "@main/services";
@@ -33,11 +34,13 @@ const restoreBackup = async (
 
   const confirm = await dialog.showMessageBox(senderWindow, {
     type: "warning",
-    buttons: ["Cancel", "Restore and restart"],
+    buttons: [
+      i18next.t("cancel", { ns: "sidebar" }),
+      i18next.t("restore_and_restart", { ns: "settings" }),
+    ],
     defaultId: 1,
     cancelId: 0,
-    message:
-      "Restoring will overwrite your current library, settings, and save backups, then restart the app. Continue?",
+    message: i18next.t("restore_backup_warning", { ns: "settings" }),
   });
 
   if (confirm.response !== 1) {

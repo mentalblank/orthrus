@@ -386,6 +386,7 @@ declare global {
       scope: "all" | "saves"
     ) => Promise<{ canceled: boolean; path?: string }>;
     restoreBackup: () => Promise<{ canceled: boolean; restored?: boolean }>;
+    openBackupsFolder: () => Promise<void>;
     exportGameSave: (
       shop: GameShop,
       objectId: string
